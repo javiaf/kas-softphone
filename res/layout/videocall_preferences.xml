@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<CheckBoxPreference android:title="HeadSet"
+		android:key="HEADSET" android:summary="Change Headset"
+		android:defaultValue="true" />
+
+	<CheckBoxPreference android:title="Mute"
+		android:key="MUTE" android:summary="Mute"
+		android:defaultValue="false" />
+
+</PreferenceScreen>

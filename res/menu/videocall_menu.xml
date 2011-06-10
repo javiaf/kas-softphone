@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	android:name="Context Menu">
+	<item android:icon="@drawable/ic_menu_preferences" android:title="@string/txt_preferences"
+		android:id="@+id/menu_preferences">
+		<menu>
+			<item android:icon="@drawable/ic_menu_preferences"
+				android:title="@string/txt_videocall_preferences" android:id="@+id/menu_videocall_preferences"></item>
+		</menu>
+	</item>
+</menu>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<string-array name="codec_names">
+		<item>H264</item>
+		<item>H263</item>
+		<item>MPEG4</item>
+	</string-array>
+
+	<string-array name="video_sizes">
+		<item>176 x 144 (QCIF)</item>
+		<item>240 x 160 (HQVGA)</item>
+		<item>240 x 240</item>
+		<item>320 x 240  (QVGA)</item>
+		<item>272 x 272</item>
+		<item>352 x 288 (CIF)</item>
+		<item>384 x 288</item>
+		<item>400 x 240</item>
+		<item>480 x 320  (HVGA)</item>
+		<item>576 x 432</item>
+		<item>640 x 480  (VGA)</item>
+		<item>720 x 480</item>
+		<item>800 x 480</item>
+		<item>1280 x 720</item>
+	</string-array>
+
+	<integer-array name="video_width">
+		<item>176</item>
+		<item>240</item>
+		<item>240</item>
+		<item>320</item>
+		<item>272</item>
+		<item>352</item>
+		<item>384</item>
+		<item>400</item>
+		<item>480</item>
+		<item>576</item>
+		<item>640</item>
+		<item>720</item>
+		<item>800</item>
+		<item>1280</item>
+	</integer-array>
+
+	<integer-array name="video_height">
+		<item>144</item>
+		<item>160</item>
+		<item>240</item>
+		<item>240</item>
+		<item>272</item>
+		<item>288</item>
+		<item>288</item>
+		<item>240</item>
+		<item>320</item>
+		<item>432</item>
+		<item>480</item>
+		<item>480</item>
+		<item>480</item>
+		<item>720</item>
+	</integer-array>
+
+
+
+	<string-array name="frame_rates">
+		<item>15</item>
+		<item>30</item>
+	</string-array>
+</resources>

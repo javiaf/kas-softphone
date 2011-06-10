@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory android:title="Video Preferences">
+		<!-- <ListPreference android:key="CODEC_NAME" android:title="Video codec" 
+			android:summary="Select a video codec" android:entries="@array/codec_names" 
+			android:entryValues="@array/codec_names" android:defaultValue="H263" android:dialogTitle="Select 
+			a video codec" /> -->
+
+		<PreferenceScreen android:key="VIDEO_CODECS"
+			android:title="Video codecs" android:summary="Select video codecs">
+			<CheckBoxPreference android:title="H263"
+				android:defaultValue="true" android:key="H263_CODEC" />
+			<CheckBoxPreference android:title="MPEG4"
+				android:defaultValue="false" android:key="MPEG4_CODEC" />
+			<CheckBoxPreference android:title="H264"
+				android:defaultValue="false" android:key="H264_CODEC" />
+		</PreferenceScreen>
+
+
+		<ListPreference android:key="VIDEO_SIZE" android:title="Video size"
+			android:summary="Select a video size" android:entries="@array/video_sizes"
+			android:entryValues="@array/video_sizes" android:defaultValue="352 x 288 (CIF)"
+			android:dialogTitle="Select a video size" />
+		<!-- <ListPreference android:key="FRAME_RATE" android:title="Frame rate" 
+			android:summary="Select a frame rate" android:entries="@array/frame_rates" 
+			android:entryValues="@array/frame_rates" android:defaultValue="15" android:dialogTitle="Select 
+			a frame rate" /> <EditTextPreference android:key="VIDEO_OUT" android:title="Video 
+			out" android:summary="Video out" android:defaultValue="video_grabado" /> -->
+	</PreferenceCategory>
+
+	<PreferenceCategory android:title="Audio Preferences">
+		<PreferenceScreen android:key="AUDIO_CODECS"
+			android:title="Audio codecs" android:summary="Select audio codecs">
+			<CheckBoxPreference android:title="AMR"
+				android:defaultValue="false" android:key="AMR_AUDIO_CODEC" />
+			<CheckBoxPreference android:title="MP2"
+				android:defaultValue="true" android:key="MP2_AUDIO_CODEC" />
+			<CheckBoxPreference android:title="AAC"
+				android:defaultValue="false" android:key="AAC_AUDIO_CODEC" />
+		</PreferenceScreen>
+	</PreferenceCategory>
+</PreferenceScreen>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="hello">SoftPhone!</string>
+	<string name="app_name">SoftPhone</string>
+
+	<string name="sip_log">SIP Log</string>
+	<string name="incoming_call">Incoming Call</string>
+
+	<!-- menu -->
+	<string name="txt_preferences">Preferences</string>
+
+
+	<string name="txt_conection_preferences">Conection Preferences</string>
+	<string name="txt_local_preferences">Local</string>
+	<string name="preference_local_username">Local SIP URL username</string>
+	<string name="preference_local_username_summary">Local SIP URL username</string>
+	<string name="preference_local_domain">Local SIP URL domain</string>
+	<string name="preference_local_domain_summary">Local SIP URL domain</string>
+
+	<string name="txt_videocall_preferences">VideoCall Preferences</string>
+
+	<string name="txt_remote_preferences">Remote</string>
+	<string name="preference_remote_username">Remote SIP URL username</string>
+	<string name="preference_remote_username_summary">Remote SIP URL username we will send video</string>
+	<string name="preference_remote_domain">Remote SIP URL domain</string>
+	<string name="preference_remote_domain_summary">Remote SIP URL domain we will send video</string>
+
+	<string name="txt_proxy_preferences">SIP Proxy Registar</string>
+	<string name="preference_proxy_ip">SIP Proxy IP</string>
+	<string name="preference_proxy_ip_summary">SIP Proxy IP where we will register</string>
+	<string name="preference_proxy_port">SIP Proxy port</string>
+	<string name="preference_proxy_port_summary">SIP Proxy TCP port where we will receive register
+	</string>
+
+	<string name="txt_video_preferences">Video Preferences</string>
+	<string name="txt_video_codec_preferences">Video Codec</string>
+	
+	<string name="txt_menu_register">Register</string>
+
+	<!-- <string name="txt_record">Record</string> <string name="txt_send_RTP">Send 
+		RTP</string> -->
+
+	<string name="txt_exit">Exit</string>
+	<string name="incoming_sip">Unknown</string>
+	
+
+</resources>
