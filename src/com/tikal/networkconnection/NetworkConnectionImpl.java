@@ -28,6 +28,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.tikal.android.media.AudioCodec;
+import com.tikal.android.media.MediaPortManager;
 import com.tikal.android.media.VideoCodec;
 import com.tikal.media.AudioInfo;
 import com.tikal.media.IRTPMedia;
@@ -133,20 +134,22 @@ public class NetworkConnectionImpl extends NetworkConnectionBase {
 	@Override
 	public SessionSpec generateSessionSpec() {
 		// VIDEO
+		int videoPort = MediaPortManager.takeVideoLocalPort();
 		List<PayloadSpec> videoList = new Vector<PayloadSpec>();
 		if (videoInfo.getSupportedCodecsID()
 				.contains(VideoCodec.CODEC_ID_MPEG4))
-			addPayloadSpec(videoList, "96 MP4V-ES/90000", MediaType.VIDEO, 2323);
+			addPayloadSpec(videoList, "96 MP4V-ES/90000", MediaType.VIDEO, videoPort);
 		if (videoInfo.getSupportedCodecsID().contains(VideoCodec.CODEC_ID_H263))
 			addPayloadSpec(videoList, "97 H263-1998/90000", MediaType.VIDEO,
-					2323);
+					videoPort);
 		if (videoInfo.getSupportedCodecsID().contains(VideoCodec.CODEC_ID_H264))
-			addPayloadSpec(videoList, "98 H264/90000", MediaType.VIDEO, 2323);
+			addPayloadSpec(videoList, "98 H264/90000", MediaType.VIDEO, videoPort);
 
 		MediaSpec videoMedia = new MediaSpec();
 		videoMedia.setPayloadList(videoList);
 
 		// AUDIO
+		int audioPort = MediaPortManager.takeAudioLocalPort();
 		List<PayloadSpec> audioList = new Vector<PayloadSpec>();
 		if (audioInfo.getSupportedCodecsID().contains(AudioCodec.CODEC_ID_AMR)) {
 			// addPayloadSpec(audioList, "100 AMR/8000/1", MediaType.AUDIO,
@@ -156,7 +159,7 @@ public class NetworkConnectionImpl extends NetworkConnectionBase {
 				audioPayloadAMR = new PayloadSpec("100 AMR/8000/1");
 				audioPayloadAMR.setFormatParams("octet-align=1");
 				audioPayloadAMR.setMediaType(MediaType.AUDIO);
-				audioPayloadAMR.setPort(3434);
+				audioPayloadAMR.setPort(audioPort);
 			} catch (SdpException e) {
 				e.printStackTrace();
 			}
@@ -166,7 +169,7 @@ public class NetworkConnectionImpl extends NetworkConnectionBase {
 		if (audioInfo.getSupportedCodecsID().contains(AudioCodec.CODEC_ID_MP2)) {
 			PayloadSpec payloadAudioMP2 = new PayloadSpec();
 			payloadAudioMP2.setMediaType(MediaType.AUDIO);
-			payloadAudioMP2.setPort(3434);
+			payloadAudioMP2.setPort(audioPort);
 			payloadAudioMP2.setPayload(14);
 			audioList.add(payloadAudioMP2);
 		}
@@ -177,7 +180,7 @@ public class NetworkConnectionImpl extends NetworkConnectionBase {
 				audioPayloadAAC
 						.setFormatParams("profile-level-id=1;mode=AAC-hbr;sizelength=13;indexlength=3;indexdeltalength=3; config=1210");
 				audioPayloadAAC.setMediaType(MediaType.AUDIO);
-				audioPayloadAAC.setPort(3434);
+				audioPayloadAAC.setPort(audioPort);
 			} catch (SdpException e) {
 				e.printStackTrace();
 			}
