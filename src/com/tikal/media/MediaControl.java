@@ -1,10 +1,6 @@
 package com.tikal.media;
 
-import com.tikal.softphone.R;
-import com.tikal.softphone.SoftPhone;
-
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
@@ -14,8 +10,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.tikal.media.audio.*;
-import com.tikal.media.camera.*;
+import com.tikal.softphone.R;
 
 public class MediaControl extends Activity {
 	private static final String LOG_TAG = "MediaControl";
@@ -24,7 +19,6 @@ public class MediaControl extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.control_call);
 		Log.d(LOG_TAG, "MediaControl Created");
@@ -46,30 +40,27 @@ public class MediaControl extends Activity {
 
 	}
 	
-	@Override
-	protected void onNewIntent(Intent intent) {
-		// TODO Auto-generated method stub
-		super.onNewIntent(intent);
-		Log.d(LOG_TAG, "New Intent");
-	}
+//	@Override
+//	protected void onNewIntent(Intent intent) {
+//		
+//		super.onNewIntent(intent);
+//		Log.d(LOG_TAG, "New Intent");
+//	}
 
 	@Override
 	protected void onStart() {
-		// TODO Auto-generated method stub
 		super.onStart();
 		Log.d(LOG_TAG, "onStart");
 	}
 
 	@Override
 	protected void onRestart() {
-		// TODO Auto-generated method stub
 		super.onRestart();
 		Log.d(LOG_TAG, "onRestart");
 	}
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 		Log.d(LOG_TAG, "onResume");
 
@@ -78,6 +69,7 @@ public class MediaControl extends Activity {
 
 			@Override
 			public void onClick(View v) {
+				Log.d(LOG_TAG, "Call Accepted " + RESULT_OK);
 				vibrator.cancel();
 				setResult(RESULT_OK);
 				finish();
@@ -89,6 +81,7 @@ public class MediaControl extends Activity {
 
 			@Override
 			public void onClick(View v) {
+				Log.d(LOG_TAG, "Call Canceled");
 				vibrator.cancel();
 				setResult(RESULT_CANCELED);
 				finish();
@@ -99,7 +92,6 @@ public class MediaControl extends Activity {
 
 	@Override
 	protected void onStop() {
-		// TODO Auto-generated method stub
 		super.onStop();
 		Log.d(LOG_TAG, "onStop");
 		vibrator.cancel();
@@ -107,7 +99,6 @@ public class MediaControl extends Activity {
 
 	@Override
 	protected void onPause() {
-		// TODO Auto-generated method stub
 		super.onPause();
 		Log.d(LOG_TAG, "onPause");
 		vibrator.cancel();
@@ -115,7 +106,6 @@ public class MediaControl extends Activity {
 
 	@Override
 	protected void onDestroy() {
-		// TODO Auto-generated method stub
 		super.onDestroy();
 		Log.d(LOG_TAG, "onDestroy");
 		vibrator.cancel();
