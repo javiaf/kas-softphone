@@ -115,8 +115,8 @@ public class VideoCall extends Activity implements Runnable {
 					controller.hang();
 					Log.d(LOG_TAG, "Hang ...");
 					isVideoCall = false;
-					setResult(RESULT_OK);
 					finish();
+					setResult(RESULT_OK);
 				} else {
 					finish();
 				}
@@ -171,6 +171,7 @@ public class VideoCall extends Activity implements Runnable {
 
 	@Override
 	protected void onDestroy() {
+		finish();
 		super.onDestroy();
 		Log.d(LOG_TAG, "OnDestroy");
 		isVideoCall = false;
