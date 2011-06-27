@@ -50,8 +50,8 @@ public class AudioReceive implements Runnable, AudioPlayer {
 	
 	public void release(){
 		Log.d(LOG_TAG, "Release");
-		audioTrack.release();
 		MediaRx.stopAudioRx();
+		audioTrack.release();
 	}
 
 	public void setStreamType(int streamType) {

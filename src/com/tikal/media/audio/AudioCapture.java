@@ -19,6 +19,7 @@ public class AudioCapture implements Runnable {
 	private short[] buffer;
 	int frameSize;
 	int ret = 0;
+	private boolean isRecording;
 
 	public AudioCapture(AudioInfo audioInfo) {
 		Log.d(LOG_TAG,
@@ -60,10 +61,12 @@ public class AudioCapture implements Runnable {
 		StartRecording();
 	}
 
-	public void release() {
+	public synchronized void release() {
+		isRecording = false;
 		if (audioRecord != null) {
 			audioRecord.stop();
 			audioRecord.release();
+			audioRecord = null;
 		}
 		Log.d(LOG_TAG, "Release");
 	}
@@ -83,10 +86,13 @@ public class AudioCapture implements Runnable {
 	}
 
 	
-	private int readFully(short[] audioData, int sizeInShorts){
+	private synchronized int readFully(short[] audioData, int sizeInShorts){
+		if (audioRecord == null)
+			return -1;
+		
 		int shortsRead = 0;
 		int shortsLess = sizeInShorts;
-		while(shortsRead < sizeInShorts) {
+		while (shortsRead < sizeInShorts) {
 			int read = audioRecord.read(audioData, shortsRead, shortsLess);
 			shortsRead += read;
 			shortsLess -= read;
@@ -96,9 +102,11 @@ public class AudioCapture implements Runnable {
 	
 	private void StartRecording() {
 		Log.d(LOG_TAG, "Start Recording");
+		synchronized(this) {
+			isRecording = true;
+		}
 		try {
-
-			while (VideoCall.isVideoCall) {		
+			while (isRecording) {		
 				int bufferReadResult = readFully(buffer, frameSize);
 				ret = MediaTx.putAudioSamples(buffer, bufferReadResult);		
 				if (ret < 0)
