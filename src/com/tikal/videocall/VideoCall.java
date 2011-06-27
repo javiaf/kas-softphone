@@ -54,14 +54,12 @@ public class VideoCall extends Activity implements Runnable {
 
 	@Override
 	protected void onStart() {
-		// TODO Auto-generated method stub
 		super.onStart();
 		Log.d(LOG_TAG, "OnStart");
 	}
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 		Log.d(LOG_TAG, "OnResume");
 		Bundle extras = getIntent().getExtras();
@@ -137,7 +135,6 @@ public class VideoCall extends Activity implements Runnable {
 
 	@Override
 	public void finish() {
-		// TODO Auto-generated method stub
 		super.finish();
 		try {
 			Log.d(LOG_TAG, "Finish");
@@ -155,21 +152,18 @@ public class VideoCall extends Activity implements Runnable {
 
 	@Override
 	protected void onPause() {
-		// TODO Auto-generated method stub
 		super.onPause();
 		Log.d(LOG_TAG, "OnPause");
 	}
 
 	@Override
 	protected void onRestart() {
-		// TODO Auto-generated method stub
 		super.onRestart();
 		Log.d(LOG_TAG, "OnRestart");
 	}
 
 	@Override
 	protected void onStop() {
-		// TODO Auto-generated method stub
 		super.onStop();
 		Log.d(LOG_TAG, "OnStop");
 		isVideoCall = false;
@@ -177,7 +171,6 @@ public class VideoCall extends Activity implements Runnable {
 
 	@Override
 	protected void onDestroy() {
-		// TODO Auto-generated method stub
 		super.onDestroy();
 		Log.d(LOG_TAG, "OnDestroy");
 		isVideoCall = false;
@@ -185,7 +178,6 @@ public class VideoCall extends Activity implements Runnable {
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		String filename = Environment.getExternalStorageDirectory()
 		// .getAbsolutePath() + "/DCIM/Camera/vide.mp4";
 				.getAbsolutePath() + "sdp.sdp";
@@ -218,7 +210,6 @@ public class VideoCall extends Activity implements Runnable {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
 		if (requestCode == SHOW_PREFERENCES) {
 			Log.d(LOG_TAG, "Show preferences");
@@ -228,18 +219,5 @@ public class VideoCall extends Activity implements Runnable {
 			Boolean mute = settings.getBoolean("MUTE", false);
 
 		}
-	}
-
-	// @Override
-	// public void putVideoFrameRx(int[] rgb, int width, int height) {
-	// if (cameraReceive != null)
-	// cameraReceive.putFrame(rgb, width, height);
-	//
-	// }
-	//
-	// @Override
-	// public void putAudioSamplesRx(byte[] audio, int length) {
-	// if (audioReceive != null)
-	// audioReceive.putAudio(audio, length);
-	// }
+	}	
 }
