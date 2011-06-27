@@ -12,16 +12,16 @@ import android.widget.TextView;
 
 import com.tikal.softphone.R;
 
-public class MediaControl extends Activity {
-	private static final String LOG_TAG = "MediaControl";
+public class MediaControlIncoming extends Activity {
+	private static final String LOG_TAG = "MediaControlIncoming";
 
 	Vibrator vibrator;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.control_call);
-		Log.d(LOG_TAG, "MediaControl Created");
+		setContentView(R.layout.control_call_incomingcall);
+		Log.d(LOG_TAG, "Media Control Incoming Created");
 
 		Bundle extras = getIntent().getExtras();
 
@@ -40,13 +40,6 @@ public class MediaControl extends Activity {
 
 	}
 	
-//	@Override
-//	protected void onNewIntent(Intent intent) {
-//		
-//		super.onNewIntent(intent);
-//		Log.d(LOG_TAG, "New Intent");
-//	}
-
 	@Override
 	protected void onStart() {
 		super.onStart();

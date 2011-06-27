@@ -30,7 +30,8 @@ import com.tikal.android.media.VideoCodec;
 import com.tikal.applicationcontext.ApplicationContext;
 import com.tikal.media.AudioInfo;
 import com.tikal.media.IRTPMedia;
-import com.tikal.media.MediaControl;
+import com.tikal.media.MediaControlIncoming;
+import com.tikal.media.MediaControlOutgoing;
 import com.tikal.media.RTPInfo;
 import com.tikal.media.VideoInfo;
 import com.tikal.media.format.SessionSpec;
@@ -41,10 +42,11 @@ import com.tikal.sip.Controller;
 import com.tikal.videocall.VideoCall;
 
 public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
-	private static int MEDIA_CONTROL = 0;
-	private static int SHOW_PREFERENCES = 1;
-	private static int VIDEO_CALL = 2;
-	static final int PICK_CONTACT_REQUEST = 3;
+	private static int MEDIA_CONTROL_INCOMING = 0;
+	private static int MEDIA_CONTROL_OUTGOING = 1;
+	private static int SHOW_PREFERENCES = 2;
+	private static int VIDEO_CALL = 3;
+	static final int PICK_CONTACT_REQUEST = 4;
 
 	private static final String LOG_TAG = "SoftPhone";
 
@@ -181,16 +183,16 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == MEDIA_CONTROL) {
+		if (requestCode == MEDIA_CONTROL_INCOMING) {
 			if (resultCode == RESULT_OK) {
-				Log.d(LOG_TAG, "Accept Call on onActivityResult");
+				Log.d(LOG_TAG, "Incoming: Accept Call on onActivityResult");
 				try {
 					controller.aceptCall();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			} else if (resultCode == RESULT_CANCELED) {
-				Log.d(LOG_TAG, "Rejected Call");
+				Log.d(LOG_TAG, "Incoming: Rejected Call");
 				try {
 					controller.reject();
 				} catch (Exception e) {
@@ -200,11 +202,24 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 				// Meter notificación de cancelación
 
 			} else
-				Log.d(LOG_TAG, "Media Control; ResultCode = " + resultCode);
+				Log.d(LOG_TAG, "Incoming: Media Control; ResultCode = " + resultCode);
+		}
+		if (requestCode == MEDIA_CONTROL_OUTGOING) {
+			if (resultCode == RESULT_CANCELED) {
+				Log.d(LOG_TAG, "Outgoing: Rejected Call");
+				try {
+					controller.reject();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+			} else
+				Log.d(LOG_TAG, "Media Control Outgoing; ResultCode = " + resultCode);
 		}
 
 		if (requestCode == VIDEO_CALL) {
 			Log.d(LOG_TAG, "Video Call Finish");
+			
 
 		}
 		if (requestCode == SHOW_PREFERENCES) {
@@ -213,6 +228,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			 */
 			Log.d(LOG_TAG, "Reconfigure Preferences");
 			initControllerUAFromSettings();
+			initUA();
 
 		}
 
@@ -360,6 +376,11 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 		try {
 			Log.d(LOG_TAG, "remoteURI: " + remoteURI);
 			controller.call(remoteURI);
+			Intent mediaIntent = new Intent(SoftPhone.this, MediaControlOutgoing.class);
+			mediaIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+			mediaIntent.putExtra("Uri", remoteURI);
+			startActivityForResult(mediaIntent, MEDIA_CONTROL_OUTGOING);
+			Log.d(LOG_TAG, "Media Control Outgoing Started");
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.toString());
 			e.printStackTrace();
@@ -412,10 +433,10 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	@Override
 	public void inviteReceived(String uri) {
 		Log.d(LOG_TAG, "Invite received");
-		Intent mediaIntent = new Intent(SoftPhone.this, MediaControl.class);
+		Intent mediaIntent = new Intent(SoftPhone.this, MediaControlIncoming.class);
 		mediaIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 		mediaIntent.putExtra("Uri", uri);
-		startActivityForResult(mediaIntent, MEDIA_CONTROL);
+		startActivityForResult(mediaIntent, MEDIA_CONTROL_INCOMING);
 		Log.d(LOG_TAG, "Media Control Started");
 	}
 
@@ -484,6 +505,9 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 
 		Log.d(LOG_TAG, "Accept Call: SdpAudio -> " + sdpAudio.toString());
 		Log.d(LOG_TAG, "Accept Call: SdpVideo -> " + sdpVideo.toString());
+		
+		
+		finishActivity(MEDIA_CONTROL_OUTGOING);
 
 		Intent videoCallIntent = new Intent(SoftPhone.this, VideoCall.class);
 		videoCallIntent.putExtra("VideoInfo", videoInfo);
@@ -590,7 +614,8 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	private void initUA() {
 		try {
 			Log.d(LOG_TAG, "LocalUser : " + localUser + "; localReal : "
-					+ localRealm);
+					+ localRealm + " proxyIP: " + proxyIP + "; localPort : " + proxyPort);
+			
 			controller.initUA(this, vi, ai, proxyIP, proxyPort, localUser,
 					localRealm);
 			ApplicationContext.contextTable.put("controller", controller);

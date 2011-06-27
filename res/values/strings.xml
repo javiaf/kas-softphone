@@ -42,6 +42,8 @@
 
 	<string name="txt_exit">Exit</string>
 	<string name="incoming_sip">Unknown</string>
+	<string name="outgoing_sip">Unknown</string>
+	<string name="outgoing_call">Outgoing Call</string>
 	
 
 </resources>
