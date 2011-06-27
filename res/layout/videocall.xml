@@ -7,23 +7,21 @@
 		android:layout_width="fill_parent" android:id="@+id/video_receive_surface"></SurfaceView>
 	<SurfaceView android:layout_height="100dip"
 		android:layout_width="92dip" android:id="@+id/video_capture_surface"
-		android:layout_gravity="right|bottom" ></SurfaceView>
+		android:layout_gravity="right|bottom"></SurfaceView>
 
 	<TableLayout android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:id="@+id/tableLayout1"
 		android:layout_gravity="bottom">
 		<TableRow android:id="@+id/TableRow01">
-			<Button android:id="@+id/button_mute"
-				android:layout_width="wrap_content" android:background="@drawable/mute"
-				android:layout_height="wrap_content"
+			<Button android:id="@+id/button_mute" android:layout_width="wrap_content"
+				android:background="@drawable/mute" android:layout_height="wrap_content"
 				android:layout_alignParentBottom="true"
 				android:layout_alignParentRight="true" android:layout_gravity="left|bottom" />
-			<Button android:id="@+id/button_headset"
-				android:layout_width="wrap_content" android:background="@drawable/headset"
-				android:layout_height="wrap_content"
+			<Button android:id="@+id/button_headset" android:layout_width="wrap_content"
+				android:background="@drawable/headset" android:layout_height="wrap_content"
 				android:layout_alignParentBottom="true"
 				android:layout_alignParentRight="true" android:layout_gravity="left|bottom" />
-					<Button android:id="@+id/button_use_front_camera"
+			<Button android:id="@+id/button_use_front_camera"
 				android:layout_width="wrap_content" android:background="@drawable/headset"
 				android:layout_height="wrap_content"
 				android:layout_alignParentBottom="true"
