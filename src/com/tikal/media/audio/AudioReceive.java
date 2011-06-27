@@ -1,12 +1,11 @@
 package com.tikal.media.audio;
 
-import com.tikal.android.media.rx.AudioPlayer;
-import com.tikal.android.media.rx.MediaRx;
-
 import android.media.AudioFormat;
-import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.util.Log;
+
+import com.tikal.android.media.rx.AudioPlayer;
+import com.tikal.android.media.rx.MediaRx;
 
 public class AudioReceive implements Runnable, AudioPlayer {
 	/*Implementará la interfaz definida para realizar las llamadas a FFMPEG*/
