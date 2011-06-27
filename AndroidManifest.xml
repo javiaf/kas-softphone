@@ -31,8 +31,8 @@
 
 		</activity>
 		<activity android:name="com.tikal.media.MediaControl"
-			android:label="Media Control" android:screenOrientation="portrait"
-			 android:launchMode="singleTask" >
+			android:label="Media Control" android:screenOrientation="portrait">
+<!-- 			 android:launchMode="singleTask" > -->
 			<intent-filter>
 <!-- 				<action android:name="android.intent.action.MAIN" /> -->
 				<action android:name="android.intent.action.VIEW" />
