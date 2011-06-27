@@ -38,7 +38,6 @@ import com.tikal.media.format.SpecTools;
 import com.tikal.preferences.Connection_Preferences;
 import com.tikal.preferences.Video_Preferences;
 import com.tikal.sip.Controller;
-
 import com.tikal.videocall.VideoCall;
 
 public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
@@ -104,13 +103,11 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 
 	@Override
 	protected void onStart() {
-		// TODO Auto-generated method stub
 		super.onStart();
 	}
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 
 		final Button buttonCall = (Button) findViewById(R.id.simulate_call);
@@ -160,22 +157,20 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 
 	@Override
 	protected void onPause() {
-		// TODO Auto-generated method stub
 		super.onPause();
 	}
 
 	@Override
 	protected void onStop() {
-		// TODO Auto-generated method stub
 		super.onStop();
 	}
 
 	@Override
 	protected void onDestroy() {
-		// TODO Auto-generated method stub
 		super.onDestroy();
 		try {
 			controller.finishUA();
+			Log.d(LOG_TAG, " FinishUA");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -185,7 +180,6 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
 		if (requestCode == MEDIA_CONTROL) {
 			if (resultCode == RESULT_OK) {
@@ -193,7 +187,6 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 				try {
 					controller.aceptCall();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			} else if (resultCode == RESULT_CANCELED) {
@@ -218,6 +211,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			/*
 			 * CARGAR LAS PREFERENCIAS
 			 */
+			Log.d(LOG_TAG, "Reconfigure Preferences");
 			initControllerUAFromSettings();
 
 		}
@@ -354,14 +348,6 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 		}
 	}
 
-	@Override
-	protected void onNewIntent(Intent intent) {
-		// TODO Auto-generated method stub
-		super.onNewIntent(intent);
-
-		Log.d(LOG_TAG, "Se está intentando crear una nueva actividad...");
-	}
-
 	private void call(String remoteURI) {
 		if (controller.getUa() == null)
 			initControllerUAFromSettings();
@@ -417,14 +403,14 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	}
 
 	private void register() {
-		controller = new Controller(this, this);
+		if (controller == null)
+			controller = new Controller(this, this);
 		initControllerUAFromSettings();
 		initUA();
 	}
 
 	@Override
 	public void inviteReceived(String uri) {
-		// TODO Auto-generated method stub
 		Log.d(LOG_TAG, "Invite received");
 		Intent mediaIntent = new Intent(SoftPhone.this, MediaControl.class);
 		mediaIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -435,14 +421,12 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 
 	@Override
 	public void registerSucessful() {
-		// TODO Auto-generated method stub
 		Log.d(LOG_TAG, "Register Sucessful");
 
 		handler.post(new Runnable() {
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
 				SoftPhone.this.text.setTextSize(20);
 				SoftPhone.this.text.setTextColor(Color.GREEN);
@@ -454,13 +438,11 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 
 	@Override
 	public void registerFailed() {
-		// TODO Auto-generated method stub
 		Log.d(LOG_TAG, "Register Failed");
 		handler.post(new Runnable() {
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
 				SoftPhone.this.text.setTextSize(20);
 				SoftPhone.this.text.setTextColor(Color.RED);
