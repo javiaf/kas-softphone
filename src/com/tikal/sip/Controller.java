@@ -1,6 +1,5 @@
 package com.tikal.sip;
 
-
 import javax.media.mscontrol.join.Joinable.Direction;
 
 import android.util.Log;
@@ -74,16 +73,22 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone 
 		config.setProxyPort(proxyPort);
 
 		Log.d(LOG_TAG, "CONFIGURATION User Agent: " + config);
-		if (ua != null)
-			ua.terminate();
-		ua = UaFactory.getInstance(config);
 		
+		if (ua != null){
+			ua.terminate();
+			Log.d(LOG_TAG, "UA Terminate");
+		}
+		// Log.d(LOG_TAG, "UA: " + ua.toString());
+
+		ua = UaFactory.getInstance(config);
+
 		register(localUser, localRealm);
 	}
 
 	public void finishUA() throws Exception {
 		if (ua != null)
 			ua.terminate();
+		Log.d(LOG_TAG, "FinishUA");
 	}
 
 	private void register(String localUser, String localRealm) throws Exception {
@@ -100,12 +105,14 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone 
 			this.pendingEndPointEvent = event;
 			try {
 
-				Log.d(LOG_TAG, "Call Source: " + event.getCallSource().toString());
-				Log.d(LOG_TAG, "Me llama Uri: " + event.getCallSource().getRemoteUri());
-				
+				Log.d(LOG_TAG, "Call Source: "
+						+ event.getCallSource().toString());
+				Log.d(LOG_TAG, "Me llama Uri: "
+						+ event.getCallSource().getRemoteUri());
+
 				phoneGUI.inviteReceived(event.getCallSource().getRemoteUri());
 
-				//this.aceptCall();
+				// this.aceptCall();
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.toString());
 				e.printStackTrace();
@@ -114,11 +121,16 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone 
 		if (SipEndPointEvent.REGISTER_USER_SUCESSFUL.equals(eventType)) {
 			this.pendingEndPointEvent = event;
 			try {
-
-				// Lanzar MediaControl.
 				phoneGUI.registerSucessful();
-
-				//this.aceptCall();
+			} catch (Exception e) {
+				Log.e(LOG_TAG, e.toString());
+				e.printStackTrace();
+			}
+		}
+		if (SipEndPointEvent.REGISTER_USER_FAIL.equals(eventType)) {
+			this.pendingEndPointEvent = event;
+			try {
+				phoneGUI.registerFailed();
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.toString());
 				e.printStackTrace();
@@ -136,7 +148,7 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone 
 			Log.d(LOG_TAG, "Setting currentCall");
 		} else if (SipCallEvent.CALL_TERMINATE.equals(eventType)) {
 			Log.d(LOG_TAG, "Call Terminate");
-			
+
 		} else if (SipCallEvent.CALL_ERROR.equals(eventType)) {
 			Log.d(LOG_TAG, "Call Error");
 		}
