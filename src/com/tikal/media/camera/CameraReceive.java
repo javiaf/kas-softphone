@@ -1,20 +1,19 @@
 package com.tikal.media.camera;
 
-import com.tikal.android.media.rx.MediaRx;
-import com.tikal.android.media.rx.VideoPlayer;
-import com.tikal.media.VideoInfo;
-
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Surface;
 import android.view.Surface.OutOfResourcesException;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+
+import com.tikal.android.media.rx.MediaRx;
+import com.tikal.android.media.rx.VideoPlayer;
+import com.tikal.media.VideoInfo;
 
 public class CameraReceive implements Runnable, VideoPlayer {
 	/* Implementará la interfaz definida para realizar las llamadas a FFMPEG */
