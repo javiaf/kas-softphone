@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="fill_parent">
-	<TextView android:id="@+id/textRegister" android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:text="@string/hello" />
-	<Button android:id="@+id/simulate_call" android:layout_width="wrap_content"
-		android:text="Simulate Call" android:layout_height="wrap_content"
-		android:layout_alignParentBottom="true"
-		android:layout_alignParentRight="true" />
-	<Button android:id="@+id/contacts" android:layout_width="wrap_content"
+<FrameLayout android:id="@+id/FrameLayout01"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<TableLayout android:layout_height="wrap_content" android:id="@+id/tableLayout1"
+		android:layout_gravity="top" android:layout_width="match_parent">
+		<TableRow android:id="@+id/TableRow01">
+			<TextView android:id="@+id/textRegister"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:text="@string/hello" />
+		</TableRow>
+		<TableRow android:id="@+id/TableRow01">
+			<EditText android:id="@+id/textRemoteUri" android:hint="user@host"
+				android:text="user@host" android:layout_gravity="top" android:layout_height="match_parent" android:layout_width="200dip"></EditText>
+		</TableRow>
+		<TableRow android:id="@+id/TableRow01">
+			<Button android:id="@+id/contacts" android:layout_width="wrap_content"
 		android:text="Contacts" android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
-		android:layout_alignParentRight="true" />
-</LinearLayout>
+		android:layout_alignParentRight="true" android:layout_gravity="left" />
+		</TableRow>
+	</TableLayout>
+
+	
+
+<Button android:id="@+id/call" android:layout_height="wrap_content"
+				android:layout_alignParentBottom="true" android:background="@drawable/ic_jog_dial_answer"
+				android:layout_alignParentRight="true" android:layout_width="100dip"
+				android:layout_gravity="center|center_horizontal|bottom" />
+</FrameLayout>
 
