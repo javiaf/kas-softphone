@@ -63,11 +63,14 @@ public class AudioCapture extends Thread {
 	}
 	
 	private void releaseAudio() {
+		Log.d(LOG_TAG, "ReleaseAudio");
 		MediaTx.finishAudio();
+		Log.d(LOG_TAG, "MediaTx.finishAudio");
 		if (audioRecord != null) {
 			audioRecord.stop();
 			audioRecord.release();
 			audioRecord = null;
+			Log.d(LOG_TAG, "AudioRecord, stop, release and null");
 		}
 	}
 
@@ -103,11 +106,14 @@ public class AudioCapture extends Thread {
 		Log.d(LOG_TAG, "Start Recording");
 		audioRecord.startRecording();
 		try {
-			while (!isInterrupted()) {		
+			while (!isInterrupted()) {
+				
 				int bufferReadResult = readFully(buffer, frameSize);
+				
 				ret = MediaTx.putAudioSamples(buffer, bufferReadResult);		
 				if (ret < 0)
 					break;
+				this.sleep(20);
 			}
 			releaseAudio();
 		} catch (Throwable t) {

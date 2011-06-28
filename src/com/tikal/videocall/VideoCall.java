@@ -47,10 +47,10 @@ public class VideoCall extends Activity implements Runnable {
 		setContentView(R.layout.videocall);
 		Log.d(LOG_TAG, "OnCreate");
 		/* Create Threads Audio/Video Capture/Receive */
-		final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK,
-				LOG_TAG);
-		wl.acquire();
+//		final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+//		PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK,
+//				LOG_TAG);
+//		wl.acquire();
 	}
 
 	@Override
@@ -97,7 +97,7 @@ public class VideoCall extends Activity implements Runnable {
 				tCameraReceive.start();
 				Log.d(LOG_TAG, "Video is OK");
 			}
-			
+
 			// thiz.start();
 
 		}
@@ -107,6 +107,7 @@ public class VideoCall extends Activity implements Runnable {
 
 			@Override
 			public void onClick(View v) {
+				Log.d(LOG_TAG, "Hang ...");
 				IPhone controller = (IPhone) ApplicationContext.contextTable
 						.get("controller");
 				if (controller != null) {
@@ -128,24 +129,27 @@ public class VideoCall extends Activity implements Runnable {
 
 	@Override
 	public void finish() {
+		super.finish();
 		Log.d(LOG_TAG, "Finish");
-		isVideoCall = false;
+		
 		try {
-			Log.d(LOG_TAG, "cameraCapture.release()");
-			cameraCapture.release();
-			Log.d(LOG_TAG, "cameraReceive.release()");
-			cameraReceive.release();
+			if (cameraCapture != null)
+				cameraCapture.release();
 			
-			Log.d(LOG_TAG, "audioCapture.release()");
-			audioCapture.release();
-			Log.d(LOG_TAG, "audioReceive.release()");
-			audioReceive.release();		
+			if (cameraReceive != null)
+				cameraReceive.release();
+
+			if (audioCapture != null)
+				audioCapture.release();
 			
+			if (audioReceive != null)
+				audioReceive.release();
+
 			Log.d(LOG_TAG, "Release All");
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Exception:" + e.toString());
 		}
-		super.finish();
+		
 	}
 
 	@Override
@@ -217,5 +221,5 @@ public class VideoCall extends Activity implements Runnable {
 			Boolean mute = settings.getBoolean("MUTE", false);
 
 		}
-	}	
+	}
 }

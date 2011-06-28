@@ -75,9 +75,9 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 				true);
 		initControllerUAFromSettings();
 		final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK,
-				LOG_TAG);
-		wl.acquire();
+//		PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK,
+//				LOG_TAG);
+//		wl.acquire();
 		
 		if (controller == null)
 			register();
@@ -458,6 +458,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	@Override
 	public void releaseRTPMedia() {
 		Log.d(LOG_TAG, "ReleaseRTPMedia");
+		
 		finishActivity(VIDEO_CALL);
 	}
 

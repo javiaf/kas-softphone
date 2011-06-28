@@ -34,7 +34,7 @@ public class CameraCapture implements Runnable, SurfaceHolder.Callback,
 
 	// default values
 	private int frame_rate;// = 15;// 30;
-	private int bit_rate = 4000000;//320000;// 250000;//4000000;
+	private int bit_rate = 320000;//4000000;//320000;// 250000;//4000000;
 	private int width;// = 352;// 640;//176;//320;
 	private int height;// = 288;// 480;//144;//240;
 	private int codec = VideoCodec.CODEC_ID_MPEG4;
