@@ -76,8 +76,9 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 		initControllerUAFromSettings();
 		final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK,
-				"GdC");
-
+				LOG_TAG);
+		wl.acquire();
+		
 		if (controller == null)
 			register();
 		// Estoy registrado?

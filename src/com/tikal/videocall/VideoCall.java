@@ -49,7 +49,8 @@ public class VideoCall extends Activity implements Runnable {
 		/* Create Threads Audio/Video Capture/Receive */
 		final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK,
-				"GdC");
+				LOG_TAG);
+		wl.acquire();
 	}
 
 	@Override
