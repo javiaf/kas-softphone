@@ -1,6 +1,7 @@
 package com.tikal.media;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
@@ -10,11 +11,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.tikal.controlcontacts.ControlContacts;
 import com.tikal.softphone.R;
 
 public class MediaControlIncoming extends Activity {
 	private static final String LOG_TAG = "MediaControlIncoming";
 
+	private ControlContacts controlcontacts = new ControlContacts(this);
 	Vibrator vibrator;
 
 	@Override
@@ -30,9 +33,22 @@ public class MediaControlIncoming extends Activity {
 		TextView text = (TextView) findViewById(R.id.incoming_sip);
 		text.setText(uri);
 		
-		ImageView imageCall = (ImageView) findViewById(R.id.image_call);
-		// imageCall.setImageURI(uri)
-		// Ring Ring and Vibrate phone
+		String[] sipArray = uri.split(":");
+		String sipUri = "";
+		if (sipArray.length > 0) sipUri = sipArray[1];
+		else sipUri = sipArray[0];
+		
+		Log.d(LOG_TAG, "sipUri = " + sipUri);
+		Integer idContact = controlcontacts.getId(sipUri);
+		Log.d(LOG_TAG, "idContact = " + idContact);
+		if (!idContact.equals("")){
+			ImageView imageCall = (ImageView) findViewById(R.id.image_call);
+			Bitmap bm = controlcontacts.getPhoto(idContact);
+			if (bm != null) {
+				imageCall.setImageBitmap(bm);
+			}
+		}
+	
 		vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 		long[] pattern = { 0, 1000, 2000, 3000 };
 

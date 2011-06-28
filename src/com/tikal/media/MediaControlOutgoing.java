@@ -1,6 +1,7 @@
 package com.tikal.media;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.tikal.controlcontacts.ControlContacts;
 import com.tikal.softphone.R;
 
 public class MediaControlOutgoing extends Activity {
@@ -18,17 +20,26 @@ public class MediaControlOutgoing extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.control_call_outgoingcall);
-		Log.d(LOG_TAG, "Media Control Outgoing Created");
+		
 
 		Bundle extras = getIntent().getExtras();
-
 		String uri = (String) extras.getSerializable("Uri");
-
+		Integer id = (Integer) extras.getSerializable("Id");
+		Log.d(LOG_TAG, "Media Control Outgoing Created; uri = " + uri + " id = " + id);
 		TextView text = (TextView) findViewById(R.id.outgoing_sip);
 		text.setText(uri);
 
 		ImageView imageCall = (ImageView) findViewById(R.id.image_call);
-		// imageCall.setImageURI(uri)
+
+		ControlContacts controlcontacts = new ControlContacts(this);
+		
+		Bitmap bm = controlcontacts.getPhoto(id);
+		
+		if (bm != null) {
+			
+			imageCall.setImageBitmap(bm);
+		}
+
 	}
 
 	@Override

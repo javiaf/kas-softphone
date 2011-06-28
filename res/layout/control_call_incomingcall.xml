@@ -4,8 +4,8 @@
 	xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<ImageView android:id="@+id/image_call" android:src="@drawable/image_call"
-		android:layout_width="fill_parent" android:layout_height="fill_parent"
-		android:scaleType="center" />
+		android:layout_height="fill_parent"
+		android:scaleType="center" android:layout_width="match_parent"/>
 
 	<TextView android:text="@string/incoming_call" android:id="@+id/incoming_call"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="hello">SoftPhone!</string>
+	<string name="hello">Connecting...</string>
 	<string name="app_name">SoftPhone</string>
 
 	<string name="sip_log">SIP Log</string>
