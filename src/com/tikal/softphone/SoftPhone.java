@@ -105,7 +105,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 				Integer idContact = controlcontacts.getId(sip);
 				if (idContact != -1)
 					name = controlcontacts.getName(idContact);
-				
+
 				if (sip != null) {
 					Toast.makeText(SoftPhone.this, name + ". SIP:" + sip,
 							Toast.LENGTH_SHORT).show();
@@ -121,7 +121,6 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 
 	@Override
 	protected void onRestart() {
-		// TODO Auto-generated method stub
 		super.onRestart();
 	}
 
@@ -142,27 +141,24 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 				if (controller != null) {
 					if (controller.getUa() == null)
 						initControllerUAFromSettings();
-					// SharedPreferences settings = PreferenceManager
-					// .getDefaultSharedPreferences(getBaseContext());
-					//
-					// String remoteURI = "sip:"
-					// + settings.getString("REMOTE_USERNAME", "pc1")
-					// + "@"
-					// + settings.getString("REMOTE_DOMAIN", "urjc.es");
 					try {
 						TextView textRemoteUri = (TextView) findViewById(R.id.textRemoteUri);
 						String remoteURI = "sip:";
-						if (textRemoteUri.getText().toString().equals("user@host") || textRemoteUri.getText().toString().equals("")) {
-							openContacts();						
-							
+						if (textRemoteUri.getText().toString()
+								.equals("user@host")
+								|| textRemoteUri.getText().toString()
+										.equals("")) {
+							openContacts();
+
 						} else {
-							remoteURI +=  textRemoteUri.getText().toString();
+							remoteURI += textRemoteUri.getText().toString();
 							Integer idContact;
-							idContact = controlcontacts.getId(textRemoteUri.getText().toString());
-							
-							Log.d(LOG_TAG, "remoteURI: " + remoteURI + " IdContact = " + idContact);
-							//controller.call(remoteURI);
-							call(remoteURI,idContact);
+							idContact = controlcontacts.getId(textRemoteUri
+									.getText().toString());
+
+							Log.d(LOG_TAG, "remoteURI: " + remoteURI
+									+ " IdContact = " + idContact);
+							call(remoteURI, idContact);
 						}
 
 					} catch (Exception e) {
@@ -180,25 +176,21 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			@Override
 			public void onClick(View v) {
 				try {
-//					Intent intentContacts = new Intent(Intent.ACTION_PICK,
-//							ContactsContract.Contacts.CONTENT_URI);
-//
-//					startActivityForResult(intentContacts, PICK_CONTACT_REQUEST);
 					openContacts();
 				} catch (Exception e) {
 					Log.e("Error Search", e.toString());
 				}
-
 			}
 		});
 	}
 
-	private void openContacts(){
+	private void openContacts() {
 		Intent intentContacts = new Intent(Intent.ACTION_PICK,
 				ContactsContract.Contacts.CONTENT_URI);
 
 		startActivityForResult(intentContacts, PICK_CONTACT_REQUEST);
 	}
+
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -273,7 +265,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			SoftPhone.this.text.setTextSize(20);
 			SoftPhone.this.text.setTextColor(Color.WHITE);
 			SoftPhone.this.text.setText("Connecting...");
-			
+
 			Log.d(LOG_TAG, "Reconfigure Preferences");
 			initControllerUAFromSettings();
 			initUA();
@@ -309,14 +301,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 		if (controller != null) {
 			if (controller.getUa() == null)
 				initControllerUAFromSettings();
-			
-//			SharedPreferences settings = PreferenceManager
-//					.getDefaultSharedPreferences(getBaseContext());
-//			if (remoteURI == null) {
-//				remoteURI = "sip:"
-//						+ settings.getString("REMOTE_USERNAME", "pc1") + "@"
-//						+ settings.getString("REMOTE_DOMAIN", "urjc.es");
-//			}
+
 			try {
 
 				controller.call(remoteURI);
@@ -494,7 +479,6 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			}
 		if (select < 0)
 			select = 0;
-	
 
 		Log.d(LOG_TAG, "select: " + select);
 		int width = getResources().getIntArray(R.array.video_width)[select];
@@ -576,9 +560,4 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 		}
 	}
 
-	/* Gestión de Contactos */
-
-	public void Contacts() {
-
-	}
 }
