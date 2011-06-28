@@ -184,10 +184,11 @@ public class CameraCapture implements Runnable, SurfaceHolder.Callback,
 	}
 
 	public void release() {
+		Log.d(LOG_TAG, "Release");
+		MediaTx.finishVideo();
 		// mCamera.stopPreview();
 		// mCamera.release();
 		mCamera = null;
-		Log.d(LOG_TAG, "Release");
 	}
 
 	@Override
@@ -203,11 +204,9 @@ public class CameraCapture implements Runnable, SurfaceHolder.Callback,
 			
 			parameters.setRotation(degrees);
 			// params.setPreviewSize(width, height);
-			 mCamera.setParameters(parameters);
+			mCamera.setParameters(parameters);
 
-		
 			mCamera.startPreview();
-
 		}
 	}
 
@@ -229,7 +228,6 @@ public class CameraCapture implements Runnable, SurfaceHolder.Callback,
 				mCamera.setPreviewDisplay(holder);
 			} else
 				Log.w(LOG_TAG, "Not Surface Create");
-
 			
 			StartRecording();
 		} catch (Exception e) {
@@ -242,7 +240,6 @@ public class CameraCapture implements Runnable, SurfaceHolder.Callback,
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		if (mCamera != null) {
 			mCamera.stopPreview();
-
 		}
 	}
 

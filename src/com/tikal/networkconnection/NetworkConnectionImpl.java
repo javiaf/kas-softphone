@@ -113,9 +113,11 @@ public class NetworkConnectionImpl extends NetworkConnectionBase {
 			return;
 		}
 	}
-
+	
 	@Override
 	public void release() {
+		MediaPortManager.releaseAudioLocalPort();
+		MediaPortManager.releaseVideoLocalPort();
 		rtpMedia.releaseRTPMedia();
 	}
 

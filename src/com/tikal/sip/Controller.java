@@ -157,7 +157,7 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone 
 	@Override
 	public void aceptCall() throws Exception {
 		SipCall sipCall = pendingEndPointEvent.getCallSource();
-		sipCall.setListener(this);
+		sipCall.addListener(this);
 		sipCall.accept();
 	}
 

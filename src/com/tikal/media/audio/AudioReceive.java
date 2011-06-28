@@ -40,8 +40,7 @@ public class AudioReceive implements Runnable, AudioPlayer {
 	private void StartReceiving() {
 		Log.d(LOG_TAG, "Start Audio Receiving");
 		audioTrack.play();
-		MediaRx.startAudioRx(sdp, this);// sdp);
-		
+		MediaRx.startAudioRx(sdp, this);
 	}
 	
 	public void putAudio(byte[] audio, int length){
@@ -51,7 +50,10 @@ public class AudioReceive implements Runnable, AudioPlayer {
 	public void release(){
 		Log.d(LOG_TAG, "Release");
 		MediaRx.stopAudioRx();
-		audioTrack.release();
+		Log.d(LOG_TAG, "ok1");
+		if (audioTrack != null)
+			audioTrack.release();
+		Log.d(LOG_TAG, "ok2");
 	}
 
 	public void setStreamType(int streamType) {

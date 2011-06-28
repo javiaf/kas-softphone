@@ -1,7 +1,6 @@
 package com.tikal.media.audio;
 
 import com.tikal.media.AudioInfo;
-import com.tikal.videocall.VideoCall;
 import com.tikal.android.media.tx.MediaTx;
 
 import android.media.AudioFormat;
@@ -9,7 +8,7 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
-public class AudioCapture implements Runnable {
+public class AudioCapture extends Thread {
 	/* Implementará la interfaz definida para realizar las llamadas a FFMPEG */
 	private static final String LOG_TAG = "AudioCapture";
 	private int frequency =  8000;//44100;
@@ -19,7 +18,6 @@ public class AudioCapture implements Runnable {
 	private short[] buffer;
 	int frameSize;
 	int ret = 0;
-	private boolean isRecording;
 
 	public AudioCapture(AudioInfo audioInfo) {
 		Log.d(LOG_TAG,
@@ -51,8 +49,7 @@ public class AudioCapture implements Runnable {
 		// Create a new AudioRecord.
 		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequency,
 				channelConfiguration, audioEncoding, bufferSize);
-
-		audioRecord.startRecording();
+		
 		Log.d(LOG_TAG, "AudioRecord Create");
 	}
 
@@ -60,15 +57,18 @@ public class AudioCapture implements Runnable {
 	public void run() {
 		StartRecording();
 	}
-
-	public synchronized void release() {
-		isRecording = false;
+	
+	public void release() {
+		interrupt();
+	}
+	
+	private void releaseAudio() {
+		MediaTx.finishAudio();
 		if (audioRecord != null) {
 			audioRecord.stop();
 			audioRecord.release();
 			audioRecord = null;
 		}
-		Log.d(LOG_TAG, "Release");
 	}
 
 	/**
@@ -84,9 +84,8 @@ public class AudioCapture implements Runnable {
 			finalSize += frameSizeEncode;
 		return finalSize;
 	}
-
 	
-	private synchronized int readFully(short[] audioData, int sizeInShorts){
+	private int readFully(short[] audioData, int sizeInShorts){
 		if (audioRecord == null)
 			return -1;
 		
@@ -102,18 +101,15 @@ public class AudioCapture implements Runnable {
 	
 	private void StartRecording() {
 		Log.d(LOG_TAG, "Start Recording");
-		synchronized(this) {
-			isRecording = true;
-		}
+		audioRecord.startRecording();
 		try {
-			while (isRecording) {		
+			while (!isInterrupted()) {		
 				int bufferReadResult = readFully(buffer, frameSize);
 				ret = MediaTx.putAudioSamples(buffer, bufferReadResult);		
 				if (ret < 0)
 					break;
 			}
-			MediaTx.finishAudio();
-			Log.d(LOG_TAG, "Audio recording finished");
+			releaseAudio();
 		} catch (Throwable t) {
 			Log.e(LOG_TAG, "Error al grabar:" + t.toString());
 		}

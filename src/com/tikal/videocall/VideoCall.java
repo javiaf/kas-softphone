@@ -78,9 +78,8 @@ public class VideoCall extends Activity implements Runnable {
 				audioCapture = new AudioCapture(ai);
 				audioReceive = new AudioReceive(AudioManager.STREAM_MUSIC,
 						sdpAudio);
-				Thread tAudioCapture = new Thread(audioCapture);
 				Thread tAudioReceive = new Thread(audioReceive);
-				tAudioCapture.start();
+				audioCapture.start();
 				tAudioReceive.start();
 				Log.d(LOG_TAG, "Audio is OK");
 			}
@@ -110,17 +109,10 @@ public class VideoCall extends Activity implements Runnable {
 			public void onClick(View v) {
 				IPhone controller = (IPhone) ApplicationContext.contextTable
 						.get("controller");
-				Log.d(LOG_TAG, "Push Button Terminate controller " + controller);
 				if (controller != null) {
-					Log.d(LOG_TAG, "Push Button Terminate");
 					controller.hang();
-					Log.d(LOG_TAG, "Hang ...");
-					isVideoCall = false;
-					finish();
-					setResult(RESULT_OK);
-				} else {
-					finish();
 				}
+				setResult(RESULT_OK);
 			}
 		});
 		final Button ButtonUseFrontCamera = (Button) findViewById(R.id.button_use_front_camera);
@@ -136,19 +128,24 @@ public class VideoCall extends Activity implements Runnable {
 
 	@Override
 	public void finish() {
-		super.finish();
+		Log.d(LOG_TAG, "Finish");
+		isVideoCall = false;
 		try {
-			Log.d(LOG_TAG, "Finish");
-			// MediaRx.stopRx();
+			Log.d(LOG_TAG, "cameraCapture.release()");
 			cameraCapture.release();
+			Log.d(LOG_TAG, "cameraReceive.release()");
 			cameraReceive.release();
+			
+			Log.d(LOG_TAG, "audioCapture.release()");
 			audioCapture.release();
-			audioReceive.release();
+			Log.d(LOG_TAG, "audioReceive.release()");
+			audioReceive.release();		
+			
 			Log.d(LOG_TAG, "Release All");
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Exception:" + e.toString());
 		}
-
+		super.finish();
 	}
 
 	@Override
@@ -165,17 +162,16 @@ public class VideoCall extends Activity implements Runnable {
 
 	@Override
 	protected void onStop() {
-		super.onStop();
 		Log.d(LOG_TAG, "OnStop");
 		isVideoCall = false;
+		finish();
+		super.onStop();
 	}
 
 	@Override
 	protected void onDestroy() {
-		finish();
-		super.onDestroy();
 		Log.d(LOG_TAG, "OnDestroy");
-		isVideoCall = false;
+		super.onDestroy();
 	}
 
 	@Override

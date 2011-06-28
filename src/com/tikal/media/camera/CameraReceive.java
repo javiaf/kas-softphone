@@ -74,7 +74,7 @@ public class CameraReceive implements Runnable, VideoPlayer {
 	public void release() {
 		Log.d(LOG_TAG, "Release");
 		MediaRx.stopVideoRx();
-		
+		Log.d(LOG_TAG, "ok");
 	}
 
 
