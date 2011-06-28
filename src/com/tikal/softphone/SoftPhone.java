@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
@@ -28,6 +27,7 @@ import android.widget.Toast;
 import com.tikal.android.media.AudioCodec;
 import com.tikal.android.media.VideoCodec;
 import com.tikal.applicationcontext.ApplicationContext;
+import com.tikal.controlcontacts.ControlContacts;
 import com.tikal.media.AudioInfo;
 import com.tikal.media.IRTPMedia;
 import com.tikal.media.MediaControlIncoming;
@@ -58,6 +58,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	private int proxyPort;
 
 	private Handler handler = new Handler();
+	ControlContacts controlcontacts = new ControlContacts(this);
 
 	private TextView text;
 
@@ -77,6 +78,8 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 		PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK,
 				"GdC");
 
+		if (controller == null)
+			register();
 		// Estoy registrado?
 		checkCallIntent();
 
@@ -93,7 +96,26 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			Log.d(LOG_TAG, "sip:" + intent.getData().getLastPathSegment());
 			if (controller == null)
 				register();
-			call("sip:" + intent.getData().getLastPathSegment());
+
+			try {
+				String sip = null;
+				String name = "";
+				sip = intent.getData().getLastPathSegment();
+
+				Integer idContact = controlcontacts.getId(sip);
+				if (idContact != -1)
+					name = controlcontacts.getName(idContact);
+				
+				if (sip != null) {
+					Toast.makeText(SoftPhone.this, name + ". SIP:" + sip,
+							Toast.LENGTH_SHORT).show();
+					call("sip:" + sip, idContact);
+				} else
+					Toast.makeText(SoftPhone.this, name + ". No tiene SIP:",
+							Toast.LENGTH_SHORT).show();
+			} catch (Exception e) {
+				Log.e("onActivityResult", e.toString());
+			}
 		}
 	}
 
@@ -112,30 +134,43 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	protected void onResume() {
 		super.onResume();
 
-		final Button buttonCall = (Button) findViewById(R.id.simulate_call);
+		final Button buttonCall = (Button) findViewById(R.id.call);
 		buttonCall.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
+				if (controller != null) {
+					if (controller.getUa() == null)
+						initControllerUAFromSettings();
+					// SharedPreferences settings = PreferenceManager
+					// .getDefaultSharedPreferences(getBaseContext());
+					//
+					// String remoteURI = "sip:"
+					// + settings.getString("REMOTE_USERNAME", "pc1")
+					// + "@"
+					// + settings.getString("REMOTE_DOMAIN", "urjc.es");
+					try {
+						TextView textRemoteUri = (TextView) findViewById(R.id.textRemoteUri);
+						String remoteURI = "sip:";
+						if (textRemoteUri.getText().toString().equals("user@host") || textRemoteUri.getText().toString().equals("")) {
+							openContacts();						
+							
+						} else {
+							remoteURI +=  textRemoteUri.getText().toString();
+							Integer idContact;
+							idContact = controlcontacts.getId(textRemoteUri.getText().toString());
+							
+							Log.d(LOG_TAG, "remoteURI: " + remoteURI + " IdContact = " + idContact);
+							//controller.call(remoteURI);
+							call(remoteURI,idContact);
+						}
 
-				if (controller.getUa() == null)
-					initControllerUAFromSettings();
-				SharedPreferences settings = PreferenceManager
-						.getDefaultSharedPreferences(getBaseContext());
-				String remoteURI = "sip:"
-						+ settings.getString("REMOTE_USERNAME", "pc1") + "@"
-						+ settings.getString("REMOTE_DOMAIN", "urjc.es");
-				try {
-					Log.d(LOG_TAG, "remoteURI: " + remoteURI);
-					controller.call(remoteURI);
-				} catch (Exception e) {
-					Log.e(LOG_TAG, e.toString());
-					e.printStackTrace();
-				}
-
-				// Intent mediaIntent = new Intent(SoftPhone.this,
-				// MediaControl.class);
-				// startActivityForResult(mediaIntent, MEDIA_CONTROL);
+					} catch (Exception e) {
+						Log.e(LOG_TAG, e.toString());
+						e.printStackTrace();
+					}
+				} else
+					notRegister();
 			}
 		});
 
@@ -145,10 +180,11 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			@Override
 			public void onClick(View v) {
 				try {
-					Intent intentContacts = new Intent(Intent.ACTION_PICK,
-							ContactsContract.Contacts.CONTENT_URI);
-
-					startActivityForResult(intentContacts, PICK_CONTACT_REQUEST);
+//					Intent intentContacts = new Intent(Intent.ACTION_PICK,
+//							ContactsContract.Contacts.CONTENT_URI);
+//
+//					startActivityForResult(intentContacts, PICK_CONTACT_REQUEST);
+					openContacts();
 				} catch (Exception e) {
 					Log.e("Error Search", e.toString());
 				}
@@ -157,6 +193,12 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 		});
 	}
 
+	private void openContacts(){
+		Intent intentContacts = new Intent(Intent.ACTION_PICK,
+				ContactsContract.Contacts.CONTENT_URI);
+
+		startActivityForResult(intentContacts, PICK_CONTACT_REQUEST);
+	}
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -202,7 +244,8 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 				// Meter notificación de cancelación
 
 			} else
-				Log.d(LOG_TAG, "Incoming: Media Control; ResultCode = " + resultCode);
+				Log.d(LOG_TAG, "Incoming: Media Control; ResultCode = "
+						+ resultCode);
 		}
 		if (requestCode == MEDIA_CONTROL_OUTGOING) {
 			if (resultCode == RESULT_CANCELED) {
@@ -212,20 +255,25 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
+
 			} else
-				Log.d(LOG_TAG, "Media Control Outgoing; ResultCode = " + resultCode);
+				Log.d(LOG_TAG, "Media Control Outgoing; ResultCode = "
+						+ resultCode);
 		}
 
 		if (requestCode == VIDEO_CALL) {
 			Log.d(LOG_TAG, "Video Call Finish");
-			
 
 		}
 		if (requestCode == SHOW_PREFERENCES) {
 			/*
 			 * CARGAR LAS PREFERENCIAS
 			 */
+			SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
+			SoftPhone.this.text.setTextSize(20);
+			SoftPhone.this.text.setTextColor(Color.WHITE);
+			SoftPhone.this.text.setText("Connecting...");
+			
 			Log.d(LOG_TAG, "Reconfigure Preferences");
 			initControllerUAFromSettings();
 			initUA();
@@ -234,157 +282,58 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 
 		if (requestCode == PICK_CONTACT_REQUEST) {
 			if (resultCode == RESULT_OK) {
-				// A contact was picked. Here we will just display it
-				// to the user.
-				try {
-					String id = null;
-					String name = null;
-					String number = null;
-					String note = null;
-					String sip = null;
-					String imType = "";
-					/* En Data esta el resultado de pulsar a una persona */
-					Cursor cursor = getContentResolver().query(data.getData(),
-							null, null, null, null);
+				Integer id = null;
+				String sip = null;
+				String name = null;
 
-					if (cursor.moveToFirst()) {
-						int nameIdx = cursor
-								.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME);
-						int idIdx = cursor
-								.getColumnIndexOrThrow(ContactsContract.Data._ID);
+				id = controlcontacts.getId(data);
+				sip = controlcontacts.getSip(data);
+				name = controlcontacts.getName(data);
 
-						id = cursor.getString(idIdx);
-						name = cursor.getString(nameIdx);
+				Log.d(LOG_TAG, "Id: " + id);
+				Log.d(LOG_TAG, "Sip: " + sip);
+				Log.d(LOG_TAG, "Name: " + name);
 
-						Log.e(LOG_TAG, "Valor de nameIdx:" + nameIdx + " ID: "
-								+ id);
-
-						// Leer las notas del usuario si tine
-
-						String[] columns = new String[] { ContactsContract.CommonDataKinds.Note.NOTE };
-						String where = ContactsContract.Data.RAW_CONTACT_ID
-								+ " = ? AND " + ContactsContract.Data.MIMETYPE
-								+ " = ?";
-						String[] whereParameters = new String[] {
-								id,
-								ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE };
-
-						Cursor contacts = getContentResolver().query(
-								ContactsContract.Data.CONTENT_URI, null, where,
-								whereParameters, null);
-						Log.e(LOG_TAG,
-								"Valor de contacts:" + contacts.getCount());
-						;
-						String rv = null;
-						if (contacts.moveToFirst()) {
-							Log.e(LOG_TAG,
-									"Valor de las colunas:"
-											+ contacts.getColumnCount());
-							for (int i = 0; i < contacts.getColumnCount(); i++)
-								Log.e(LOG_TAG,
-										"Name:" + contacts.getColumnName(i)
-												+ "; ValueIm = "
-												+ contacts.getString(i));
-
-							note = contacts
-									.getString(contacts
-											.getColumnIndexOrThrow(ContactsContract.Data.DATA1));
-						}
-						contacts.close();
-
-						// Leer las IM del usuario si tine
-
-						String[] columnsIm = new String[] { ContactsContract.CommonDataKinds.Im.PROTOCOL };
-
-						String whereIm = ContactsContract.Data.RAW_CONTACT_ID
-								+ " = ? AND " + ContactsContract.Data.MIMETYPE
-								+ " = ?";
-						String[] whereParametersIm = new String[] {
-								id,
-								ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE };
-
-						Cursor contactsIm = getContentResolver().query(
-								ContactsContract.Data.CONTENT_URI, null,
-								whereIm, whereParametersIm, null);
-						Log.e(LOG_TAG,
-								"Valor de contacts:" + contactsIm.getCount());
-						;
-						String rvIm = null;
-						if (contactsIm.moveToFirst()) {
-							Log.e(LOG_TAG,
-									"Valor de las colunas:"
-											+ contactsIm.getColumnCount());
-							for (int i = 0; i < contactsIm.getColumnCount(); i++)
-								Log.e(LOG_TAG,
-										"NameIm:" + contactsIm.getColumnName(i)
-												+ "; ValueIm = "
-												+ contactsIm.getString(i));
-
-							rvIm = "Protocolo: "
-									+ contactsIm
-											.getString(contactsIm
-													.getColumnIndexOrThrow(ContactsContract.Data.DATA5))
-									+ " Custom: "
-									+ contactsIm
-											.getString(contactsIm
-													.getColumnIndexOrThrow(ContactsContract.Data.DATA6))
-									+ " Data: "
-									+ contactsIm
-											.getString(contactsIm
-													.getColumnIndexOrThrow(ContactsContract.Data.DATA1));
-							// sip = contactsIm
-							// .getString(contactsIm
-							// .getColumnIndexOrThrow(ContactsContract.Data.DATA1));
-							sip = contactsIm
-									.getString(contactsIm
-											.getColumnIndexOrThrow(ContactsContract.Data.DATA1));
-						}
-						contactsIm.close();
-
-						Log.e(LOG_TAG, "Valor de nameIdx:" + nameIdx + " ID: "
-								+ id + " IM: " + rvIm);
-
-					}
-
-					if (sip != null) {
-						Toast.makeText(SoftPhone.this, name + ", SIP:" + sip,
-								Toast.LENGTH_SHORT).show();
-						call("sip:" + sip);
-
-					} else
-						Toast.makeText(SoftPhone.this,
-								name + ", No tiene SIP:", Toast.LENGTH_SHORT)
-								.show();
-
-					// startActivity(intent);
-				} catch (Exception e) {
-					Log.e("onActivityResult", e.toString());
-				}
+				if (sip != null) {
+					Toast.makeText(SoftPhone.this, name + ", SIP:" + sip,
+							Toast.LENGTH_SHORT).show();
+					call("sip:" + sip, id);
+				} else
+					Toast.makeText(SoftPhone.this, name + ", No tiene SIP:",
+							Toast.LENGTH_SHORT).show();
 			}
 		}
 	}
 
-	private void call(String remoteURI) {
-		if (controller.getUa() == null)
-			initControllerUAFromSettings();
-		SharedPreferences settings = PreferenceManager
-				.getDefaultSharedPreferences(getBaseContext());
-		if (remoteURI == null) {
-			remoteURI = "sip:" + settings.getString("REMOTE_USERNAME", "pc1")
-					+ "@" + settings.getString("REMOTE_DOMAIN", "urjc.es");
-		}
-		try {
-			Log.d(LOG_TAG, "remoteURI: " + remoteURI);
-			controller.call(remoteURI);
-			Intent mediaIntent = new Intent(SoftPhone.this, MediaControlOutgoing.class);
-			mediaIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-			mediaIntent.putExtra("Uri", remoteURI);
-			startActivityForResult(mediaIntent, MEDIA_CONTROL_OUTGOING);
-			Log.d(LOG_TAG, "Media Control Outgoing Started");
-		} catch (Exception e) {
-			Log.e(LOG_TAG, e.toString());
-			e.printStackTrace();
-		}
+	private void call(String remoteURI, Integer id) {
+		if (controller != null) {
+			if (controller.getUa() == null)
+				initControllerUAFromSettings();
+			
+//			SharedPreferences settings = PreferenceManager
+//					.getDefaultSharedPreferences(getBaseContext());
+//			if (remoteURI == null) {
+//				remoteURI = "sip:"
+//						+ settings.getString("REMOTE_USERNAME", "pc1") + "@"
+//						+ settings.getString("REMOTE_DOMAIN", "urjc.es");
+//			}
+			try {
+
+				controller.call(remoteURI);
+				Intent mediaIntent = new Intent(SoftPhone.this,
+						MediaControlOutgoing.class);
+
+				mediaIntent.putExtra("Id", id);
+				mediaIntent.putExtra("Uri", remoteURI);
+				startActivityForResult(mediaIntent, MEDIA_CONTROL_OUTGOING);
+
+				Log.d(LOG_TAG, "Media Control Outgoing Started");
+			} catch (Exception e) {
+				Log.e(LOG_TAG, e.toString());
+				e.printStackTrace();
+			}
+		} else
+			notRegister();
 	}
 
 	/* Menu */
@@ -412,11 +361,6 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			startActivityForResult(remotePreferences, SHOW_PREFERENCES);
 			return true;
 		case (R.id.menu_register):
-			// ****Revisar si hay que comprobar si los datos han cambiado antes
-			// de crear o registar de nuevo.
-			// text = (TextView)findViewById(R.id.textRegister);
-			// text.setText("Registering...");
-
 			register();
 			return true;
 		}
@@ -433,7 +377,8 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	@Override
 	public void inviteReceived(String uri) {
 		Log.d(LOG_TAG, "Invite received");
-		Intent mediaIntent = new Intent(SoftPhone.this, MediaControlIncoming.class);
+		Intent mediaIntent = new Intent(SoftPhone.this,
+				MediaControlIncoming.class);
 		mediaIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 		mediaIntent.putExtra("Uri", uri);
 		startActivityForResult(mediaIntent, MEDIA_CONTROL_INCOMING);
@@ -473,6 +418,13 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 
 	}
 
+	public void notRegister() {
+		SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
+		SoftPhone.this.text.setTextSize(20);
+		SoftPhone.this.text.setTextColor(Color.BLUE);
+		SoftPhone.this.text.setText("Not Register, please register.");
+	}
+
 	@Override
 	public void startRTPMedia(RTPInfo rtpInfo, SessionSpec sdp) { // Sesion Spec
 																	// en vez de
@@ -505,8 +457,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 
 		Log.d(LOG_TAG, "Accept Call: SdpAudio -> " + sdpAudio.toString());
 		Log.d(LOG_TAG, "Accept Call: SdpVideo -> " + sdpVideo.toString());
-		
-		
+
 		finishActivity(MEDIA_CONTROL_OUTGOING);
 
 		Intent videoCallIntent = new Intent(SoftPhone.this, VideoCall.class);
@@ -531,7 +482,6 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 		int frame_rate = Integer
 				.parseInt(settings.getString("FRAME_RATE", "0"));
 
-		// FIXME Comprobar arrays
 		String[] arraySizes = getResources()
 				.getStringArray(R.array.video_sizes);
 		String size = settings.getString("VIDEO_SIZE", arraySizes[0]);
@@ -544,7 +494,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			}
 		if (select < 0)
 			select = 0;
-		// FIXME throw Exception if select is -1
+	
 
 		Log.d(LOG_TAG, "select: " + select);
 		int width = getResources().getIntArray(R.array.video_width)[select];
@@ -614,8 +564,9 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	private void initUA() {
 		try {
 			Log.d(LOG_TAG, "LocalUser : " + localUser + "; localReal : "
-					+ localRealm + " proxyIP: " + proxyIP + "; localPort : " + proxyPort);
-			
+					+ localRealm + " proxyIP: " + proxyIP + "; localPort : "
+					+ proxyPort);
+
 			controller.initUA(this, vi, ai, proxyIP, proxyPort, localUser,
 					localRealm);
 			ApplicationContext.contextTable.put("controller", controller);
