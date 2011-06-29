@@ -6,12 +6,13 @@ import android.util.Log;
 
 import com.tikal.android.media.rx.AudioPlayer;
 import com.tikal.android.media.rx.MediaRx;
+import com.tikal.media.AudioInfo;
 
 public class AudioReceive implements Runnable, AudioPlayer {
 	/* Implementará la interfaz definida para realizar las llamadas a FFMPEG */
 	private static final String LOG_TAG = "AudioReceive";
 
-	private int frequency = 8000;// 44100;//8000;// 11025;
+	private int frequency =   44100;//8000;// 11025;
 	private int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
 	private int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
 	private AudioTrack audioTrack;
@@ -20,8 +21,15 @@ public class AudioReceive implements Runnable, AudioPlayer {
 
 	private String sdp;
 
-	public AudioReceive(int streamType, String sdp) {
-		Log.d(LOG_TAG, "AudioReceive Created");
+	public AudioReceive(AudioInfo audioInfo, int streamType, String sdp) {
+
+		Log.d(LOG_TAG,
+				"AudioReceive Created: audioInfo.getOut: " + audioInfo.getOut()
+						+ " ; getCodectID:" + audioInfo.getCodecID()
+						+ " ; getPayLoadType:" + audioInfo.getPayloadType());
+		frequency = audioInfo.getSample_rate();
+		Log.d(LOG_TAG,
+				"Frequency = " + frequency);
 		buffer_min = AudioTrack.getMinBufferSize(frequency,
 				channelConfiguration, audioEncoding);
 

@@ -47,10 +47,12 @@ public class VideoCall extends Activity implements Runnable {
 		setContentView(R.layout.videocall);
 		Log.d(LOG_TAG, "OnCreate");
 		/* Create Threads Audio/Video Capture/Receive */
-//		final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-//		PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK,
-//				LOG_TAG);
-//		wl.acquire();
+		// final PowerManager pm = (PowerManager)
+		// getSystemService(Context.POWER_SERVICE);
+		// PowerManager.WakeLock wl =
+		// pm.newWakeLock(PowerManager.FULL_WAKE_LOCK,
+		// LOG_TAG);
+		// wl.acquire();
 	}
 
 	@Override
@@ -76,7 +78,7 @@ public class VideoCall extends Activity implements Runnable {
 			Log.d(LOG_TAG, "Accept Call: SdpVideo -> " + sdpVideo.toString());
 			if (!sdpAudio.equals("")) {
 				audioCapture = new AudioCapture(ai);
-				audioReceive = new AudioReceive(AudioManager.STREAM_MUSIC,
+				audioReceive = new AudioReceive(ai, AudioManager.STREAM_MUSIC,
 						sdpAudio);
 				Thread tAudioReceive = new Thread(audioReceive);
 				audioCapture.start();
@@ -117,6 +119,7 @@ public class VideoCall extends Activity implements Runnable {
 			}
 		});
 		final Button ButtonUseFrontCamera = (Button) findViewById(R.id.button_use_front_camera);
+		ButtonUseFrontCamera.setVisibility(0);
 		ButtonUseFrontCamera.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -131,17 +134,17 @@ public class VideoCall extends Activity implements Runnable {
 	public void finish() {
 		super.finish();
 		Log.d(LOG_TAG, "Finish");
-		
+
 		try {
 			if (cameraCapture != null)
 				cameraCapture.release();
-			
+
 			if (cameraReceive != null)
 				cameraReceive.release();
 
 			if (audioCapture != null)
 				audioCapture.release();
-			
+
 			if (audioReceive != null)
 				audioReceive.release();
 
@@ -149,7 +152,7 @@ public class VideoCall extends Activity implements Runnable {
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Exception:" + e.toString());
 		}
-		
+
 	}
 
 	@Override

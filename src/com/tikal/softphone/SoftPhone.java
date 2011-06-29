@@ -56,6 +56,8 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	private String localRealm;
 	private String proxyIP;
 	private int proxyPort;
+	
+//	private boolean isVideoCall = false;
 
 	private Handler handler = new Handler();
 	ControlContacts controlcontacts = new ControlContacts(this);
@@ -222,13 +224,16 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			if (resultCode == RESULT_OK) {
 				Log.d(LOG_TAG, "Incoming: Accept Call on onActivityResult");
 				try {
+//					isVideoCall = true;
 					controller.aceptCall();
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			} else if (resultCode == RESULT_CANCELED) {
 				Log.d(LOG_TAG, "Incoming: Rejected Call");
 				try {
+//					isVideoCall = false;
 					controller.reject();
 				} catch (Exception e) {
 
@@ -244,6 +249,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			if (resultCode == RESULT_CANCELED) {
 				Log.d(LOG_TAG, "Outgoing: Rejected Call");
 				try {
+//					isVideoCall = false;
 					controller.reject();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -256,6 +262,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 
 		if (requestCode == VIDEO_CALL) {
 			Log.d(LOG_TAG, "Video Call Finish");
+//			isVideoCall = false;
 
 		}
 		if (requestCode == SHOW_PREFERENCES) {
@@ -457,9 +464,9 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 
 	@Override
 	public void releaseRTPMedia() {
-		Log.d(LOG_TAG, "ReleaseRTPMedia");
-		
-		finishActivity(VIDEO_CALL);
+	Log.d(LOG_TAG, "ReleaseRTPMedia");//; videoCall = " + isVideoCall);
+//		if (isVideoCall)
+			finishActivity(VIDEO_CALL);
 	}
 
 	private VideoInfo getVideoInfoFromSettings() {
