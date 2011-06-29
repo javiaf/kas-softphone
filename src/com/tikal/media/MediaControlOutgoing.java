@@ -20,23 +20,23 @@ public class MediaControlOutgoing extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.control_call_outgoingcall);
-		
 
 		Bundle extras = getIntent().getExtras();
 		String uri = (String) extras.getSerializable("Uri");
 		Integer id = (Integer) extras.getSerializable("Id");
-		Log.d(LOG_TAG, "Media Control Outgoing Created; uri = " + uri + " id = " + id);
+		Log.d(LOG_TAG, "Media Control Outgoing Created; uri = " + uri
+				+ " id = " + id);
 		TextView text = (TextView) findViewById(R.id.outgoing_sip);
 		text.setText(uri);
 
 		ImageView imageCall = (ImageView) findViewById(R.id.image_call);
 
 		ControlContacts controlcontacts = new ControlContacts(this);
-		
+
 		Bitmap bm = controlcontacts.getPhoto(id);
-		
+
 		if (bm != null) {
-			
+
 			imageCall.setImageBitmap(bm);
 		}
 
@@ -66,7 +66,7 @@ public class MediaControlOutgoing extends Activity {
 			public void onClick(View v) {
 				Log.d(LOG_TAG, "Call Canceled");
 				finish();
-				setResult(RESULT_CANCELED);
+				setResult(RESULT_OK);
 
 			}
 		});
