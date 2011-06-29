@@ -3,16 +3,19 @@ package com.tikal.softphone;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.telephony.PhoneStateListener;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -57,7 +60,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	private String proxyIP;
 	private int proxyPort;
 	
-//	private boolean isVideoCall = false;
+	private boolean isVideoCall = false;
 
 	private Handler handler = new Handler();
 	ControlContacts controlcontacts = new ControlContacts(this);
@@ -87,6 +90,30 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 		checkCallIntent();
 
 	}
+	
+	@Override
+	protected void onNewIntent(Intent intent) {
+		// TODO Auto-generated method stub
+		super.onNewIntent(intent);
+		if (intent.getData() == null)
+			return;
+//		Log.d(LOG_TAG, "onNewIntent Tlf: " + intent.getData().getSchemeSpecificPart() + "; Action: " + intent.getData().getScheme());
+//		if (intent.getData().getScheme().equalsIgnoreCase("tel")){
+//			try {
+//		        Intent callIntent = new Intent(Intent.ACTION_DIAL);
+//		        callIntent.setData(Uri.parse("tel:" + intent.getData().getSchemeSpecificPart()));
+//		        startActivity(callIntent);
+//		    } catch (ActivityNotFoundException activityException) {
+//		        Log.e("dialing-example", "Call failed", activityException);
+//		    }
+//			
+//			
+//
+//		}
+		
+		
+		checkCallIntent();
+	}
 
 	private void checkCallIntent() {
 		Intent intent = getIntent();
@@ -94,7 +121,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			return;
 
 		if (Intent.ACTION_CALL.equalsIgnoreCase(intent.getAction())) {
-			Log.d(LOG_TAG, "CALL" + intent.getData().getSchemeSpecificPart());
+			Log.d(LOG_TAG, " ********* CALL" + intent.getData().getSchemeSpecificPart());
 		} else if (Intent.ACTION_SENDTO.equals(intent.getAction())) {
 			Log.d(LOG_TAG, "sip:" + intent.getData().getLastPathSegment());
 			if (controller == null)
@@ -224,7 +251,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			if (resultCode == RESULT_OK) {
 				Log.d(LOG_TAG, "Incoming: Accept Call on onActivityResult");
 				try {
-//					isVideoCall = true;
+					isVideoCall = true;
 					controller.aceptCall();
 					
 				} catch (Exception e) {
@@ -233,7 +260,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			} else if (resultCode == RESULT_CANCELED) {
 				Log.d(LOG_TAG, "Incoming: Rejected Call");
 				try {
-//					isVideoCall = false;
+					isVideoCall = false;
 					controller.reject();
 				} catch (Exception e) {
 
@@ -246,11 +273,13 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 						+ resultCode);
 		}
 		if (requestCode == MEDIA_CONTROL_OUTGOING) {
-			if (resultCode == RESULT_CANCELED) {
+			if (resultCode == RESULT_OK) {
 				Log.d(LOG_TAG, "Outgoing: Rejected Call");
 				try {
 //					isVideoCall = false;
-					controller.reject();
+					
+					//************Aquí iria el Cancel no el Reject
+//					controller.reject();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -262,7 +291,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 
 		if (requestCode == VIDEO_CALL) {
 			Log.d(LOG_TAG, "Video Call Finish");
-//			isVideoCall = false;
+			isVideoCall = false;
 
 		}
 		if (requestCode == SHOW_PREFERENCES) {
@@ -463,10 +492,12 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	}
 
 	@Override
-	public void releaseRTPMedia() {
-	Log.d(LOG_TAG, "ReleaseRTPMedia");//; videoCall = " + isVideoCall);
-//		if (isVideoCall)
+	public synchronized void releaseRTPMedia() {
+	Log.d(LOG_TAG, "ReleaseRTPMedia videoCall = " + isVideoCall);
+//		if (isVideoCall){
 			finishActivity(VIDEO_CALL);
+//			isVideoCall = false;
+//		}
 	}
 
 	private VideoInfo getVideoInfoFromSettings() {
@@ -567,6 +598,12 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			Log.e(LOG_TAG, e.toString());
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void rejectReceived() {
+		Log.d(LOG_TAG, "Call Reject Received");
+		finishActivity(MEDIA_CONTROL_OUTGOING);
 	}
 
 }
