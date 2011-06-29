@@ -73,8 +73,8 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone 
 		config.setProxyPort(proxyPort);
 
 		Log.d(LOG_TAG, "CONFIGURATION User Agent: " + config);
-		
-		if (ua != null){
+
+		if (ua != null) {
 			ua.terminate();
 			Log.d(LOG_TAG, "UA Terminate");
 		}
@@ -149,8 +149,12 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone 
 		} else if (SipCallEvent.CALL_TERMINATE.equals(eventType)) {
 			Log.d(LOG_TAG, "Call Terminate");
 
+		} else if (SipCallEvent.CALL_REJECT.equals(eventType)) {
+			Log.d(LOG_TAG, "Call Reject");
+			phoneGUI.rejectReceived();
 		} else if (SipCallEvent.CALL_ERROR.equals(eventType)) {
 			Log.d(LOG_TAG, "Call Error");
+			
 		}
 	}
 
