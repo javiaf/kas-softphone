@@ -132,9 +132,8 @@ public class VideoCall extends Activity implements Runnable {
 
 	@Override
 	public void finish() {
-		super.finish();
 		Log.d(LOG_TAG, "Finish");
-
+		isVideoCall = false;
 		try {
 			if (cameraCapture != null)
 				cameraCapture.release();
@@ -152,7 +151,7 @@ public class VideoCall extends Activity implements Runnable {
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Exception:" + e.toString());
 		}
-
+		super.finish();
 	}
 
 	@Override
@@ -170,7 +169,6 @@ public class VideoCall extends Activity implements Runnable {
 	@Override
 	protected void onStop() {
 		Log.d(LOG_TAG, "OnStop");
-		isVideoCall = false;
 		finish();
 		super.onStop();
 	}
