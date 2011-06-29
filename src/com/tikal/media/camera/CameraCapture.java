@@ -255,9 +255,6 @@ public class CameraCapture implements Runnable, SurfaceHolder.Callback,
 	public void onPreviewFrame(byte[] data, Camera camera) {
 		if (data == null)
 			return;
-		
-
-		long t1 = System.currentTimeMillis();
 		MediaTx.putVideoFrame(data);
 	}
 
