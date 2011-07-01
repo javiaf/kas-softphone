@@ -4,7 +4,10 @@
   <artifactId>tk-android-softphone</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>apk</packaging>
+
   <name>SoftPhone</name>
+  <description>TODO: Add description here</description>
+  <url>http://193.147.51.37/site/tk-android-softphone</url>
 
   <dependencies>
     <dependency>
@@ -60,4 +63,10 @@
     </plugins>
   </build>
 
+  <distributionManagement>
+    <site>
+      <id>maven-site</id>
+      <url>scp://193.147.51.37/var/www/site/tk-android-softphone/</url>
+    </site>
+  </distributionManagement>
 </project>
