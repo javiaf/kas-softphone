@@ -35,7 +35,8 @@ public class MediaControlIncoming extends Activity {
 		
 		String[] sipArray = uri.split(":");
 		String sipUri = "";
-		if (sipArray.length > 0) sipUri = sipArray[1];
+		Log.d(LOG_TAG, "SipArray = " + sipArray.length);
+		if (sipArray.length > 1) sipUri = sipArray[1];
 		else sipUri = sipArray[0];
 		
 		Log.d(LOG_TAG, "sipUri = " + sipUri);
