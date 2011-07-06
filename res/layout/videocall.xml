@@ -13,19 +13,19 @@
 		android:layout_height="wrap_content" android:id="@+id/tableLayout1"
 		android:layout_gravity="bottom">
 		<TableRow android:id="@+id/TableRow01">
-			<Button android:id="@+id/button_mute" android:layout_width="wrap_content"
-				android:background="@drawable/mute" android:layout_height="wrap_content"
-				android:layout_alignParentBottom="true"
-				android:layout_alignParentRight="true" android:layout_gravity="left|bottom" />
-			<Button android:id="@+id/button_headset" android:layout_width="wrap_content"
-				android:background="@drawable/headset" android:layout_height="wrap_content"
-				android:layout_alignParentBottom="true"
-				android:layout_alignParentRight="true" android:layout_gravity="left|bottom" />
-			<Button android:id="@+id/button_use_front_camera"
-				android:layout_width="wrap_content" android:background="@drawable/headset"
-				android:layout_height="wrap_content"
-				android:layout_alignParentBottom="true"
-				android:layout_alignParentRight="true" android:layout_gravity="left|bottom" />
+<!-- 			<Button android:id="@+id/button_mute" android:layout_width="wrap_content" -->
+<!-- 				android:background="@drawable/mute" android:layout_height="wrap_content" -->
+<!-- 				android:layout_alignParentBottom="true" -->
+<!-- 				android:layout_alignParentRight="true" android:layout_gravity="left|bottom" /> -->
+<!-- 			<Button android:id="@+id/button_headset" android:layout_width="wrap_content" -->
+<!-- 				android:background="@drawable/headset" android:layout_height="wrap_content" -->
+<!-- 				android:layout_alignParentBottom="true" -->
+<!-- 				android:layout_alignParentRight="true" android:layout_gravity="left|bottom" /> -->
+<!-- 			<Button android:id="@+id/button_use_front_camera" -->
+<!-- 				android:layout_width="wrap_content" android:background="@drawable/headset" -->
+<!-- 				android:layout_height="wrap_content" -->
+<!-- 				android:layout_alignParentBottom="true" -->
+<!-- 				android:layout_alignParentRight="true" android:layout_gravity="left|bottom" /> --> 
 		</TableRow>
 		<TableRow android:id="@+id/TableRow01">
 		</TableRow>

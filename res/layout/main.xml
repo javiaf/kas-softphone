@@ -11,17 +11,29 @@
 		</TableRow>
 		<TableRow android:id="@+id/TableRow01">
 			<EditText android:id="@+id/textRemoteUri" android:hint="user@host"
-				android:text="user@host" android:layout_gravity="top" android:layout_height="match_parent" android:layout_width="200dip"></EditText>
+				android:text="" android:layout_gravity="top" android:layout_height="match_parent" android:layout_width="200dip"></EditText>
 		</TableRow>
 		<TableRow android:id="@+id/TableRow01">
-			<Button android:id="@+id/contacts" android:layout_width="wrap_content"
-		android:text="Contacts" android:layout_height="wrap_content"
-		android:layout_alignParentBottom="true"
-		android:layout_alignParentRight="true" android:layout_gravity="left" />
+<!-- 			<Button android:id="@+id/contacts" android:layout_width="wrap_content" -->
+<!-- 		android:text="" android:layout_height="wrap_content" -->
+<!-- 		android:layout_alignParentBottom="true" -->
+<!-- 		android:background="@drawable/peoplecontactsicon" -->
+<!-- 		android:layout_alignParentRight="true" android:layout_gravity="left|bottom" /> -->
+		</TableRow>
+		<TableRow android:id="@+id/TableRow01">
+<!-- 	<Button android:layout_width="wrap_content" -->
+<!-- 		android:layout_height="wrap_content" android:id="@+id/buttonStart" -->
+<!-- 		android:text="Start"></Button> -->
+<!-- 	<Button android:layout_width="wrap_content" -->
+<!-- 		android:layout_height="wrap_content" android:text="Stop" android:id="@+id/buttonStop"></Button> -->
 		</TableRow>
 	</TableLayout>
 
-	
+	<Button android:id="@+id/contacts" android:layout_width="wrap_content"
+		android:text="" android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:background="@drawable/peoplecontactsicon"
+		android:layout_alignParentRight="true" android:layout_gravity="left|bottom" />
 
 <Button android:id="@+id/call" android:layout_height="wrap_content"
 				android:layout_alignParentBottom="true" android:background="@drawable/ic_jog_dial_answer"
