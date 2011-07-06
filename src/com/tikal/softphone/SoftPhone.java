@@ -3,6 +3,8 @@ package com.tikal.softphone;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Message;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
@@ -44,7 +47,8 @@ import com.tikal.preferences.Video_Preferences;
 import com.tikal.sip.Controller;
 import com.tikal.videocall.VideoCall;
 
-public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
+public class SoftPhone extends Activity implements IRTPMedia,
+		ServiceUpdateUIListener {// , IPhoneGUI {
 	private static int MEDIA_CONTROL_INCOMING = 0;
 	private static int MEDIA_CONTROL_OUTGOING = 1;
 	private static int SHOW_PREFERENCES = 2;
@@ -59,7 +63,10 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	private String localRealm;
 	private String proxyIP;
 	private int proxyPort;
-	
+
+	private ProgressDialog dialog;
+	Intent intentService;
+
 	private boolean isVideoCall = false;
 
 	private Handler handler = new Handler();
@@ -80,48 +87,63 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 				true);
 		initControllerUAFromSettings();
 		final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-//		PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK,
-//				LOG_TAG);
-//		wl.acquire();
-		
+		// PowerManager.WakeLock wl =
+		// pm.newWakeLock(PowerManager.FULL_WAKE_LOCK,
+		// LOG_TAG);
+		// WakeLock wl = mPowerManager.newWakeLock(
+		// PowerManager.ACQUIRE_CAUSES_WAKEUP
+		// |PowerManager.ON_AFTER_RELEASE
+		// |PowerManager.SCREEN_BRIGHT_WAKE_LOCK,
+		// "incoming_call");
+
+		// wl.acquire(tiempo);
+
+		intentService = new Intent(this, MyService.class);
+		startService(intentService);
+
+		MyService.setUpdateListener(this);
+
 		if (controller == null)
 			register();
 		// Estoy registrado?
-		checkCallIntent();
+		checkCallIntent(getIntent());
 
 	}
-	
+
 	@Override
 	protected void onNewIntent(Intent intent) {
 		// TODO Auto-generated method stub
 		super.onNewIntent(intent);
 		if (intent.getData() == null)
 			return;
-//		Log.d(LOG_TAG, "onNewIntent Tlf: " + intent.getData().getSchemeSpecificPart() + "; Action: " + intent.getData().getScheme());
-//		if (intent.getData().getScheme().equalsIgnoreCase("tel")){
-//			try {
-//		        Intent callIntent = new Intent(Intent.ACTION_DIAL);
-//		        callIntent.setData(Uri.parse("tel:" + intent.getData().getSchemeSpecificPart()));
-//		        startActivity(callIntent);
-//		    } catch (ActivityNotFoundException activityException) {
-//		        Log.e("dialing-example", "Call failed", activityException);
-//		    }
-//			
-//			
-//
-//		}
-		
-		
-		checkCallIntent();
+		// Log.d(LOG_TAG, "onNewIntent Tlf: " +
+		// intent.getData().getSchemeSpecificPart() + "; Action: " +
+		// intent.getData().getScheme());
+		// if (intent.getData().getScheme().equalsIgnoreCase("tel")){
+		// try {
+		// Intent callIntent = new Intent(Intent.ACTION_DIAL);
+		// callIntent.setData(Uri.parse("tel:" +
+		// intent.getData().getSchemeSpecificPart()));
+		// startActivity(callIntent);
+		// } catch (ActivityNotFoundException activityException) {
+		// Log.e("dialing-example", "Call failed", activityException);
+		// }
+		//
+		//
+		//
+		// }
+
+		checkCallIntent(intent);
 	}
 
-	private void checkCallIntent() {
-		Intent intent = getIntent();
-		if (intent.getData() == null)
+	private void checkCallIntent(Intent intent) {
+
+		if (intent == null || intent.getData() == null)
 			return;
 
 		if (Intent.ACTION_CALL.equalsIgnoreCase(intent.getAction())) {
-			Log.d(LOG_TAG, " ********* CALL" + intent.getData().getSchemeSpecificPart());
+			Log.d(LOG_TAG, " ********* CALL"
+					+ intent.getData().getSchemeSpecificPart());
 		} else if (Intent.ACTION_SENDTO.equals(intent.getAction())) {
 			Log.d(LOG_TAG, "sip:" + intent.getData().getLastPathSegment());
 			if (controller == null)
@@ -162,6 +184,37 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		/**
+		 * Control Botones Servicio Quitar
+		 */
+
+//		final Button buttonStartService = (Button) findViewById(R.id.buttonStart);
+//		buttonStartService.setOnClickListener(new OnClickListener() {
+//
+//			@Override
+//			public void onClick(View v) {
+//				// TODO Auto-generated method stub
+//				Log.d(LOG_TAG, "++++Start Service");
+//
+//				startService(intentService);
+//
+//			}
+//		});
+//		final Button buttonEndService = (Button) findViewById(R.id.buttonStop);
+//		buttonEndService.setOnClickListener(new OnClickListener() {
+//
+//			@Override
+//			public void onClick(View v) {
+//				// TODO Auto-generated method stub
+//				Log.d(LOG_TAG, "++++nStop Service");
+//				stopService(intentService);
+//			}
+//		});
+
+		/**
+		 * Fin Control Botones Servicio Quitar
+		 */
 
 		final Button buttonCall = (Button) findViewById(R.id.call);
 		buttonCall.setOnClickListener(new OnClickListener() {
@@ -253,7 +306,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 				try {
 					isVideoCall = true;
 					controller.aceptCall();
-					
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -276,10 +329,10 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			if (resultCode == RESULT_OK) {
 				Log.d(LOG_TAG, "Outgoing: Rejected Call");
 				try {
-//					isVideoCall = false;
-					
-					//************Aquí iria el Cancel no el Reject
-//					controller.reject();
+					// isVideoCall = false;
+
+					// ************Aquí iria el Cancel no el Reject
+					// controller.reject();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -302,6 +355,8 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 			SoftPhone.this.text.setTextSize(20);
 			SoftPhone.this.text.setTextColor(Color.WHITE);
 			SoftPhone.this.text.setText("Connecting...");
+
+			dialog = ProgressDialog.show(SoftPhone.this, "", "Connecting ...");
 
 			Log.d(LOG_TAG, "Reconfigure Preferences");
 			initControllerUAFromSettings();
@@ -371,6 +426,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case (R.id.menu_exit):
+			stopService(intentService);
 			finish();
 			return true;
 		case (R.id.menu_conection_preferences):
@@ -390,55 +446,74 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	}
 
 	private void register() {
-		if (controller == null)
-			controller = new Controller(this, this);
+		
+		if (controller == null) {
+			// controller = new Controller(this, this);
+			MyService myService = new MyService();
+			controller = new Controller(myService, this);
+		}
+		dialog = ProgressDialog.show(SoftPhone.this, "", "Connecting ...");
 		initControllerUAFromSettings();
 		initUA();
 	}
 
-	@Override
 	public void inviteReceived(String uri) {
 		Log.d(LOG_TAG, "Invite received");
+		// Intent mediaIntent = new Intent(SoftPhone.this,
+		// MediaControlIncoming.class);
+		// mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
 		Intent mediaIntent = new Intent(SoftPhone.this,
 				MediaControlIncoming.class);
-		mediaIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+		mediaIntent.addCategory(Intent.ACTION_MAIN);
+		mediaIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+		// mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		mediaIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
+
 		mediaIntent.putExtra("Uri", uri);
 		startActivityForResult(mediaIntent, MEDIA_CONTROL_INCOMING);
 		Log.d(LOG_TAG, "Media Control Started");
 	}
 
-	@Override
 	public void registerSucessful() {
 		Log.d(LOG_TAG, "Register Sucessful");
 
-		handler.post(new Runnable() {
-
-			@Override
-			public void run() {
-				SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
-				SoftPhone.this.text.setTextSize(20);
-				SoftPhone.this.text.setTextColor(Color.GREEN);
-				SoftPhone.this.text.setText("Register Sucessful");
-			}
-		});
+		// handler.post(new Runnable() {
+		//
+		// @Override
+		// public void run() {
+		SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
+		SoftPhone.this.text.setTextSize(20);
+		SoftPhone.this.text.setTextColor(Color.GREEN);
+		SoftPhone.this.text.setText("Register Sucessful");
+		// }
+		// });
 
 	}
 
-	@Override
 	public void registerFailed() {
 		Log.d(LOG_TAG, "Register Failed");
-		handler.post(new Runnable() {
-
-			@Override
-			public void run() {
-				SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
-				SoftPhone.this.text.setTextSize(20);
-				SoftPhone.this.text.setTextColor(Color.RED);
-				SoftPhone.this.text.setText("Register Failed");
-			}
-		});
-
+		SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
+		SoftPhone.this.text.setTextSize(20);
+		SoftPhone.this.text.setTextColor(Color.RED);
+		SoftPhone.this.text.setText("Register Failed");
 	}
+
+	// @Override
+	// public void registerFailed() {
+	// Log.d(LOG_TAG, "Register Failed");
+	// handler.post(new Runnable() {
+	//
+	// @Override
+	// public void run() {
+	// SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
+	// SoftPhone.this.text.setTextSize(20);
+	// SoftPhone.this.text.setTextColor(Color.RED);
+	// SoftPhone.this.text.setText("Register Failed");
+	// }
+	// });
+	//
+	// }
 
 	public void notRegister() {
 		SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
@@ -493,11 +568,11 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 
 	@Override
 	public synchronized void releaseRTPMedia() {
-	Log.d(LOG_TAG, "ReleaseRTPMedia videoCall = " + isVideoCall);
-//		if (isVideoCall){
-			finishActivity(VIDEO_CALL);
-//			isVideoCall = false;
-//		}
+		Log.d(LOG_TAG, "ReleaseRTPMedia videoCall = " + isVideoCall);
+		// if (isVideoCall){
+		finishActivity(VIDEO_CALL);
+		// isVideoCall = false;
+		// }
 	}
 
 	private VideoInfo getVideoInfoFromSettings() {
@@ -571,6 +646,7 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	}
 
 	private void initControllerUAFromSettings() {
+
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(getBaseContext());
 		localUser = settings.getString("LOCAL_USERNAME", "android1");
@@ -601,9 +677,30 @@ public class SoftPhone extends Activity implements IRTPMedia, IPhoneGUI {
 	}
 
 	@Override
-	public void rejectReceived() {
-		Log.d(LOG_TAG, "Call Reject Received");
-		finishActivity(MEDIA_CONTROL_OUTGOING);
+	public void update(Message message) {
+		// TODO Auto-generated method stub
+		if (dialog != null)
+			dialog.dismiss();
+		Log.d(LOG_TAG, "Message : " + message.getData());
+
+		if (message.getData().containsKey("Call")) {
+			if (message.getData().getString("Call").equals("Invite")) {
+				inviteReceived(message.getData().getString("Contact"));
+			}
+		} else if (message.getData().containsKey("Register")) {
+			if (message.getData().getString("Register").equals("Sucessful")) {
+				registerSucessful();
+			}else if (message.getData().getString("Register").equals("Failed")){
+				registerFailed();
+			}
+		}
+
 	}
+
+	// @Override
+	// public void rejectReceived() {
+	// Log.d(LOG_TAG, "Call Reject Received");
+	// finishActivity(MEDIA_CONTROL_OUTGOING);
+	// }
 
 }
