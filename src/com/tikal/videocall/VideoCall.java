@@ -28,7 +28,7 @@ import com.tikal.preferences.VideoCall_Preferences;
 import com.tikal.softphone.IPhone;
 import com.tikal.softphone.R;
 
-public class VideoCall extends Activity implements Runnable {
+public class VideoCall extends Activity {
 	private static final String LOG_TAG = "VideoCall";
 	private static final int SHOW_PREFERENCES = 1;
 
@@ -112,21 +112,22 @@ public class VideoCall extends Activity implements Runnable {
 				Log.d(LOG_TAG, "Hang ...");
 				IPhone controller = (IPhone) ApplicationContext.contextTable
 						.get("controller");
+//				setResult(RESULT_OK);
 				if (controller != null) {
 					controller.hang();
 				}
-				setResult(RESULT_OK);
+			
 			}
 		});
-		final Button ButtonUseFrontCamera = (Button) findViewById(R.id.button_use_front_camera);
-		ButtonUseFrontCamera.setVisibility(0);
-		ButtonUseFrontCamera.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// CameraCapture.getInstance().setUseFrontCamera(false);
-			}
-		});
+//		final Button ButtonUseFrontCamera = (Button) findViewById(R.id.button_use_front_camera);
+//		ButtonUseFrontCamera.setVisibility(0);
+//		ButtonUseFrontCamera.setOnClickListener(new OnClickListener() {
+//
+//			@Override
+//			public void onClick(View v) {
+//				// CameraCapture.getInstance().setUseFrontCamera(false);
+//			}
+//		});
 
 	}
 
@@ -147,6 +148,7 @@ public class VideoCall extends Activity implements Runnable {
 			if (audioReceive != null)
 				audioReceive.release();
 
+//			stopService(getIntent());
 			Log.d(LOG_TAG, "Release All");
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Exception:" + e.toString());
@@ -177,17 +179,6 @@ public class VideoCall extends Activity implements Runnable {
 	protected void onDestroy() {
 		Log.d(LOG_TAG, "OnDestroy");
 		super.onDestroy();
-	}
-
-	@Override
-	public void run() {
-		String filename = Environment.getExternalStorageDirectory()
-		// .getAbsolutePath() + "/DCIM/Camera/vide.mp4";
-				.getAbsolutePath() + "sdp.sdp";
-		Log.d(LOG_TAG, "File:" + filename);
-
-		// MediaRx.startVideoRx(sdp, this);// sdp);
-
 	}
 
 	/* Menu */
