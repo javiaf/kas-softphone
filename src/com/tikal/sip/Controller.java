@@ -36,7 +36,7 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone 
 		this.phoneGUI = phoneGUI;
 		setUp(rtpMedia);
 	}
-
+	
 	public Controller(IPhoneGUI phoneGUI, IRTPMedia rtpMedia, VideoInfo vi,
 			AudioInfo ai, String proxyIP, int proxyPort, String localUser,
 			String localRealm) throws Exception {
@@ -67,6 +67,7 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone 
 				rtpMedia, vi, ai));
 
 		SipConfig config = new SipConfig();
+		//TODO : CONTROLAR QUE LA WIFI ESTÉ APAGADA. POR SI DEVUELVE NULL EN getHostAddress()
 		config.setLocalAddress(NetworkIP.getLocalAddress().getHostAddress());
 		config.setLocalPort(6060);
 		config.setProxyAddress(proxyIP);
