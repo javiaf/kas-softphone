@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -46,6 +47,7 @@ import com.tikal.preferences.Connection_Preferences;
 import com.tikal.preferences.Video_Preferences;
 import com.tikal.sip.Controller;
 import com.tikal.videocall.VideoCall;
+import com.tikal.videocall.VideoCallService;
 
 public class SoftPhone extends Activity implements IRTPMedia,
 		ServiceUpdateUIListener {// , IPhoneGUI {
@@ -73,6 +75,7 @@ public class SoftPhone extends Activity implements IRTPMedia,
 	ControlContacts controlcontacts = new ControlContacts(this);
 
 	private TextView text;
+	
 
 	private Controller controller;
 
@@ -85,7 +88,7 @@ public class SoftPhone extends Activity implements IRTPMedia,
 
 		PreferenceManager.setDefaultValues(this, R.layout.video_preferences,
 				true);
-		initControllerUAFromSettings();
+
 		final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		// PowerManager.WakeLock wl =
 		// pm.newWakeLock(PowerManager.FULL_WAKE_LOCK,
@@ -102,7 +105,9 @@ public class SoftPhone extends Activity implements IRTPMedia,
 		startService(intentService);
 
 		MyService.setUpdateListener(this);
-
+		
+		
+		initControllerUAFromSettings();
 		if (controller == null)
 			register();
 		// Estoy registrado?
@@ -189,28 +194,30 @@ public class SoftPhone extends Activity implements IRTPMedia,
 		 * Control Botones Servicio Quitar
 		 */
 
-//		final Button buttonStartService = (Button) findViewById(R.id.buttonStart);
-//		buttonStartService.setOnClickListener(new OnClickListener() {
-//
-//			@Override
-//			public void onClick(View v) {
-//				// TODO Auto-generated method stub
-//				Log.d(LOG_TAG, "++++Start Service");
-//
-//				startService(intentService);
-//
-//			}
-//		});
-//		final Button buttonEndService = (Button) findViewById(R.id.buttonStop);
-//		buttonEndService.setOnClickListener(new OnClickListener() {
-//
-//			@Override
-//			public void onClick(View v) {
-//				// TODO Auto-generated method stub
-//				Log.d(LOG_TAG, "++++nStop Service");
-//				stopService(intentService);
-//			}
-//		});
+		// final Button buttonStartService = (Button)
+		// findViewById(R.id.buttonStart);
+		// buttonStartService.setOnClickListener(new OnClickListener() {
+		//
+		// @Override
+		// public void onClick(View v) {
+		// // TODO Auto-generated method stub
+		// Log.d(LOG_TAG, "++++Start Service");
+		//
+		// startService(intentService);
+		//
+		// }
+		// });
+		// final Button buttonEndService = (Button)
+		// findViewById(R.id.buttonStop);
+		// buttonEndService.setOnClickListener(new OnClickListener() {
+		//
+		// @Override
+		// public void onClick(View v) {
+		// // TODO Auto-generated method stub
+		// Log.d(LOG_TAG, "++++nStop Service");
+		// stopService(intentService);
+		// }
+		// });
 
 		/**
 		 * Fin Control Botones Servicio Quitar
@@ -356,7 +363,8 @@ public class SoftPhone extends Activity implements IRTPMedia,
 			SoftPhone.this.text.setTextColor(Color.WHITE);
 			SoftPhone.this.text.setText("Connecting...");
 
-			dialog = ProgressDialog.show(SoftPhone.this, "", "Connecting ...");
+			// dialog = ProgressDialog.show(SoftPhone.this, "",
+			// "Connecting ...");
 
 			Log.d(LOG_TAG, "Reconfigure Preferences");
 			initControllerUAFromSettings();
@@ -446,13 +454,14 @@ public class SoftPhone extends Activity implements IRTPMedia,
 	}
 
 	private void register() {
-		
+
 		if (controller == null) {
 			// controller = new Controller(this, this);
+			
 			MyService myService = new MyService();
 			controller = new Controller(myService, this);
 		}
-		dialog = ProgressDialog.show(SoftPhone.this, "", "Connecting ...");
+		// dialog = ProgressDialog.show(SoftPhone.this, "", "Connecting ...");
 		initControllerUAFromSettings();
 		initUA();
 	}
@@ -557,12 +566,15 @@ public class SoftPhone extends Activity implements IRTPMedia,
 
 		finishActivity(MEDIA_CONTROL_OUTGOING);
 
-		Intent videoCallIntent = new Intent(SoftPhone.this, VideoCall.class);
+//		Intent videoCallIntent = new Intent(SoftPhone.this, VideoCall.class);
+		Intent videoCallIntent = new Intent(SoftPhone.this, VideoCallService.class);
 		videoCallIntent.putExtra("VideoInfo", videoInfo);
 		videoCallIntent.putExtra("AudioInfo", audioInfo);
 		videoCallIntent.putExtra("SdpVideo", sdpVideo);
 		videoCallIntent.putExtra("SdpAudio", sdpAudio);
-		startActivityForResult(videoCallIntent, VIDEO_CALL);
+		videoCallIntent.putExtra("SurfaceReceive",R.id.video_receive_surface);
+		startService(videoCallIntent);
+	//	startActivityForResult(videoCallIntent, VIDEO_CALL);
 
 	}
 
@@ -679,8 +691,8 @@ public class SoftPhone extends Activity implements IRTPMedia,
 	@Override
 	public void update(Message message) {
 		// TODO Auto-generated method stub
-		if (dialog != null)
-			dialog.dismiss();
+		// if (dialog != null)
+		// dialog.dismiss();
 		Log.d(LOG_TAG, "Message : " + message.getData());
 
 		if (message.getData().containsKey("Call")) {
@@ -690,7 +702,7 @@ public class SoftPhone extends Activity implements IRTPMedia,
 		} else if (message.getData().containsKey("Register")) {
 			if (message.getData().getString("Register").equals("Sucessful")) {
 				registerSucessful();
-			}else if (message.getData().getString("Register").equals("Failed")){
+			} else if (message.getData().getString("Register").equals("Failed")) {
 				registerFailed();
 			}
 		}
