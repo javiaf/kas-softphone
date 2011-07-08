@@ -1,8 +1,9 @@
 package com.tikal.preferences;
 
-import com.tikal.softphone.R;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+
+import com.tikal.softphone.R;
 
 
 public class Video_Preferences extends PreferenceActivity {

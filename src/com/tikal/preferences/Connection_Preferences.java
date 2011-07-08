@@ -1,10 +1,10 @@
 package com.tikal.preferences;
 
 
-import com.tikal.softphone.R;
-
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+
+import com.tikal.softphone.R;
 
 
 public class Connection_Preferences extends PreferenceActivity {
