@@ -4,70 +4,57 @@ import javax.media.mscontrol.join.Joinable.Direction;
 
 import android.util.Log;
 
+import com.tikal.javax.media.mscontrol.networkconnection.NetworkConnectionFactoryImpl;
+import com.tikal.javax.media.mscontrol.networkconnection.NetworkConnectionImpl;
+import com.tikal.javax.media.mscontrol.networkconnection.NetworkIP;
 import com.tikal.media.AudioInfo;
-import com.tikal.media.IRTPMedia;
 import com.tikal.media.VideoInfo;
-import com.tikal.networkconnection.NetworkConnectionFactoryImpl;
-import com.tikal.networkconnection.NetworkIP;
 import com.tikal.sip.agent.UaFactory;
 import com.tikal.sip.event.SipCallEvent;
 import com.tikal.sip.event.SipEndPointEvent;
 import com.tikal.sip.event.SipEventType;
 import com.tikal.sip.exception.ServerInternalErrorException;
 import com.tikal.sip.util.SipConfig;
+import com.tikal.softphone.CallListener;
+import com.tikal.softphone.CallNotifier;
 import com.tikal.softphone.IPhone;
-import com.tikal.softphone.IPhoneGUI;
 
-public class Controller implements SipEndPointListener, SipCallListener, IPhone {
+public class Controller implements SipEndPointListener, SipCallListener,
+		IPhone, CallNotifier {
 
 	public final static String LOG_TAG = "CONTROLLER";
-
-	private IPhoneGUI phoneGUI;
 	private UA ua = null;
 	private SipEndPoint endPoint = null;;
 	private SipEndPointEvent pendingEndPointEvent;
 	private SipCall currentCall;
 
+	NetworkConnectionImpl networkConnection;
+
+	private CallListener callListener;
+
 	public UA getUa() {
 		return ua;
 	}
 
-	public Controller(IPhoneGUI phoneGUI, IRTPMedia rtpMedia) {
-		this.phoneGUI = phoneGUI;
-		setUp(rtpMedia);
-	}
-	
-	public Controller(IPhoneGUI phoneGUI, IRTPMedia rtpMedia, VideoInfo vi,
-			AudioInfo ai, String proxyIP, int proxyPort, String localUser,
-			String localRealm) throws Exception {
-		this.phoneGUI = phoneGUI;
-		setUp(rtpMedia);
-		initUA(rtpMedia, vi, ai, proxyIP, proxyPort, localUser, localRealm);
+	public NetworkConnectionImpl getNetworkConnection() {
+		return networkConnection;
 	}
 
-	private void setUp(IRTPMedia rtpMedia) {
-		try {
-			// PatternLayout layout = new PatternLayout("%d - %-5p - %m%n");
-			// Logger logger = Logger.getRootLogger();
-			// logger.addAppender(new ConsoleAppender(layout));
-			// logger.setLevel(Level.TRACE);
+	// public Controller(VideoInfo vi,
+	// AudioInfo ai, String proxyIP, int proxyPort, String localUser,
+	// String localRealm) throws Exception {
+	// initUA(vi, ai, proxyIP, proxyPort, localUser, localRealm);
+	// }
 
-			// UaFactory
-			// .setNetworkConnectionFactory(new NetworkConnectionFactoryImpl(
-			// rtpMedia));
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "UaFactory initialization error", e);
-		}
-	}
-
-	public void initUA(IRTPMedia rtpMedia, VideoInfo vi, AudioInfo ai,
-			String proxyIP, int proxyPort, String localUser, String localRealm)
+	public void initUA(VideoInfo vi, AudioInfo ai, String proxyIP,
+			int proxyPort, String localUser, String localRealm)
 			throws Exception {
-		UaFactory.setNetworkConnectionFactory(new NetworkConnectionFactoryImpl(
-				rtpMedia, vi, ai));
+
+		networkConnection = (NetworkConnectionImpl) new NetworkConnectionFactoryImpl(
+				vi, ai).getInstance();
+		UaFactory.setNetworkConnection(networkConnection);
 
 		SipConfig config = new SipConfig();
-		//TODO : CONTROLAR QUE LA WIFI ESTÉ APAGADA. POR SI DEVUELVE NULL EN getHostAddress()
 		config.setLocalAddress(NetworkIP.getLocalAddress().getHostAddress());
 		config.setLocalPort(6060);
 		config.setProxyAddress(proxyIP);
@@ -79,7 +66,6 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone 
 			ua.terminate();
 			Log.d(LOG_TAG, "UA Terminate");
 		}
-		// Log.d(LOG_TAG, "UA: " + ua.toString());
 
 		ua = UaFactory.getInstance(config);
 
@@ -111,7 +97,8 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone 
 				Log.d(LOG_TAG, "Me llama Uri: "
 						+ event.getCallSource().getRemoteUri());
 
-				phoneGUI.inviteReceived(event.getCallSource().getRemoteUri());
+				if(callListener != null)
+					callListener.incomingCall(event.getCallSource().getRemoteUri());
 
 				// this.aceptCall();
 			} catch (Exception e) {
@@ -122,7 +109,8 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone 
 		if (SipEndPointEvent.REGISTER_USER_SUCESSFUL.equals(eventType)) {
 			this.pendingEndPointEvent = event;
 			try {
-				phoneGUI.registerSucessful();
+				if(callListener != null)
+					callListener.registerUserSucessful();
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.toString());
 				e.printStackTrace();
@@ -131,7 +119,8 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone 
 		if (SipEndPointEvent.REGISTER_USER_FAIL.equals(eventType)) {
 			this.pendingEndPointEvent = event;
 			try {
-				phoneGUI.registerFailed();
+				if(callListener != null)
+					callListener.registerUserFailed();
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.toString());
 				e.printStackTrace();
@@ -147,15 +136,19 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone 
 		if (SipCallEvent.CALL_SETUP.equals(eventType)) {
 			currentCall = event.getSource();
 			Log.d(LOG_TAG, "Setting currentCall");
+			if(callListener != null)
+				callListener.callSetup();
 		} else if (SipCallEvent.CALL_TERMINATE.equals(eventType)) {
 			Log.d(LOG_TAG, "Call Terminate");
-
+			if(callListener != null)
+				callListener.callTerminate();
 		} else if (SipCallEvent.CALL_REJECT.equals(eventType)) {
 			Log.d(LOG_TAG, "Call Reject");
-			phoneGUI.rejectReceived();
+			if(callListener != null)
+				callListener.callReject();
 		} else if (SipCallEvent.CALL_ERROR.equals(eventType)) {
 			Log.d(LOG_TAG, "Call Error");
-			
+
 		}
 	}
 
@@ -186,6 +179,16 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone 
 			} catch (ServerInternalErrorException e) {
 				e.printStackTrace();
 			}
+	}
+
+	@Override
+	public void addListener(CallListener listener) {
+		callListener = listener;
+	}
+
+	@Override
+	public void removeListener(CallListener listener) {
+		callListener = null;
 	}
 
 }

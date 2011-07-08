@@ -1,72 +1,145 @@
 package com.tikal.videocall;
 
+import java.net.URI;
+
+import javax.media.mscontrol.MsControlException;
+import javax.media.mscontrol.Parameters;
+import javax.media.mscontrol.join.Joinable.Direction;
+import javax.media.mscontrol.join.JoinableStream.StreamType;
+import javax.media.mscontrol.mediagroup.MediaGroup;
+import javax.media.mscontrol.resource.RTC;
+
+import com.tikal.applicationcontext.ApplicationContext;
+import com.tikal.javax.media.mscontrol.mediagroup.AudioMediaGroup;
+import com.tikal.javax.media.mscontrol.mediagroup.VideoMediaGroup;
+import com.tikal.javax.media.mscontrol.networkconnection.NetworkConnectionImpl;
 import com.tikal.media.AudioInfo;
 import com.tikal.media.VideoInfo;
-import com.tikal.media.audio.AudioCapture;
-import com.tikal.media.audio.AudioReceive;
-import com.tikal.media.camera.CameraCapture;
-import com.tikal.media.camera.CameraReceive;
+import com.tikal.sip.Controller;
 import com.tikal.softphone.R;
-import com.tikal.softphone.SoftPhone;
 
 import android.app.Service;
 import android.content.Intent;
-import android.media.AudioManager;
-import android.os.Bundle;
 import android.os.IBinder;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 public class VideoCallService extends Service {
 	private final String LOG_TAG = "VideoCallService";
 
-	
-	private AudioCapture audioCapture;
-	private AudioReceive audioReceive;
-	private CameraCapture cameraCapture;
-	private CameraReceive cameraReceive;
-	
-	
+	AudioMediaGroup audioMediaGroup = null;
+	VideoMediaGroup videoMediaGroup = null;
+
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
 	}
-	
-	
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		// Crear mediagroups y registralos en el context
+
+		Controller controller = (Controller) ApplicationContext.contextTable
+				.get("controller");
+		
+//FIXME controller != null
+		NetworkConnectionImpl nc = controller.getNetworkConnection();
+
+		VideoInfo vi = nc.getVideoInfo();
+		AudioInfo ai = nc.getAudioInfo();
+
+		String sdpVideo = nc.getSdpVideo();
+		String sdpAudio = nc.getSdpAudio();
+
+//		if (!sdpAudio.equals("")) {
+			try {
+				audioMediaGroup = new AudioMediaGroup(
+						MediaGroup.PLAYER_RECORDER_SIGNALDETECTOR,
+						ai.getSample_rate(), ai.getFrameSize());
+			} catch (MsControlException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+//		}
+		Log.d(LOG_TAG, "sdpVideo:\n" + sdpVideo);
+//		if (!sdpVideo.equals("")) {
+			Log.d(LOG_TAG, "create videoMediaGroup");
+			try {
+				videoMediaGroup = new VideoMediaGroup(
+						MediaGroup.PLAYER_RECORDER_SIGNALDETECTOR, null,
+						vi.getWidth(), vi.getHeight(), null, 0, 0);
+			} catch (MsControlException e) {
+				// TODO Auto-generated catch block
+				Log.e(LOG_TAG, "Error on create videoMediaGroup");
+				e.printStackTrace();
+			}
+//		}
+
+		Log.d(LOG_TAG, "videoMediaGroup: " + videoMediaGroup);
+		ApplicationContext.contextTable.put("audioMediaGroup", audioMediaGroup);
+		ApplicationContext.contextTable.put("videoMediaGroup", videoMediaGroup);
 	}
-	
-	
+
 	@Override
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
-		Log.d(LOG_TAG, "On Start = " + intent.getExtras().toString());
-		Bundle extras = intent.getExtras();
-		
-		
-		VideoInfo vi = (VideoInfo) extras.getSerializable("VideoInfo");
-		AudioInfo ai = (AudioInfo) extras.getSerializable("AudioInfo");
 
-		String sdpVideo = (String) extras.getSerializable("SdpVideo");
-		String sdpAudio = (String) extras.getSerializable("SdpAudio");
-		
+		// hacer joins de los mediagroups con el NC
+		// start play y recorder
+
+		Controller controller = (Controller) ApplicationContext.contextTable
+				.get("controller");
+
+		NetworkConnectionImpl nc = controller.getNetworkConnection();
+
+		try {
+			if (audioMediaGroup != null) {
+				audioMediaGroup.join(Direction.DUPLEX,
+						nc.getJoinableStream(StreamType.audio));
+				audioMediaGroup.getPlayer().play(URI.create(""), RTC.NO_RTC,
+						Parameters.NO_PARAMETER);
+				audioMediaGroup.getRecorder().record(URI.create(""),
+						RTC.NO_RTC, Parameters.NO_PARAMETER);
+
+				// Unjoin example
+				// audioMediaGroup.stop();
+				// audioMediaGroup.unjoin(controller.getNetworkConnection()
+				// .getJoinableStream(StreamType.audio));
+			}
+			if (videoMediaGroup != null) {
+				videoMediaGroup.join(Direction.DUPLEX,
+						nc.getJoinableStream(StreamType.video));
+				videoMediaGroup.getPlayer().play(URI.create(""), RTC.NO_RTC,
+						Parameters.NO_PARAMETER);
+				 videoMediaGroup.getRecorder().record(URI.create(""),
+				 RTC.NO_RTC, Parameters.NO_PARAMETER);
+
+				// Unjoin example
+				// videoMediaGroup.stop();
+				// videoMediaGroup.unjoin(controller.getNetworkConnection()
+				// .getJoinableStream(StreamType.audio));
+				Log.d(LOG_TAG, "Video is OK");
+			}
+		} catch (MsControlException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		Intent videoCallIntent = new Intent(this, VideoCall.class);
-		videoCallIntent.putExtra("VideoInfo", vi);
-		videoCallIntent.putExtra("AudioInfo", ai);
-		videoCallIntent.putExtra("SdpVideo", sdpVideo);
-		videoCallIntent.putExtra("SdpAudio", sdpAudio);
 		videoCallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(videoCallIntent);
-
 	}
-	
-	
+
 	@Override
 	public void onDestroy() {
-		Log.d(LOG_TAG, "On Destroy"); 
+		Log.d(LOG_TAG, "On Destroy");
+		if (audioMediaGroup != null)
+			audioMediaGroup.stop();
+
+		if (videoMediaGroup != null)
+			videoMediaGroup.stop();
 		super.onDestroy();
 	}
-	
 
 }

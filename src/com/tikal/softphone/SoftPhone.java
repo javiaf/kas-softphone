@@ -3,14 +3,11 @@ package com.tikal.softphone;
 import java.util.ArrayList;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -18,13 +15,10 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
-import android.telephony.PhoneStateListener;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -36,26 +30,16 @@ import com.tikal.android.media.VideoCodec;
 import com.tikal.applicationcontext.ApplicationContext;
 import com.tikal.controlcontacts.ControlContacts;
 import com.tikal.media.AudioInfo;
-import com.tikal.media.IRTPMedia;
-import com.tikal.media.MediaControlIncoming;
 import com.tikal.media.MediaControlOutgoing;
-import com.tikal.media.RTPInfo;
 import com.tikal.media.VideoInfo;
-import com.tikal.media.format.SessionSpec;
-import com.tikal.media.format.SpecTools;
 import com.tikal.preferences.Connection_Preferences;
 import com.tikal.preferences.Video_Preferences;
 import com.tikal.sip.Controller;
-import com.tikal.videocall.VideoCall;
-import com.tikal.videocall.VideoCallService;
 
-public class SoftPhone extends Activity implements IRTPMedia,
-		ServiceUpdateUIListener {// , IPhoneGUI {
-	private static int MEDIA_CONTROL_INCOMING = 0;
-	private static int MEDIA_CONTROL_OUTGOING = 1;
-	private static int SHOW_PREFERENCES = 2;
-	private static int VIDEO_CALL = 3;
-	static final int PICK_CONTACT_REQUEST = 4;
+public class SoftPhone extends Activity implements ServiceUpdateUIListener {
+	private final int MEDIA_CONTROL_OUTGOING = 0;
+	private final int SHOW_PREFERENCES = 1;
+	private final int PICK_CONTACT_REQUEST = 2;
 
 	private static final String LOG_TAG = "SoftPhone";
 
@@ -67,15 +51,12 @@ public class SoftPhone extends Activity implements IRTPMedia,
 	private int proxyPort;
 
 	private ProgressDialog dialog;
-	Intent intentService;
-
-	private boolean isVideoCall = false;
+	private Intent intentService;
 
 	private Handler handler = new Handler();
-	ControlContacts controlcontacts = new ControlContacts(this);
+	private ControlContacts controlcontacts = new ControlContacts(this);
 
 	private TextView text;
-	
 
 	private Controller controller;
 
@@ -83,6 +64,8 @@ public class SoftPhone extends Activity implements IRTPMedia,
 	/* Cycle Life */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		Log.d(LOG_TAG, "onCreate");
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
@@ -101,12 +84,6 @@ public class SoftPhone extends Activity implements IRTPMedia,
 
 		// wl.acquire(tiempo);
 
-		intentService = new Intent(this, MyService.class);
-		startService(intentService);
-
-		MyService.setUpdateListener(this);
-		
-		
 		initControllerUAFromSettings();
 		if (controller == null)
 			register();
@@ -307,37 +284,11 @@ public class SoftPhone extends Activity implements IRTPMedia,
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == MEDIA_CONTROL_INCOMING) {
-			if (resultCode == RESULT_OK) {
-				Log.d(LOG_TAG, "Incoming: Accept Call on onActivityResult");
-				try {
-					isVideoCall = true;
-					controller.aceptCall();
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			} else if (resultCode == RESULT_CANCELED) {
-				Log.d(LOG_TAG, "Incoming: Rejected Call");
-				try {
-					isVideoCall = false;
-					controller.reject();
-				} catch (Exception e) {
-
-					e.printStackTrace();
-				}
-				// Meter notificación de cancelación
-
-			} else
-				Log.d(LOG_TAG, "Incoming: Media Control; ResultCode = "
-						+ resultCode);
-		}
 		if (requestCode == MEDIA_CONTROL_OUTGOING) {
 			if (resultCode == RESULT_OK) {
 				Log.d(LOG_TAG, "Outgoing: Rejected Call");
 				try {
-					// isVideoCall = false;
-
+					// TODO
 					// ************Aquí iria el Cancel no el Reject
 					// controller.reject();
 				} catch (Exception e) {
@@ -349,11 +300,6 @@ public class SoftPhone extends Activity implements IRTPMedia,
 						+ resultCode);
 		}
 
-		if (requestCode == VIDEO_CALL) {
-			Log.d(LOG_TAG, "Video Call Finish");
-			isVideoCall = false;
-
-		}
 		if (requestCode == SHOW_PREFERENCES) {
 			/*
 			 * CARGAR LAS PREFERENCIAS
@@ -454,49 +400,27 @@ public class SoftPhone extends Activity implements IRTPMedia,
 	}
 
 	private void register() {
+		if (controller == null)
+			controller = new Controller();
 
-		if (controller == null) {
-			// controller = new Controller(this, this);
-			
-			MyService myService = new MyService();
-			controller = new Controller(myService, this);
+		if (intentService == null) {
+			intentService = new Intent(this, SoftPhoneService.class);
+			startService(intentService);
+			SoftPhoneService.setUpdateListener(this);
 		}
+
 		// dialog = ProgressDialog.show(SoftPhone.this, "", "Connecting ...");
 		initControllerUAFromSettings();
 		initUA();
 	}
 
-	public void inviteReceived(String uri) {
-		Log.d(LOG_TAG, "Invite received");
-		// Intent mediaIntent = new Intent(SoftPhone.this,
-		// MediaControlIncoming.class);
-		// mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-		Intent mediaIntent = new Intent(SoftPhone.this,
-				MediaControlIncoming.class);
-		mediaIntent.addCategory(Intent.ACTION_MAIN);
-		mediaIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-		// mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		mediaIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
-
-		mediaIntent.putExtra("Uri", uri);
-		startActivityForResult(mediaIntent, MEDIA_CONTROL_INCOMING);
-		Log.d(LOG_TAG, "Media Control Started");
-	}
-
 	public void registerSucessful() {
 		Log.d(LOG_TAG, "Register Sucessful");
 
-		// handler.post(new Runnable() {
-		//
-		// @Override
-		// public void run() {
 		SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
 		SoftPhone.this.text.setTextSize(20);
 		SoftPhone.this.text.setTextColor(Color.GREEN);
 		SoftPhone.this.text.setText("Register Sucessful");
-		// }
-		// });
 
 	}
 
@@ -508,83 +432,11 @@ public class SoftPhone extends Activity implements IRTPMedia,
 		SoftPhone.this.text.setText("Register Failed");
 	}
 
-	// @Override
-	// public void registerFailed() {
-	// Log.d(LOG_TAG, "Register Failed");
-	// handler.post(new Runnable() {
-	//
-	// @Override
-	// public void run() {
-	// SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
-	// SoftPhone.this.text.setTextSize(20);
-	// SoftPhone.this.text.setTextColor(Color.RED);
-	// SoftPhone.this.text.setText("Register Failed");
-	// }
-	// });
-	//
-	// }
-
 	public void notRegister() {
 		SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
 		SoftPhone.this.text.setTextSize(20);
 		SoftPhone.this.text.setTextColor(Color.BLUE);
 		SoftPhone.this.text.setText("Not Register, please register.");
-	}
-
-	@Override
-	public void startRTPMedia(RTPInfo rtpInfo, SessionSpec sdp) { // Sesion Spec
-																	// en vez de
-																	// String
-		// Cuando la llamada está aceptada y se puede enviar audio y video.
-		Log.d(LOG_TAG, "startRTPMedia");
-		VideoInfo videoInfo = getVideoInfoFromSettings();
-		videoInfo.setCodecID(rtpInfo.getVideoCodecId());
-		videoInfo.setOut(rtpInfo.getVideoRTPDir());
-		videoInfo.setMode(VideoInfo.MODE_SEND_RTP);
-		videoInfo.setPayloadType(rtpInfo.getVideoPayloadType());
-
-		AudioInfo audioInfo = getAudioInfoFromSettings();
-		audioInfo.setCodecID(rtpInfo.getAudioCodecId());
-		audioInfo.setOut(rtpInfo.getAudioRTPDir());
-		audioInfo.setPayloadType(rtpInfo.getAudioPayloadType());
-		AudioCodec ac = AudioCodec.getInstance();
-		audioInfo.setSample_rate(ac.getSampleRate(rtpInfo.getAudioCodecId()));
-		audioInfo.setBit_rate(ac.getBitRate(rtpInfo.getAudioCodecId()));
-
-		Log.d(LOG_TAG, "Accept Call: Sdp -> " + sdp.toString());
-
-		String sdpAudio = "";
-		String sdpVideo = "";
-
-		if (!SpecTools.filterMediaByType(sdp, "audio").getMediaSpec().isEmpty())
-			sdpAudio = SpecTools.filterMediaByType(sdp, "audio").toString();
-		if (!SpecTools.filterMediaByType(sdp, "video").getMediaSpec().isEmpty())
-			sdpVideo = SpecTools.filterMediaByType(sdp, "video").toString();
-
-		Log.d(LOG_TAG, "Accept Call: SdpAudio -> " + sdpAudio.toString());
-		Log.d(LOG_TAG, "Accept Call: SdpVideo -> " + sdpVideo.toString());
-
-		finishActivity(MEDIA_CONTROL_OUTGOING);
-
-//		Intent videoCallIntent = new Intent(SoftPhone.this, VideoCall.class);
-		Intent videoCallIntent = new Intent(SoftPhone.this, VideoCallService.class);
-		videoCallIntent.putExtra("VideoInfo", videoInfo);
-		videoCallIntent.putExtra("AudioInfo", audioInfo);
-		videoCallIntent.putExtra("SdpVideo", sdpVideo);
-		videoCallIntent.putExtra("SdpAudio", sdpAudio);
-		videoCallIntent.putExtra("SurfaceReceive",R.id.video_receive_surface);
-		startService(videoCallIntent);
-	//	startActivityForResult(videoCallIntent, VIDEO_CALL);
-
-	}
-
-	@Override
-	public synchronized void releaseRTPMedia() {
-		Log.d(LOG_TAG, "ReleaseRTPMedia videoCall = " + isVideoCall);
-		// if (isVideoCall){
-		finishActivity(VIDEO_CALL);
-		// isVideoCall = false;
-		// }
 	}
 
 	private VideoInfo getVideoInfoFromSettings() {
@@ -626,13 +478,8 @@ public class SoftPhone extends Activity implements IRTPMedia,
 				+ "/DCIM/"
 				+ settings.getString("VIDEO_OUT", "-");
 
-		DisplayMetrics dm = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(dm);
-		int screenWidth = dm.widthPixels;
-		int screenHeight = dm.heightPixels;
-
 		return new VideoInfo(frame_rate, width, height, supportedCodecsID,
-				codecName, out, "", screenWidth, screenHeight);
+				codecName, out, "");
 	}
 
 	private AudioInfo getAudioInfoFromSettings() {
@@ -679,8 +526,8 @@ public class SoftPhone extends Activity implements IRTPMedia,
 					+ localRealm + " proxyIP: " + proxyIP + "; localPort : "
 					+ proxyPort);
 
-			controller.initUA(this, vi, ai, proxyIP, proxyPort, localUser,
-					localRealm);
+			controller
+					.initUA(vi, ai, proxyIP, proxyPort, localUser, localRealm);
 			ApplicationContext.contextTable.put("controller", controller);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.toString());
@@ -696,23 +543,22 @@ public class SoftPhone extends Activity implements IRTPMedia,
 		Log.d(LOG_TAG, "Message : " + message.getData());
 
 		if (message.getData().containsKey("Call")) {
-			if (message.getData().getString("Call").equals("Invite")) {
-				inviteReceived(message.getData().getString("Contact"));
-			}
+			// if (message.getData().getString("Call").equals("Invite")) {
+			// inviteReceived(message.getData().getString("Contact"));
+			// }
 		} else if (message.getData().containsKey("Register")) {
 			if (message.getData().getString("Register").equals("Sucessful")) {
 				registerSucessful();
 			} else if (message.getData().getString("Register").equals("Failed")) {
 				registerFailed();
 			}
+		} else if (message.getData().containsKey("finishActivity")) {
+			if (message.getData().getString("finishActivity")
+					.equals("MEDIA_CONTROL_OUTGOING")) {
+				finishActivity(MEDIA_CONTROL_OUTGOING);
+			}
 		}
 
 	}
-
-	// @Override
-	// public void rejectReceived() {
-	// Log.d(LOG_TAG, "Call Reject Received");
-	// finishActivity(MEDIA_CONTROL_OUTGOING);
-	// }
 
 }
