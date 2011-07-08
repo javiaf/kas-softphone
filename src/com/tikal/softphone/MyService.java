@@ -20,6 +20,7 @@ import com.tikal.media.AudioInfo;
 import com.tikal.media.MediaControlIncoming;
 import com.tikal.media.VideoInfo;
 import com.tikal.sip.Controller;
+import com.tikal.videocall.VideoCall;
 
 public class MyService extends Service implements IPhoneGUI {
 	private static final String LOG_TAG = "MyService";
@@ -42,7 +43,8 @@ public class MyService extends Service implements IPhoneGUI {
 
 	private Notification mNotif;
 	private PendingIntent mNotifContentIntent;
-	private String notificationTitle;
+	private Intent notifIntent;
+	private String notificationTitle = "Softphone";
 	private static final int IC_LEVEL_ORANGE = 0;
 	/*
 	 * private static final int IC_LEVEL_GREEN=1; private static final int
@@ -61,63 +63,52 @@ public class MyService extends Service implements IPhoneGUI {
 
 	@Override
 	public void onCreate() {
-//		Toast.makeText(this, "My Service Created", Toast.LENGTH_LONG).show();
+		// Toast.makeText(this, "My Service Created", Toast.LENGTH_LONG).show();
 		Log.d(LOG_TAG, "onCreate");
 
 		mNotificationMgr = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotif = new Notification(R.drawable.icon, "",
+
+		mNotif = new Notification(R.drawable.icon, notificationTitle,
 				System.currentTimeMillis());
 		mNotif.iconLevel = IC_LEVEL_ORANGE;
 		mNotif.flags |= Notification.FLAG_ONGOING_EVENT;
 
-		Intent notifIntent = new Intent(this, SoftPhone.class);
-		mNotifContentIntent = PendingIntent
-				.getActivity(this, 0, notifIntent, 0);
-		mNotif.setLatestEventInfo(this, notificationTitle, "Softphone",
-				mNotifContentIntent);
-		mNotificationMgr.notify(NOTIF_ID, mNotif);
-
-		// player = MediaPlayer.create(this, R.raw.braincandy);
-		// player.setLooping(false); // Set looping
-	}
-
-	private void sendNotification(int level, int textId) {
-		mNotif = new Notification(R.drawable.headset, "",
-				System.currentTimeMillis());
-		mNotif.iconLevel = IC_LEVEL_ORANGE;
-		mNotif.flags |= Notification.FLAG_ONGOING_EVENT;
-
-		Intent notifIntent = new Intent(this, SoftPhone.class);
+		notifIntent = new Intent(this, SoftPhone.class);
 		mNotifContentIntent = PendingIntent
 				.getActivity(this, 0, notifIntent, 0);
 		mNotif.setLatestEventInfo(this, notificationTitle, "",
 				mNotifContentIntent);
-		mNotificationMgr.notify(NOTIF_ID, mNotif);
-		mNotif.iconLevel = level;
-		mNotif.when = System.currentTimeMillis();
-		// String text = getString(textId);
-		// if (text.contains("%s")) {
-		// text = String.format(text, id);
-		// }
-		String text = "Demo mi Demo";
-		mNotif.setLatestEventInfo(this, notificationTitle, text,
-				mNotifContentIntent);
+
 		mNotificationMgr.notify(NOTIF_ID, mNotif);
 
 	}
 
+	// private void sendNotification(int level, String text) {
+	// if (mNotif != null) {
+	// // mNotif.iconLevel = level;
+	// mNotif.when = System.currentTimeMillis();
+	//
+	// mNotif.setLatestEventInfo(this, notificationTitle, text,
+	// mNotifContentIntent);
+	// mNotificationMgr.notify(NOTIF_ID, mNotif);
+	// Log.d(LOG_TAG, "sendNotification = " + text);
+	// } else
+	// Log.d(LOG_TAG, "mNotif == null");
+	//
+	// }
+
 	@Override
 	public void onDestroy() {
-//		Toast.makeText(this, "My Service Stopped", Toast.LENGTH_LONG).show();
+		// Toast.makeText(this, "My Service Stopped", Toast.LENGTH_LONG).show();
 		Log.d(LOG_TAG, "onDestroy");
 		mNotificationMgr.cancel(NOTIF_ID);
 		// player.stop();
 	}
-
+	Intent mediaIntent;
 	@Override
 	public void onStart(Intent intent, int startid) {
-//		Toast.makeText(this, "My Service Started", Toast.LENGTH_LONG).show();
+		// Toast.makeText(this, "My Service Started", Toast.LENGTH_LONG).show();
 		Log.d(LOG_TAG, "onStart");
 
 		// initControllerUAFromSettings();
@@ -125,6 +116,10 @@ public class MyService extends Service implements IPhoneGUI {
 		// if (controller == null)
 		// register();
 		//
+		
+//		mediaIntent = new Intent(this, MediaControlIncoming.class);
+		
+		
 
 	}
 
@@ -142,10 +137,11 @@ public class MyService extends Service implements IPhoneGUI {
 		b.putString("Call", "Invite");
 		b.putString("Contact", uri);
 		msg.setData(b);
+
 		handler.sendMessage(msg);
-		sendNotification(IC_LEVEL_ORANGE, 5);
-//		startActivity(new Intent().setClass(this, MediaControlIncoming.class)
-//				.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("Uri", uri));
+
+		// startActivity(new Intent().setClass(this, MediaControlIncoming.class)
+		// .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("Uri", uri));
 	}
 
 	@Override
@@ -166,6 +162,7 @@ public class MyService extends Service implements IPhoneGUI {
 		Bundle b = new Bundle();
 		b.putString("Register", "Sucessful");
 		msg.setData(b);
+
 		handler.sendMessage(msg);
 
 		// handler.post(new Runnable() {
