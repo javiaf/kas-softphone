@@ -1,12 +1,12 @@
 package com.tikal.media;
 
+import android.util.Log;
+
 import com.tikal.android.media.AudioCodec;
 import com.tikal.android.media.VideoCodec;
 import com.tikal.media.format.MediaSpec;
 import com.tikal.media.format.SessionSpec;
 import com.tikal.sdp.enums.MediaType;
-
-import android.util.Log;
 
 
 

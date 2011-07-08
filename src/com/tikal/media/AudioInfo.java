@@ -1,6 +1,5 @@
 package com.tikal.media;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import android.util.Log;
@@ -14,7 +13,7 @@ import com.tikal.android.media.AudioCodec;
  * @author Miguel París Díaz
  * 
  */
-public class AudioInfo implements Serializable {
+public class AudioInfo {
 
 private static final long serialVersionUID = 2763070968508207537L;
 	
@@ -26,6 +25,8 @@ private static final long serialVersionUID = 2763070968508207537L;
 	private int payloadType;
 	ArrayList<Integer> supportedCodecsID;
 	private String out;
+	
+	public int frameSize;
 
 	public int getSample_rate() {
 		return sample_rate;
@@ -77,6 +78,16 @@ private static final long serialVersionUID = 2763070968508207537L;
 
 	public void setOut(String out) {
 		this.out = out;
+	}
+	
+	
+
+	public int getFrameSize() {
+		return frameSize;
+	}
+
+	public void setFrameSize(int frameSize) {
+		this.frameSize = frameSize;
 	}
 
 	public AudioInfo(ArrayList<Integer> supportedCodecsID, String codecName,

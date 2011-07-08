@@ -11,7 +11,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.tikal.applicationcontext.ApplicationContext;
 import com.tikal.controlcontacts.ControlContacts;
+import com.tikal.sip.Controller;
 import com.tikal.softphone.R;
 
 public class MediaControlIncoming extends Activity {
@@ -19,7 +21,9 @@ public class MediaControlIncoming extends Activity {
 
 	private ControlContacts controlcontacts = new ControlContacts(this);
 	Vibrator vibrator;
-
+	Controller controller = (Controller) ApplicationContext.contextTable
+	.get("controller");
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -54,6 +58,8 @@ public class MediaControlIncoming extends Activity {
 		long[] pattern = { 0, 1000, 2000, 3000 };
 
 		vibrator.vibrate(pattern, 1);
+		
+		
 
 	}
 	
@@ -73,6 +79,8 @@ public class MediaControlIncoming extends Activity {
 	protected void onResume() {
 		super.onResume();
 		Log.d(LOG_TAG, "onResume");
+		
+		
 
 		final Button buttonCall = (Button) findViewById(R.id.button_call_accept);
 		buttonCall.setOnClickListener(new OnClickListener() {
@@ -81,7 +89,14 @@ public class MediaControlIncoming extends Activity {
 			public void onClick(View v) {
 				Log.d(LOG_TAG, "Call Accepted " + RESULT_OK);
 				vibrator.cancel();
-				setResult(RESULT_OK);
+				if (controller != null){
+					try {
+						controller.aceptCall();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 				finish();
 			}
 		});
@@ -93,7 +108,14 @@ public class MediaControlIncoming extends Activity {
 			public void onClick(View v) {
 				Log.d(LOG_TAG, "Call Canceled");
 				vibrator.cancel();
-				setResult(RESULT_CANCELED);
+				if (controller != null){
+					try {
+						controller.reject();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 				finish();
 			}
 		});

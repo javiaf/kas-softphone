@@ -1,18 +1,15 @@
 package com.tikal.media;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.tikal.android.media.VideoCodec;
-
-
 
 /**
  * 
  * @author Miguel París Díaz
  * 
  */
-public class VideoInfo implements Serializable {
+public class VideoInfo {
 
 	public final static String LOG_TAG = "VI";
 
@@ -29,9 +26,6 @@ public class VideoInfo implements Serializable {
 	ArrayList<Integer> supportedCodecsID;
 	private String out;
 	private String mode;
-	
-	private int screenWidth;
-	private int screenHeight;
 
 	public int getFrame_rate() {
 		return frame_rate;
@@ -87,7 +81,7 @@ public class VideoInfo implements Serializable {
 
 	public VideoInfo(int frame_rate, int width, int height,
 			ArrayList<Integer> supportedCodecsID, String codecName, String out,
-			String mode, int screenWidth, int screenHeight) {
+			String mode) {
 		this.frame_rate = frame_rate;
 		this.width = width;
 		this.height = height;
@@ -102,25 +96,6 @@ public class VideoInfo implements Serializable {
 		this.supportedCodecsID = supportedCodecsID;
 		this.out = out;
 		this.mode = mode;
-		
-		this.screenWidth = screenWidth;
-		this.screenHeight = screenHeight;
-	}
-
-	public void setScreenWidth(int screenWidth) {
-		this.screenWidth = screenWidth;
-	}
-
-	public int getScreenWidth() {
-		return screenWidth;
-	}
-
-	public void setScreenHeight(int screenHeight) {
-		this.screenHeight = screenHeight;
-	}
-
-	public int getScreenHeight() {
-		return screenHeight;
 	}
 
 }
