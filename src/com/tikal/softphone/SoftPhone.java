@@ -2,12 +2,16 @@ package com.tikal.softphone;
 
 import java.util.ArrayList;
 
+import javax.media.mscontrol.networkconnection.NetworkConnection;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -60,6 +64,16 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	private Controller controller;
 
+	ConnectivityManager ConnectManager;
+
+	// =(ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+	//
+	// String sNetworkType = "No Activate";
+	// /*Control para sólo transmitir cuando tengamos conexión si es false*/
+	// boolean backgroundEnabled = ConnectManager.getBackgroundDataSetting();
+	//
+	// NetworkInfo activeNetwork = ConnectManager.getActiveNetworkInfo();
+
 	/** Called when the activity is first created. */
 	/* Cycle Life */
 	@Override
@@ -96,6 +110,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	protected void onNewIntent(Intent intent) {
 		// TODO Auto-generated method stub
 		super.onNewIntent(intent);
+		Log.d(LOG_TAG, "onNewIntent Is first or is call??");
 		if (intent.getData() == null)
 			return;
 		// Log.d(LOG_TAG, "onNewIntent Tlf: " +
@@ -167,38 +182,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	protected void onResume() {
 		super.onResume();
 
-		/**
-		 * Control Botones Servicio Quitar
-		 */
-
-		// final Button buttonStartService = (Button)
-		// findViewById(R.id.buttonStart);
-		// buttonStartService.setOnClickListener(new OnClickListener() {
-		//
-		// @Override
-		// public void onClick(View v) {
-		// // TODO Auto-generated method stub
-		// Log.d(LOG_TAG, "++++Start Service");
-		//
-		// startService(intentService);
-		//
-		// }
-		// });
-		// final Button buttonEndService = (Button)
-		// findViewById(R.id.buttonStop);
-		// buttonEndService.setOnClickListener(new OnClickListener() {
-		//
-		// @Override
-		// public void onClick(View v) {
-		// // TODO Auto-generated method stub
-		// Log.d(LOG_TAG, "++++nStop Service");
-		// stopService(intentService);
-		// }
-		// });
-
-		/**
-		 * Fin Control Botones Servicio Quitar
-		 */
+		Log.d(LOG_TAG, "On Resume");
 
 		final Button buttonCall = (Button) findViewById(R.id.call);
 		buttonCall.setOnClickListener(new OnClickListener() {
@@ -272,7 +256,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	protected void onDestroy() {
 		super.onDestroy();
 		try {
-			controller.finishUA();
+			if (controller != null)
+				controller.finishUA();
 			Log.d(LOG_TAG, " FinishUA");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -449,7 +434,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		String[] arraySizes = getResources()
 				.getStringArray(R.array.video_sizes);
 		String size = settings.getString("VIDEO_SIZE", arraySizes[0]);
-		Log.d(LOG_TAG, "size: " + size);
+
 		int select = -1;
 		for (int pos = 0; pos < arraySizes.length; pos++)
 			if (arraySizes[pos].equalsIgnoreCase(size)) {
@@ -459,7 +444,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		if (select < 0)
 			select = 0;
 
-		Log.d(LOG_TAG, "select: " + select);
 		int width = getResources().getIntArray(R.array.video_width)[select];
 		int height = getResources().getIntArray(R.array.video_height)[select];
 
