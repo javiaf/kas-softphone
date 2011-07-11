@@ -53,7 +53,7 @@
 
 		<activity android:name="com.tikal.preferences.VideoCall_Preferences"
 			android:label="Video Call Preferences" android:screenOrientation="portrait"></activity>
-		<service android:enabled="true" android:name="com.tikal.softphone.MyService" />
+		<service android:enabled="true" android:name="com.tikal.softphone.SoftPhoneService" />
 		<service android:enabled="true" android:name="com.tikal.videocall.VideoCallService" />
 	</application>
 
