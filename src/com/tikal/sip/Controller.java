@@ -22,7 +22,7 @@ import com.tikal.softphone.IPhone;
 public class Controller implements SipEndPointListener, SipCallListener,
 		IPhone, CallNotifier {
 
-	public final static String LOG_TAG = "CONTROLLER";
+	public final static String LOG_TAG = "Controller";
 	private UA ua = null;
 	private SipEndPoint endPoint = null;;
 	private SipEndPointEvent pendingEndPointEvent;
