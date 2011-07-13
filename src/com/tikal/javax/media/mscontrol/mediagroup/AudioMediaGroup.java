@@ -18,13 +18,13 @@ public class AudioMediaGroup extends MediaGroupBase implements AudioRx {
 	private AudioRecorder audioRecorder = null;
 
 	public AudioMediaGroup(Configuration<MediaGroup> predefinedConfig,
-			int sampleRate, int frameSize) throws MsControlException {
+			int sampleRate, int frameSize, int streamType) throws MsControlException {
 		if (PLAYER.equals(predefinedConfig))
 			audioPlayer = new AudioPlayer(this, sampleRate, frameSize);
 		else if (PLAYER_RECORDER_SIGNALDETECTOR.equals(predefinedConfig)) {
 			audioPlayer = new AudioPlayer(this, sampleRate, frameSize);
 			audioRecorder = new AudioRecorder(this, sampleRate,
-					AudioManager.STREAM_MUSIC);
+					streamType);
 		}
 	}
 
