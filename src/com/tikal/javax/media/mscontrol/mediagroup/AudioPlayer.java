@@ -17,7 +17,7 @@ public class AudioPlayer extends PlayerBase {
 
 	private static final String LOG_TAG = "AudioPlayer";
 
-	private int frequency = 44100;
+	private int frequency;
 	private int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
 	private int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
 	private AudioRecord audioRecord;
@@ -29,7 +29,7 @@ public class AudioPlayer extends PlayerBase {
 	public boolean isPlaying() {
 		if (audioCapture == null)
 			return false;
-		return audioCapture.isPlaying;
+		return audioCapture.isPlaying();
 	}
 
 	public AudioPlayer(MediaGroupBase parent, int sampleRate, int frameSize)
@@ -37,10 +37,8 @@ public class AudioPlayer extends PlayerBase {
 		super(parent);
 
 		this.frameSize = frameSize;
-		Log.d(LOG_TAG, "frameSize = " + frameSize);
-
 		frequency = sampleRate;
-		Log.d(LOG_TAG, "Frequency = " + frequency);
+	
 		int minBufferSize = AudioRecord.getMinBufferSize(frequency,
 				channelConfiguration, audioEncoding);
 
@@ -49,8 +47,6 @@ public class AudioPlayer extends PlayerBase {
 		buffer = new short[bufferSize];
 		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequency,
 				channelConfiguration, audioEncoding, bufferSize);
-
-		audioCapture = new AudioCapture();
 	}
 
 	/**
@@ -86,11 +82,8 @@ public class AudioPlayer extends PlayerBase {
 	@Override
 	public synchronized void play(URI arg0, RTC[] arg1, Parameters arg2)
 			throws MsControlException {
-		if (audioCapture != null) {
-			if (!audioCapture.isAlive())
-				audioCapture.start();
-			audioCapture.startRecording();
-		}
+		audioCapture = new AudioCapture();
+		audioCapture.start();
 	}
 
 	@Override
@@ -112,7 +105,12 @@ public class AudioPlayer extends PlayerBase {
 		}
 
 		public void stopRecording() {
-			isPlaying = false;
+			setPlaying(false);
+		}
+
+		@Override
+		public void run() {
+			startRecording();
 		}
 
 		private int readFully(short[] audioData, int sizeInShorts) {
@@ -129,12 +127,12 @@ public class AudioPlayer extends PlayerBase {
 			return shortsRead;
 		}
 
-		public void startRecording() {
+		private void startRecording() {
 			if (audioRecord == null)
 				return;
 			audioRecord.startRecording();
 			setPlaying(true);
-			try {
+				try {
 				while (isPlaying()) {
 					int bufferReadResult = readFully(buffer, frameSize);
 					for (Joinable j : getContainer().getJoinees(Direction.SEND))
@@ -150,7 +148,7 @@ public class AudioPlayer extends PlayerBase {
 				if (audioRecord != null)
 					audioRecord.stop();
 			} catch (Throwable t) {
-				Log.e(LOG_TAG, "Error al grabar:" + t.toString());
+				Log.e(LOG_TAG, "Recording error:" + t.toString());
 			}
 		}
 	}
