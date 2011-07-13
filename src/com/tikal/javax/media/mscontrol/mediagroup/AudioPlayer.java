@@ -16,14 +16,20 @@ import android.util.Log;
 public class AudioPlayer extends PlayerBase {
 
 	private static final String LOG_TAG = "AudioPlayer";
+
 	private int frequency = 44100;
 	private int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
 	private int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
 	private AudioRecord audioRecord;
 	private short[] buffer;
-	int frameSize;
+	private int frameSize;
 
-	AudioCapture audioCapture;
+	private AudioCapture audioCapture;
+	private boolean isPlaying = false;
+
+	public synchronized boolean isPlaying() {
+		return isPlaying;
+	}
 
 	public AudioPlayer(MediaGroupBase parent, int sampleRate, int frameSize)
 			throws MsControlException {
@@ -60,14 +66,14 @@ public class AudioPlayer extends PlayerBase {
 		return finalSize;
 	}
 
-//	private void releaseAudioRecord() {
-//		Log.d(LOG_TAG, "ReleaseAudio");
-//		if (audioRecord != null) {
-//			audioRecord.stop();
-//			audioRecord.release();
-//			audioRecord = null;
-//		}
-//	}
+	// private void releaseAudioRecord() {
+	// Log.d(LOG_TAG, "ReleaseAudio");
+	// if (audioRecord != null) {
+	// audioRecord.stop();
+	// audioRecord.release();
+	// audioRecord = null;
+	// }
+	// }
 
 	@Override
 	public void play(URI[] arg0, RTC[] arg1, Parameters arg2)
@@ -77,14 +83,20 @@ public class AudioPlayer extends PlayerBase {
 	}
 
 	@Override
-	public void play(URI arg0, RTC[] arg1, Parameters arg2)
+	public synchronized void play(URI arg0, RTC[] arg1, Parameters arg2)
 			throws MsControlException {
-		audioCapture.start();
+		if (audioCapture != null) {
+			audioCapture.start();
+			isPlaying = true;
+		}
 	}
 
 	@Override
-	public void stop(boolean arg0) {
-		audioCapture.stopAudio();
+	public synchronized void stop(boolean arg0) {
+		if (audioCapture != null) {
+			audioCapture.stopAudio();
+			isPlaying = false;
+		}
 	}
 
 	private class AudioCapture extends Thread {
