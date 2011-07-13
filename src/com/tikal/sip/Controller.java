@@ -71,6 +71,10 @@ public class Controller implements SipEndPointListener, SipCallListener,
 
 		register(localUser, localRealm);
 	}
+	
+	public boolean isRegister(){
+		return (endPoint != null);
+	}
 
 	public void finishUA() throws Exception {
 		if (ua != null)
