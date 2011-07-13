@@ -133,7 +133,7 @@ public class NetworkConnectionImpl extends NetworkConnectionBase {
 			videoInfo.setMode(VideoInfo.MODE_SEND_RTP);
 			videoInfo.setPayloadType(rtpInfo.getVideoPayloadType());
 			int ret = MediaTx.initVideo(videoInfo.getOut(),
-					videoInfo.getWidth(), videoInfo.getHeight(), 15, 4000000,
+					videoInfo.getWidth(), videoInfo.getHeight(), 15, 1000000,
 					videoInfo.getCodecID(), videoInfo.getPayloadType(),
 					PRESET_FILE);
 			if (ret < 0) {
@@ -163,11 +163,13 @@ public class NetworkConnectionImpl extends NetworkConnectionBase {
 	@Override
 	public void release() {
 		Log.d(LOG_TAG, "release");
-		MediaTx.finishVideo();
+		
 		MediaRx.stopVideoRx();
+		MediaTx.finishVideo();
 
-		MediaTx.finishAudio();
+		
 		MediaRx.stopAudioRx();
+		MediaTx.finishAudio();
 
 //		MediaPortManager.releaseAudioLocalPort();
 //		MediaPortManager.releaseVideoLocalPort();

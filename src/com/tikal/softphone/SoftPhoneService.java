@@ -24,7 +24,8 @@ public class SoftPhoneService extends Service implements CallListener {
 	private static final String LOG_TAG = "SoftPhoneService";
 
 	private NotificationManager mNotificationMgr;
-	private final static int NOTIF_ID = 1;
+	private final static int NOTIF_SOFTPHONE = 1;
+	private final static int NOTIF_VIDEOCALL = 1;
 
 	private Notification mNotif;
 	private PendingIntent mNotifContentIntent;
@@ -65,7 +66,7 @@ public class SoftPhoneService extends Service implements CallListener {
 		mNotif.setLatestEventInfo(this, notificationTitle, "",
 				mNotifContentIntent);
 
-		mNotificationMgr.notify(NOTIF_ID, mNotif);
+		mNotificationMgr.notify(NOTIF_SOFTPHONE, mNotif);
 
 		Controller controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
@@ -91,7 +92,13 @@ public class SoftPhoneService extends Service implements CallListener {
 	@Override
 	public void onDestroy() {
 		Log.d(LOG_TAG, "onDestroy");
-		mNotificationMgr.cancel(NOTIF_ID);
+		mNotificationMgr.cancel(NOTIF_SOFTPHONE);
+		mNotificationMgr.cancel(NOTIF_VIDEOCALL);
+		try {
+			stopService(videoCallIntent);
+		} catch (Exception e) {
+		}
+
 	}
 
 	Intent mediaIntent;
@@ -138,12 +145,13 @@ public class SoftPhoneService extends Service implements CallListener {
 
 		videoCallIntent = new Intent(this, VideoCallService.class);
 		videoCallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		Log.d(LOG_TAG, "Start Service " + videoCallIntent);
 		startService(videoCallIntent);
 	}
 
 	@Override
 	public void callTerminate() {
-		Log.d(LOG_TAG, "callTerminate");
+		Log.d(LOG_TAG, "callTerminate: " + videoCallIntent);
 		stopService(videoCallIntent);
 	}
 

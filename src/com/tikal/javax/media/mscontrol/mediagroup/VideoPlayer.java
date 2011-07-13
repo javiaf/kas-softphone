@@ -34,10 +34,17 @@ public class VideoPlayer extends PlayerBase implements SurfaceHolder.Callback,
 	public void setVideoSurfaceTx(View surface) {
 		this.videoSurfaceTx = surface;
 		if (videoSurfaceTx != null) {
-			mVideoView = (SurfaceView) videoSurfaceTx;
-			mHolder = mVideoView.getHolder();
-			mHolder.addCallback(this);
-			mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+			try {
+				mVideoView = (SurfaceView) videoSurfaceTx;
+				mHolder = mVideoView.getHolder();
+				mHolder.addCallback(this);
+				Log.d(LOG_TAG, "setVideoSurfaceTx: mHolder is creating ? " + mHolder.isCreating());
+				mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+				Log.d(LOG_TAG, "setVideoSurfaceTx is OK");
+			} catch (Exception e) {
+				Log.e(LOG_TAG, "Exception : " + e.toString());
+			}
+
 		}
 	}
 
@@ -66,7 +73,8 @@ public class VideoPlayer extends PlayerBase implements SurfaceHolder.Callback,
 					cam = Camera.open(camIdx);
 				} catch (RuntimeException e) {
 					Log.e(LOG_TAG,
-							"Camera failed to open: " + e.getLocalizedMessage());
+							"Camera failed to open: " + e.getLocalizedMessage()
+									+ " ; " + e.toString());
 				}
 			}
 		}
@@ -86,24 +94,12 @@ public class VideoPlayer extends PlayerBase implements SurfaceHolder.Callback,
 				mCamera = openFrontFacingCameraGingerbread();
 		}
 
-		Log.i(LOG_TAG, "Camera: W:"
-				+ mCamera.getParameters().getPreviewSize().width + "; H:"
-				+ mCamera.getParameters().getPreviewSize().height);
-
 		Camera.Parameters parameters = mCamera.getParameters();
 
 		// parameters.set("camera-id", 2);
 		// mCamera.setParameters(parameters);
 
 		List<Size> sizes = parameters.getSupportedPreviewSizes();
-
-		// Parameters
-		Log.d("FPS",
-				"getPreviewFrameRate(): " + parameters.getPreviewFrameRate());
-		Log.d("FPS",
-				"getSupportedPreviewFrameRates(): "
-						+ parameters.getSupportedPreviewFrameRates());
-
 		String cad = "";
 		// Video Preferences is support?
 		boolean isSupport = false;
@@ -115,31 +111,13 @@ public class VideoPlayer extends PlayerBase implements SurfaceHolder.Callback,
 				break;
 			}
 		}
-
-		Log.d("FPS", "getPreviewSize: " + parameters.getPreviewSize().width
-				+ " x " + parameters.getPreviewSize().height);
-		Log.d("FPS", "getSupportedPreviewSizes:\n" + cad);
-
-		Log.d("FPS", "getPreviewFormat(): " + parameters.getPreviewFormat());
-		Log.d("FPS",
-				"getSupportedPreviewFormats(): "
-						+ parameters.getSupportedPreviewFormats());
-
-		// frame_rate = parameters.getPreviewFrameRate();
 		if (!isSupport) {
 			width = sizes.get(0).width;
 			height = sizes.get(0).height;
 		}
 		parameters.setPreviewSize(width, height);
-		// parameters.setRotation(180);
 		mCamera.setParameters(parameters);
 
-		parameters = mCamera.getParameters();
-
-		Log.d("FPS",
-				"Despues del Set getPreviewSize: "
-						+ parameters.getPreviewSize().width + " x "
-						+ parameters.getPreviewSize().height);
 
 		mCamera.setPreviewCallback(this);
 	}
@@ -147,38 +125,51 @@ public class VideoPlayer extends PlayerBase implements SurfaceHolder.Callback,
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
-
-		// Parameters params = mCamera.getParameters();
-		if (mCamera != null) {
-			int degrees = 90;
-
-			mCamera.setDisplayOrientation(degrees);
-			Camera.Parameters parameters = mCamera.getParameters();
-
-			parameters.setRotation(degrees);
-			// params.setPreviewSize(width, height);
-			mCamera.setParameters(parameters);
-
+		Log.d(LOG_TAG, "surface Changed");
+		if (mCamera != null)
 			mCamera.startPreview();
-		}
+		// Parameters params = mCamera.getParameters();
+		// if (mCamera != null) {
+		// int degrees = 90;
+		//
+		// mCamera.setDisplayOrientation(degrees);
+		// Camera.Parameters parameters = mCamera.getParameters();
+		//
+		// parameters.setRotation(degrees);
+		// // params.setPreviewSize(width, height);
+		// mCamera.setParameters(parameters);
+		//
+		// mCamera.startPreview();
+		// }
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		try {
-
+			Log.d(LOG_TAG, "Surface Create");
 			if (mCamera == null) {
 				if (VERSION.SDK_INT < 9) {
 					mCamera = Camera.open();
 				} else
 					mCamera = openFrontFacingCameraGingerbread();
 			}
-			Log.d(LOG_TAG, " mCamera opened " + mCamera.toString());
+
 			// mCamera.setPreviewCallback(this);
 			// mCamera = Camera.open();
 			if (mCamera != null) {
-				Log.d(LOG_TAG, "Surface Create");
+				Log.d(LOG_TAG, " mCamera opened " + mCamera.toString());
+
+//				int degrees = 90;
+//
+//				mCamera.setDisplayOrientation(degrees);
+//				Camera.Parameters parameters = mCamera.getParameters();
+//
+//				parameters.setRotation(degrees);
+//				// params.setPreviewSize(width, height);
+//				mCamera.setParameters(parameters);
+
 				mCamera.setPreviewDisplay(holder);
+
 			} else
 				Log.w(LOG_TAG, "Not Surface Create");
 
@@ -191,6 +182,7 @@ public class VideoPlayer extends PlayerBase implements SurfaceHolder.Callback,
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
+		Log.d(LOG_TAG, "surfaceDestroyed");
 		if (mCamera != null) {
 			mCamera.stopPreview();
 		}
@@ -235,7 +227,7 @@ public class VideoPlayer extends PlayerBase implements SurfaceHolder.Callback,
 	@Override
 	public void stop(boolean arg0) {
 		// TODO incomplete
-		Log.d(LOG_TAG, "Release");
+		Log.d(LOG_TAG, "Stop");
 		// mCamera.stopPreview();
 		// mCamera.release();
 		mCamera = null;

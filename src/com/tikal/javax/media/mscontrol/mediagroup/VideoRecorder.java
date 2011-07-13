@@ -42,9 +42,16 @@ public class VideoRecorder extends RecorderBase implements VideoRx {
 		mVideoReceiveView = (SurfaceView) videoSurfaceRx;
 		mHolderReceive = mVideoReceiveView.getHolder();
 		mSurfaceReceive = mHolderReceive.getSurface();
-		
-		this.screenWidth = displayWidth;
-		this.screenHeight = displayHeight * 3 / 4;
+
+		Log.d(LOG_TAG, "W: " + displayWidth + "; H: " + displayHeight);
+
+		if (displayWidth < displayHeight) {
+			this.screenWidth = displayWidth;
+			this.screenHeight = displayHeight * 3 / 4;
+		} else {
+			this.screenWidth = displayWidth * 1 / 2;
+			this.screenHeight = displayHeight * 3 / 4;
+		}
 	}
 
 	public View getVideoSurfaceRx() {
@@ -59,9 +66,7 @@ public class VideoRecorder extends RecorderBase implements VideoRx {
 		this.videoSurfaceRx = surface;
 		this.screenWidth = displayWidth;
 		this.screenHeight = displayHeight * 3 / 4;
-		Log.d(LOG_TAG, "ScreenWidth : " + screenWidth + "; ScreenHeigh : "
-				+ screenHeight);
-		
+
 		if (surface != null) {
 			mVideoReceiveView = (SurfaceView) videoSurfaceRx;
 			mHolderReceive = mVideoReceiveView.getHolder();
@@ -78,6 +83,8 @@ public class VideoRecorder extends RecorderBase implements VideoRx {
 			return;
 
 		try {
+			if (mSurfaceReceive == null)
+				return;
 			canvas = mSurfaceReceive.lockCanvas(null);
 			if (canvas == null)
 				return;
@@ -87,6 +94,9 @@ public class VideoRecorder extends RecorderBase implements VideoRx {
 			RectF dirty2 = new RectF(0, 0, screenWidth, screenHeight);
 
 			canvas.drawBitmap(srcBitmap, null, dirty2, null);
+			
+			if (mSurfaceReceive == null)
+				return;
 			mSurfaceReceive.unlockCanvasAndPost(canvas);
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
@@ -109,4 +119,5 @@ public class VideoRecorder extends RecorderBase implements VideoRx {
 	public void stop() {
 		isRecording = false;
 	}
+
 }

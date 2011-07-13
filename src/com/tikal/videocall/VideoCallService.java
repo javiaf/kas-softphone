@@ -11,6 +11,7 @@ import javax.media.mscontrol.resource.RTC;
 
 import com.tikal.applicationcontext.ApplicationContext;
 import com.tikal.javax.media.mscontrol.mediagroup.AudioMediaGroup;
+import com.tikal.javax.media.mscontrol.mediagroup.AudioRecorder;
 import com.tikal.javax.media.mscontrol.mediagroup.VideoMediaGroup;
 import com.tikal.javax.media.mscontrol.networkconnection.NetworkConnectionImpl;
 import com.tikal.media.AudioInfo;
@@ -25,6 +26,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.AudioRecord;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -37,7 +40,8 @@ public class VideoCallService extends Service {
 	
 
 	private NotificationManager mNotificationMgr;
-	private final static int NOTIF_ID = 2;
+	private final static int NOTIF_VIDEOCALL = 2;
+	private final static int NOTIF_SOFTPHONE = 1;
 	
 	private Notification mNotif;
 	private PendingIntent mNotifContentIntent;
@@ -69,7 +73,8 @@ public class VideoCallService extends Service {
 		mNotif.setLatestEventInfo(this, notificationTitle, "",
 				mNotifContentIntent);
 
-		mNotificationMgr.notify(NOTIF_ID, mNotif);
+		mNotificationMgr.notify(NOTIF_VIDEOCALL, mNotif);
+		mNotificationMgr.cancel(NOTIF_SOFTPHONE);
 
 		Controller controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
@@ -87,13 +92,14 @@ public class VideoCallService extends Service {
 		try {
 			audioMediaGroup = new AudioMediaGroup(
 					MediaGroup.PLAYER_RECORDER_SIGNALDETECTOR,
-					ai.getSample_rate(), ai.getFrameSize());
+					ai.getSample_rate(), ai.getFrameSize(), AudioManager.STREAM_MUSIC);
+			
 		} catch (MsControlException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		// }
-		Log.d(LOG_TAG, "sdpVideo:\n" + sdpVideo);
+//		Log.d(LOG_TAG, "sdpVideo:\n" + sdpVideo);
 		// if (!sdpVideo.equals("")) {
 		Log.d(LOG_TAG, "create videoMediaGroup");
 		try {
@@ -128,21 +134,26 @@ public class VideoCallService extends Service {
 			if (audioMediaGroup != null) {
 				audioMediaGroup.join(Direction.DUPLEX,
 						nc.getJoinableStream(StreamType.audio));
+				Log.d(LOG_TAG, "137");
 				audioMediaGroup.getPlayer().play(URI.create(""), RTC.NO_RTC,
 						Parameters.NO_PARAMETER);
+				Log.d(LOG_TAG, "140");
 				audioMediaGroup.getRecorder().record(URI.create(""),
 						RTC.NO_RTC, Parameters.NO_PARAMETER);
-
+				Log.d(LOG_TAG, "Audio is OK");
 				// Unjoin example
 				// audioMediaGroup.stop();
 				// audioMediaGroup.unjoin(controller.getNetworkConnection()
 				// .getJoinableStream(StreamType.audio));
 			}
+			
 			if (videoMediaGroup != null) {
 				videoMediaGroup.join(Direction.DUPLEX,
 						nc.getJoinableStream(StreamType.video));
+				Log.d(LOG_TAG, "151");
 				videoMediaGroup.getPlayer().play(URI.create(""), RTC.NO_RTC,
 						Parameters.NO_PARAMETER);
+				Log.d(LOG_TAG, "154");
 				videoMediaGroup.getRecorder().record(URI.create(""),
 						RTC.NO_RTC, Parameters.NO_PARAMETER);
 
@@ -165,13 +176,26 @@ public class VideoCallService extends Service {
 	@Override
 	public void onDestroy() {
 		Log.d(LOG_TAG, "On Destroy");
+		
+		mNotificationMgr.cancel(NOTIF_VIDEOCALL);
+		mNotif = new Notification(R.drawable.icon, notificationTitle,
+				System.currentTimeMillis());
+		
+		notifIntent = new Intent(this, SoftPhone.class);
+		mNotifContentIntent = PendingIntent
+				.getActivity(this, 0, notifIntent, 0);
+		mNotif.setLatestEventInfo(this, notificationTitle, "",
+				mNotifContentIntent);
+
+		mNotificationMgr.notify(NOTIF_SOFTPHONE, mNotif);
+		
 		if (audioMediaGroup != null)
 			audioMediaGroup.stop();
 
 		if (videoMediaGroup != null)
 			videoMediaGroup.stop();
 		
-		mNotificationMgr.cancel(NOTIF_ID);
+		
 		super.onDestroy();
 	}
 

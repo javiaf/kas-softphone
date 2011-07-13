@@ -1,8 +1,15 @@
 package com.tikal.videocall;
 
+import java.net.URI;
+
+import javax.media.mscontrol.MsControlException;
+import javax.media.mscontrol.Parameters;
+import javax.media.mscontrol.resource.RTC;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
@@ -13,12 +20,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.tikal.applicationcontext.ApplicationContext;
+import com.tikal.javax.media.mscontrol.mediagroup.AudioMediaGroup;
+import com.tikal.javax.media.mscontrol.mediagroup.AudioPlayer;
+import com.tikal.javax.media.mscontrol.mediagroup.AudioRecorder;
 import com.tikal.javax.media.mscontrol.mediagroup.VideoMediaGroup;
 import com.tikal.preferences.VideoCall_Preferences;
+import com.tikal.sip.Controller;
 import com.tikal.softphone.IPhone;
 import com.tikal.softphone.R;
+import com.tikal.softphone.SoftPhone;
 
 public class VideoCall extends Activity {
 	private static final String LOG_TAG = "VideoCall";
@@ -29,21 +42,32 @@ public class VideoCall extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.videocall);
 		Log.d(LOG_TAG, "OnCreate");
-		
-		//use to mute, etc.
-//		AudioMediaGroup audioMediaGroup = (AudioMediaGroup) ApplicationContext.contextTable
-//		.get("audioMediaGroup");
-		
+
 		VideoMediaGroup videoMediaGroup = (VideoMediaGroup) ApplicationContext.contextTable
-		.get("videoMediaGroup");
+				.get("videoMediaGroup");
+
 		Log.d(LOG_TAG, "videoMediaGroup: " + videoMediaGroup);
-		if(videoMediaGroup != null) {
+		if (videoMediaGroup != null) {
 			DisplayMetrics dm = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(dm);
-			videoMediaGroup.setSurfaceTx(findViewById(R.id.video_capture_surface));
-			videoMediaGroup.setSurfaceRx(findViewById(R.id.video_receive_surface),
-						dm.widthPixels, dm.heightPixels);
-		}
+			int Orientation = getWindowManager().getDefaultDisplay()
+					.getOrientation();
+			Log.d(LOG_TAG, "W: " + dm.widthPixels + " H:" + dm.heightPixels
+					+ " Orientation = " + Orientation);
+			videoMediaGroup
+					.setSurfaceTx(findViewById(R.id.video_capture_surface));
+			videoMediaGroup.setSurfaceRx(
+					findViewById(R.id.video_receive_surface), dm.widthPixels,
+					dm.heightPixels);
+		} else
+			Log.d(LOG_TAG, "VideomediaGroup is null");
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		// TODO Auto-generated method stub
+		super.onNewIntent(intent);
+		Log.d(LOG_TAG, "OnNewIntent");
 	}
 
 	@Override
@@ -55,27 +79,76 @@ public class VideoCall extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-	
+
 		final Button buttonTerminateCall = (Button) findViewById(R.id.button_terminate_call);
 		buttonTerminateCall.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				Log.d(LOG_TAG, "Hang ...");
-				IPhone controller = (IPhone) ApplicationContext.contextTable
+				Controller controller = (Controller) ApplicationContext.contextTable
 						.get("controller");
 				if (controller != null) {
 					controller.hang();
 				}
 			}
 		});
-		final Button ButtonUseFrontCamera = (Button) findViewById(R.id.button_use_front_camera);
-		ButtonUseFrontCamera.setVisibility(0);
-		ButtonUseFrontCamera.setOnClickListener(new OnClickListener() {
+		final Button buttonMute = (Button) findViewById(R.id.button_mute);
+
+		buttonMute.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				// CameraCapture.getInstance().setUseFrontCamera(false);
+				AudioMediaGroup audioMediaGroup = (AudioMediaGroup) ApplicationContext.contextTable
+						.get("audioMediaGroup");
+				try {
+					Log.d(LOG_TAG, " Button Mute push");
+
+					if (((AudioPlayer) audioMediaGroup.getPlayer()).isPlaying()){
+						Toast.makeText(VideoCall.this, "Mute",
+								Toast.LENGTH_SHORT).show();
+						audioMediaGroup.getPlayer().stop(true);
+					}
+					else{
+						Toast.makeText(VideoCall.this, "Speak",
+								Toast.LENGTH_SHORT).show();
+						audioMediaGroup.getPlayer().play(URI.create(""),
+								RTC.NO_RTC, Parameters.NO_PARAMETER);
+					}
+
+				} catch (MsControlException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		final Button buttonSpeaker = (Button) findViewById(R.id.button_headset);
+
+		buttonSpeaker.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				AudioMediaGroup audioMediaGroup = (AudioMediaGroup) ApplicationContext.contextTable
+						.get("audioMediaGroup");
+				try {
+					if (((AudioRecorder) audioMediaGroup.getRecorder())
+							.getStreamType() == AudioManager.STREAM_MUSIC){
+						Toast.makeText(VideoCall.this, "Speaker",
+								Toast.LENGTH_SHORT).show();
+						((AudioRecorder) audioMediaGroup.getRecorder())
+								.setStreamType(AudioManager.STREAM_VOICE_CALL);
+					}
+					else{
+						Toast.makeText(VideoCall.this, "HeadSet",
+								Toast.LENGTH_SHORT).show();
+						((AudioRecorder) audioMediaGroup.getRecorder())
+								.setStreamType(AudioManager.STREAM_MUSIC);
+					}
+					audioMediaGroup.getRecorder().record(URI.create(""),
+							RTC.NO_RTC, Parameters.NO_PARAMETER);
+				} catch (MsControlException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 

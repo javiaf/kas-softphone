@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -33,6 +35,7 @@ import com.tikal.android.media.AudioCodec;
 import com.tikal.android.media.VideoCodec;
 import com.tikal.applicationcontext.ApplicationContext;
 import com.tikal.controlcontacts.ControlContacts;
+import com.tikal.javax.media.mscontrol.mediagroup.VideoMediaGroup;
 import com.tikal.media.AudioInfo;
 import com.tikal.media.MediaControlOutgoing;
 import com.tikal.media.VideoInfo;
@@ -63,6 +66,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private TextView text;
 
 	private Controller controller;
+
+	private boolean isExit = false;
 
 	ConnectivityManager ConnectManager;
 
@@ -98,9 +103,25 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 		// wl.acquire(tiempo);
 
+		/* If first time */
+		controller = (Controller) ApplicationContext.contextTable
+				.get("controller");
+		
+		String texto = (String) ApplicationContext.contextTable
+		.get("texto");
+		Log.d(LOG_TAG, "Text: " + texto);
+		if (texto == null) ApplicationContext.contextTable.put("texto", "Estoy dentro");
+		
 		initControllerUAFromSettings();
-		if (controller == null)
+		if (controller == null){
+			Log.d(LOG_TAG, "Controller is null");
 			register();
+		}
+		else{
+			Log.d(LOG_TAG, "Controller not is null");
+			if (controller.isRegister())
+				registerSucessful();
+		}
 		// Estoy registrado?
 		checkCallIntent(getIntent());
 
@@ -170,11 +191,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	@Override
 	protected void onRestart() {
+		Log.d(LOG_TAG, "On Restart");
+
 		super.onRestart();
 	}
 
 	@Override
 	protected void onStart() {
+		Log.d(LOG_TAG, "On Start");
+
 		super.onStart();
 	}
 
@@ -244,24 +269,30 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	@Override
 	protected void onPause() {
+		Log.d(LOG_TAG, "On Pause");
 		super.onPause();
 	}
 
 	@Override
 	protected void onStop() {
+		Log.d(LOG_TAG, "On Stop");
 		super.onStop();
 	}
 
 	@Override
-	protected void onDestroy() {
-		super.onDestroy();
+	protected void onDestroy() {		
+		Log.d(LOG_TAG, "On Destroy");
 		try {
-			if (controller != null)
-				controller.finishUA();
-			Log.d(LOG_TAG, " FinishUA");
+			if (isExit) {
+				if (controller != null)
+					controller.finishUA();
+				Log.d(LOG_TAG, " FinishUA");
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		super.onDestroy();
 	}
 
 	/**** End Cycle Life */
@@ -365,6 +396,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case (R.id.menu_exit):
+			isExit = true;
 			stopService(intentService);
 			finish();
 			return true;
@@ -521,9 +553,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	@Override
 	public void update(Message message) {
-		// TODO Auto-generated method stub
-		// if (dialog != null)
-		// dialog.dismiss();
 		Log.d(LOG_TAG, "Message : " + message.getData());
 
 		if (message.getData().containsKey("Call")) {
@@ -539,6 +568,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		} else if (message.getData().containsKey("finishActivity")) {
 			if (message.getData().getString("finishActivity")
 					.equals("MEDIA_CONTROL_OUTGOING")) {
+				Log.d(LOG_TAG, "Finish Activity MEDIA_CONTROL_OUTGOING");
 				finishActivity(MEDIA_CONTROL_OUTGOING);
 			}
 		}
