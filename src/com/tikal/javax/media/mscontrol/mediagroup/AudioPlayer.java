@@ -25,10 +25,11 @@ public class AudioPlayer extends PlayerBase {
 	private int frameSize;
 
 	private AudioCapture audioCapture;
-	private boolean isPlaying = false;
 
-	public synchronized boolean isPlaying() {
-		return isPlaying;
+	public boolean isPlaying() {
+		if (audioCapture == null)
+			return false;
+		return audioCapture.isPlaying;
 	}
 
 	public AudioPlayer(MediaGroupBase parent, int sampleRate, int frameSize)
@@ -86,33 +87,32 @@ public class AudioPlayer extends PlayerBase {
 	public synchronized void play(URI arg0, RTC[] arg1, Parameters arg2)
 			throws MsControlException {
 		if (audioCapture != null) {
-			audioCapture.start();
-			isPlaying = true;
+			if (!audioCapture.isAlive())
+				audioCapture.start();
+			audioCapture.startRecording();
 		}
 	}
 
 	@Override
 	public synchronized void stop(boolean arg0) {
-		if (audioCapture != null) {
-			audioCapture.stopAudio();
-			isPlaying = false;
-		}
+		if (audioCapture != null)
+			audioCapture.stopRecording();
 	}
 
 	private class AudioCapture extends Thread {
 
-		@Override
-		public void run() {
-			startRecording();
+		private boolean isPlaying = false;
+
+		public synchronized boolean isPlaying() {
+			return isPlaying;
 		}
 
-		public void stopAudio() {
-			interrupt();
+		private synchronized void setPlaying(boolean isPlaying) {
+			this.isPlaying = isPlaying;
 		}
 
-		private void stopRecording() {
-			if (audioRecord != null)
-				audioRecord.stop();
+		public void stopRecording() {
+			isPlaying = false;
 		}
 
 		private int readFully(short[] audioData, int sizeInShorts) {
@@ -129,11 +129,13 @@ public class AudioPlayer extends PlayerBase {
 			return shortsRead;
 		}
 
-		private void startRecording() {
-			Log.d(LOG_TAG, "Start Recording");
+		public void startRecording() {
+			if (audioRecord == null)
+				return;
 			audioRecord.startRecording();
+			setPlaying(true);
 			try {
-				while (!isInterrupted()) {
+				while (isPlaying()) {
 					int bufferReadResult = readFully(buffer, frameSize);
 					for (Joinable j : getContainer().getJoinees(Direction.SEND))
 						if (j instanceof AudioSink)
@@ -145,7 +147,8 @@ public class AudioPlayer extends PlayerBase {
 							((AudioSink) j).putAudioSamples(buffer,
 									bufferReadResult);
 				}
-				stopRecording();
+				if (audioRecord != null)
+					audioRecord.stop();
 			} catch (Throwable t) {
 				Log.e(LOG_TAG, "Error al grabar:" + t.toString());
 			}
