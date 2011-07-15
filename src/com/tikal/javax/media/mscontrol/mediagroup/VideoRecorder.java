@@ -19,7 +19,8 @@ import android.view.View;
 
 import com.tikal.android.media.rx.VideoRx;
 
-public class VideoRecorder extends RecorderBase implements VideoRx {
+public class VideoRecorder extends RecorderBase implements VideoRx,
+		SurfaceHolder.Callback {
 	private static final String LOG_TAG = "VideoRecorder";
 
 	private SurfaceView mVideoReceiveView;
@@ -36,8 +37,8 @@ public class VideoRecorder extends RecorderBase implements VideoRx {
 
 	private boolean isRecording = false;
 
-	public void setVideoSurfaceRx(View videoReceiveSurface, int displayWidth,
-			int displayHeight) {
+	public synchronized void setVideoSurfaceRx(View videoReceiveSurface,
+			int displayWidth, int displayHeight) {
 		this.videoSurfaceRx = videoReceiveSurface;
 		mVideoReceiveView = (SurfaceView) videoSurfaceRx;
 		mHolderReceive = mVideoReceiveView.getHolder();
@@ -54,7 +55,7 @@ public class VideoRecorder extends RecorderBase implements VideoRx {
 		}
 	}
 
-	public View getVideoSurfaceRx() {
+	public synchronized View getVideoSurfaceRx() {
 		return videoSurfaceRx;
 	}
 
@@ -75,37 +76,42 @@ public class VideoRecorder extends RecorderBase implements VideoRx {
 	}
 
 	@Override
-	public void putVideoFrameRx(int[] rgb, int width, int height) {
+	public synchronized void putVideoFrameRx(int[] rgb, int width, int height) {
 		if (!isRecording)
 			return;
 
-		if (rgb == null || rgb.length == 0)
+		if (rgb == null || rgb.length == 0){
+			Log.d(LOG_TAG, "RGB is null o length = 0");
 			return;
+		}
 
 		try {
 			if (mSurfaceReceive == null)
 				return;
+
 			canvas = mSurfaceReceive.lockCanvas(null);
-			if (canvas == null)
-				return;
+			try {
 
-			Bitmap srcBitmap = Bitmap.createBitmap(rgb, width, height,
-					Bitmap.Config.ARGB_8888);
-			RectF dirty2 = new RectF(0, 0, screenWidth, screenHeight);
+				if (canvas == null) {
+					Log.d(LOG_TAG, "canvas is null");
+					return;
+				}
 
-			canvas.drawBitmap(srcBitmap, null, dirty2, null);
-			
-			if (mSurfaceReceive == null)
-				return;
-			mSurfaceReceive.unlockCanvasAndPost(canvas);
+				Bitmap srcBitmap = Bitmap.createBitmap(rgb, width, height,
+						Bitmap.Config.ARGB_8888);
+				RectF dirty2 = new RectF(0, 0, screenWidth, screenHeight);
+
+				canvas.drawBitmap(srcBitmap, null, dirty2, null);
+
+			} finally {
+				mSurfaceReceive.unlockCanvasAndPost(canvas);
+			}
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			Log.e(LOG_TAG, "Exception: " + e.toString());
-			e.printStackTrace();
+//			e.printStackTrace();
 		} catch (OutOfResourcesException e) {
-			// TODO Auto-generated catch block
 			Log.e(LOG_TAG, "Exception: " + e.toString());
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 	}
 
@@ -118,6 +124,33 @@ public class VideoRecorder extends RecorderBase implements VideoRx {
 	@Override
 	public void stop() {
 		isRecording = false;
+	}
+
+	@Override
+	public void surfaceChanged(SurfaceHolder holder, int format, int width,
+			int height) {
+
+		Log.d(LOG_TAG, "surface Changed = W: " + width + "; H: " + height);
+		mSurfaceReceive = holder.getSurface();
+		if (width < height) {
+			this.screenWidth = width;
+			this.screenHeight = height * 3 / 4;
+		} else {
+			this.screenWidth = width * 1 / 2;
+			this.screenHeight = height * 3 / 4;
+		}
+	}
+
+	@Override
+	public void surfaceCreated(SurfaceHolder holder) {
+		Log.d(LOG_TAG, "surfaceCreated");
+		mSurfaceReceive = holder.getSurface();
+	}
+
+	@Override
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		Log.d(LOG_TAG, "surfaceDestroyed");
+
 	}
 
 }

@@ -2,29 +2,25 @@ package com.tikal.softphone;
 
 import java.util.ArrayList;
 
-import javax.media.mscontrol.networkconnection.NetworkConnection;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -35,7 +31,6 @@ import com.tikal.android.media.AudioCodec;
 import com.tikal.android.media.VideoCodec;
 import com.tikal.applicationcontext.ApplicationContext;
 import com.tikal.controlcontacts.ControlContacts;
-import com.tikal.javax.media.mscontrol.mediagroup.VideoMediaGroup;
 import com.tikal.media.AudioInfo;
 import com.tikal.media.MediaControlOutgoing;
 import com.tikal.media.VideoInfo;
@@ -90,34 +85,27 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 		PreferenceManager.setDefaultValues(this, R.layout.video_preferences,
 				true);
-
-		final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		// PowerManager.WakeLock wl =
-		// pm.newWakeLock(PowerManager.FULL_WAKE_LOCK,
-		// LOG_TAG);
-		// WakeLock wl = mPowerManager.newWakeLock(
-		// PowerManager.ACQUIRE_CAUSES_WAKEUP
-		// |PowerManager.ON_AFTER_RELEASE
-		// |PowerManager.SCREEN_BRIGHT_WAKE_LOCK,
-		// "incoming_call");
-
-		// wl.acquire(tiempo);
+		SoftPhoneService.setUpdateListener(this);
+//		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+//		 PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+//		 wl.acquire();
+//
+//		wl.acquire(tiempo);
 
 		/* If first time */
 		controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
-		
-		String texto = (String) ApplicationContext.contextTable
-		.get("texto");
+
+		String texto = (String) ApplicationContext.contextTable.get("texto");
 		Log.d(LOG_TAG, "Text: " + texto);
-		if (texto == null) ApplicationContext.contextTable.put("texto", "Estoy dentro");
-		
+		if (texto == null)
+			ApplicationContext.contextTable.put("texto", "Estoy dentro");
+
 		initControllerUAFromSettings();
-		if (controller == null){
+		if (controller == null) {
 			Log.d(LOG_TAG, "Controller is null");
 			register();
-		}
-		else{
+		} else {
 			Log.d(LOG_TAG, "Controller not is null");
 			if (controller.isRegister())
 				registerSucessful();
@@ -280,7 +268,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	}
 
 	@Override
-	protected void onDestroy() {		
+	protected void onDestroy() {
 		Log.d(LOG_TAG, "On Destroy");
 		try {
 			if (isExit) {

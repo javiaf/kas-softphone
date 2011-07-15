@@ -1,5 +1,6 @@
 package com.tikal.javax.media.mscontrol.mediagroup;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -31,14 +32,15 @@ public class VideoPlayer extends PlayerBase implements SurfaceHolder.Callback,
 	private int width;
 	private int height;
 
-	public void setVideoSurfaceTx(View surface) {
+	public  void setVideoSurfaceTx(View surface) {
 		this.videoSurfaceTx = surface;
 		if (videoSurfaceTx != null) {
 			try {
 				mVideoView = (SurfaceView) videoSurfaceTx;
 				mHolder = mVideoView.getHolder();
 				mHolder.addCallback(this);
-				Log.d(LOG_TAG, "setVideoSurfaceTx: mHolder is creating ? " + mHolder.isCreating());
+				Log.d(LOG_TAG, "setVideoSurfaceTx: mHolder is creating ? "
+						+ mHolder.isCreating());
 				mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 				Log.d(LOG_TAG, "setVideoSurfaceTx is OK");
 			} catch (Exception e) {
@@ -48,14 +50,13 @@ public class VideoPlayer extends PlayerBase implements SurfaceHolder.Callback,
 		}
 	}
 
-	public View getVideoSurfaceTx() {
+	public  View getVideoSurfaceTx() {
 		return videoSurfaceTx;
 	}
 
 	public VideoPlayer(VideoMediaGroup parent, View surface, int width,
 			int height) throws MsControlException {
 		super(parent);
-
 		this.videoSurfaceTx = surface;
 		this.width = width;
 		this.height = height;
@@ -118,7 +119,6 @@ public class VideoPlayer extends PlayerBase implements SurfaceHolder.Callback,
 		parameters.setPreviewSize(width, height);
 		mCamera.setParameters(parameters);
 
-
 		mCamera.setPreviewCallback(this);
 	}
 
@@ -126,8 +126,20 @@ public class VideoPlayer extends PlayerBase implements SurfaceHolder.Callback,
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		Log.d(LOG_TAG, "surface Changed");
-		if (mCamera != null)
+		if (mCamera != null) {
+			Log.d(LOG_TAG, "mCamera.StartPreview");
+
+			int degrees = 90;
+
+			mCamera.setDisplayOrientation(degrees);
+			Camera.Parameters parameters = mCamera.getParameters();
+
+			parameters.setRotation(degrees);
+			// params.setPreviewSize(width, height);
+			mCamera.setParameters(parameters);
 			mCamera.startPreview();
+		} else
+			Log.d(LOG_TAG, "mCamera is null on SurfaceChanged");
 		// Parameters params = mCamera.getParameters();
 		// if (mCamera != null) {
 		// int degrees = 90;
@@ -154,19 +166,20 @@ public class VideoPlayer extends PlayerBase implements SurfaceHolder.Callback,
 					mCamera = openFrontFacingCameraGingerbread();
 			}
 
+			
 			// mCamera.setPreviewCallback(this);
 			// mCamera = Camera.open();
 			if (mCamera != null) {
 				Log.d(LOG_TAG, " mCamera opened " + mCamera.toString());
 
-//				int degrees = 90;
-//
-//				mCamera.setDisplayOrientation(degrees);
-//				Camera.Parameters parameters = mCamera.getParameters();
-//
-//				parameters.setRotation(degrees);
-//				// params.setPreviewSize(width, height);
-//				mCamera.setParameters(parameters);
+				// int degrees = 90;
+				//
+				// mCamera.setDisplayOrientation(degrees);
+				// Camera.Parameters parameters = mCamera.getParameters();
+				//
+				// parameters.setRotation(degrees);
+				// // params.setPreviewSize(width, height);
+				// mCamera.setParameters(parameters);
 
 				mCamera.setPreviewDisplay(holder);
 
@@ -175,6 +188,8 @@ public class VideoPlayer extends PlayerBase implements SurfaceHolder.Callback,
 
 			// startRecording();
 		} catch (Exception e) {
+		
+			mCamera = null;
 			Log.e(LOG_TAG, "Exception : " + e.toString());
 			e.printStackTrace();
 		}
@@ -184,7 +199,13 @@ public class VideoPlayer extends PlayerBase implements SurfaceHolder.Callback,
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		Log.d(LOG_TAG, "surfaceDestroyed");
 		if (mCamera != null) {
-			mCamera.stopPreview();
+			try {
+				 mCamera.stopPreview();
+//					mCamera = null;
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			Log.d(LOG_TAG, "mCamera release");
 		}
 	}
 
@@ -216,11 +237,13 @@ public class VideoPlayer extends PlayerBase implements SurfaceHolder.Callback,
 	public void play(URI arg0, RTC[] arg1, Parameters arg2)
 			throws MsControlException {
 		if (videoSurfaceTx != null) {
+			Log.d(LOG_TAG, "Play videoSurfaceTx not is null");
 			mVideoView = (SurfaceView) videoSurfaceTx;
 			mHolder = mVideoView.getHolder();
 			mHolder.addCallback(this);
 			mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-		}
+		} else
+			Log.d(LOG_TAG, "Play videoSurfaceTx NULL");
 		startRecording();
 	}
 
@@ -228,9 +251,13 @@ public class VideoPlayer extends PlayerBase implements SurfaceHolder.Callback,
 	public void stop(boolean arg0) {
 		// TODO incomplete
 		Log.d(LOG_TAG, "Stop");
-		// mCamera.stopPreview();
-		// mCamera.release();
-		mCamera = null;
+		try {
+//			 mCamera.stopPreview();
+				mCamera = null;
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
 	}
 
 }

@@ -39,9 +39,7 @@ public class SoftPhoneService extends Service implements CallListener {
 
 	private Intent videoCallIntent;
 
-	public static void setUpdateListener(ServiceUpdateUIListener l) {
-		UI_UPDATE_LISTENER = l;
-	}
+	
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -167,6 +165,10 @@ public class SoftPhoneService extends Service implements CallListener {
 	}
 
 	public static ServiceUpdateUIListener UI_UPDATE_LISTENER;
+	
+	public static void setUpdateListener(ServiceUpdateUIListener l) {
+		UI_UPDATE_LISTENER = l;
+	}
 
 	private Handler handler = new Handler() {
 		@Override

@@ -8,6 +8,7 @@ import javax.media.mscontrol.join.Joinable.Direction;
 import javax.media.mscontrol.join.JoinableStream.StreamType;
 import javax.media.mscontrol.mediagroup.MediaGroup;
 import javax.media.mscontrol.resource.RTC;
+import javax.print.attribute.standard.Finishings;
 
 import com.tikal.applicationcontext.ApplicationContext;
 import com.tikal.javax.media.mscontrol.mediagroup.AudioMediaGroup;
@@ -18,6 +19,7 @@ import com.tikal.media.AudioInfo;
 import com.tikal.media.VideoInfo;
 import com.tikal.sip.Controller;
 import com.tikal.softphone.R;
+import com.tikal.softphone.ServiceUpdateUIListener;
 import com.tikal.softphone.SoftPhone;
 
 import android.app.Notification;
@@ -28,7 +30,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.AudioRecord;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -47,6 +52,8 @@ public class VideoCallService extends Service {
 	private PendingIntent mNotifContentIntent;
 	private Intent notifIntent;
 	private String notificationTitle = "VideoCall";
+	
+	private Intent videoCallIntent;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -99,8 +106,8 @@ public class VideoCallService extends Service {
 			e.printStackTrace();
 		}
 		// }
-//		Log.d(LOG_TAG, "sdpVideo:\n" + sdpVideo);
-		// if (!sdpVideo.equals("")) {
+		Log.d(LOG_TAG, "sdpVideo:\n" + sdpVideo);
+		 if (!sdpVideo.equals("")) {
 		Log.d(LOG_TAG, "create videoMediaGroup");
 		try {
 			videoMediaGroup = new VideoMediaGroup(
@@ -111,7 +118,7 @@ public class VideoCallService extends Service {
 			Log.e(LOG_TAG, "Error on create videoMediaGroup");
 			e.printStackTrace();
 		}
-		// }
+		 }
 
 		Log.d(LOG_TAG, "videoMediaGroup: " + videoMediaGroup);
 		ApplicationContext.contextTable.put("audioMediaGroup", audioMediaGroup);
@@ -168,7 +175,7 @@ public class VideoCallService extends Service {
 			e.printStackTrace();
 		}
 
-		Intent videoCallIntent = new Intent(this, VideoCall.class);
+		videoCallIntent = new Intent(this, VideoCall.class);
 		videoCallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(videoCallIntent);
 	}
@@ -189,6 +196,7 @@ public class VideoCallService extends Service {
 
 		mNotificationMgr.notify(NOTIF_SOFTPHONE, mNotif);
 		
+			
 		if (audioMediaGroup != null)
 			audioMediaGroup.stop();
 
@@ -196,7 +204,27 @@ public class VideoCallService extends Service {
 			videoMediaGroup.stop();
 		
 		
+		Message msg = new Message();
+		Bundle b = new Bundle();
+		b.putString("Call", "Terminate");
+		msg.setData(b);
+		handler.sendMessage(msg);
+		
 		super.onDestroy();
 	}
+	
+	public static ServiceUpdateUIListener UI_UPDATE_LISTENER_VIDEOCALL;
+	
+	public static void setUpdateListener(ServiceUpdateUIListener l) {
+		UI_UPDATE_LISTENER_VIDEOCALL = l;
+	}
+
+	private Handler handler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			Log.d(LOG_TAG, "Message = " + msg.getData());
+			UI_UPDATE_LISTENER_VIDEOCALL.update(msg);
+		}
+	};
 
 }

@@ -7,10 +7,13 @@ import javax.media.mscontrol.Parameters;
 import javax.media.mscontrol.resource.RTC;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Message;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -29,19 +32,25 @@ import com.tikal.javax.media.mscontrol.mediagroup.AudioRecorder;
 import com.tikal.javax.media.mscontrol.mediagroup.VideoMediaGroup;
 import com.tikal.preferences.VideoCall_Preferences;
 import com.tikal.sip.Controller;
-import com.tikal.softphone.IPhone;
 import com.tikal.softphone.R;
-import com.tikal.softphone.SoftPhone;
+import com.tikal.softphone.ServiceUpdateUIListener;
+import com.tikal.softphone.SoftPhoneService;
 
-public class VideoCall extends Activity {
+public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private static final String LOG_TAG = "VideoCall";
 	private static final int SHOW_PREFERENCES = 1;
+	private PowerManager.WakeLock wl;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.videocall);
+		
+		VideoCallService.setUpdateListener(this);
 		Log.d(LOG_TAG, "OnCreate");
+		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "VideoCall");
+		wl.acquire();
 
 		VideoMediaGroup videoMediaGroup = (VideoMediaGroup) ApplicationContext.contextTable
 				.get("videoMediaGroup");
@@ -91,6 +100,7 @@ public class VideoCall extends Activity {
 				if (controller != null) {
 					controller.hang();
 				}
+				finish();
 			}
 		});
 		final Button buttonMute = (Button) findViewById(R.id.button_mute);
@@ -104,12 +114,11 @@ public class VideoCall extends Activity {
 				try {
 					Log.d(LOG_TAG, " Button Mute push");
 
-					if (((AudioPlayer) audioMediaGroup.getPlayer()).isPlaying()){
+					if (((AudioPlayer) audioMediaGroup.getPlayer()).isPlaying()) {
 						Toast.makeText(VideoCall.this, "Mute",
 								Toast.LENGTH_SHORT).show();
 						audioMediaGroup.getPlayer().stop(true);
-					}
-					else{
+					} else {
 						Toast.makeText(VideoCall.this, "Speak",
 								Toast.LENGTH_SHORT).show();
 						audioMediaGroup.getPlayer().play(URI.create(""),
@@ -132,13 +141,12 @@ public class VideoCall extends Activity {
 						.get("audioMediaGroup");
 				try {
 					if (((AudioRecorder) audioMediaGroup.getRecorder())
-							.getStreamType() == AudioManager.STREAM_MUSIC){
+							.getStreamType() == AudioManager.STREAM_MUSIC) {
 						Toast.makeText(VideoCall.this, "Speaker",
 								Toast.LENGTH_SHORT).show();
 						((AudioRecorder) audioMediaGroup.getRecorder())
 								.setStreamType(AudioManager.STREAM_VOICE_CALL);
-					}
-					else{
+					} else {
 						Toast.makeText(VideoCall.this, "HeadSet",
 								Toast.LENGTH_SHORT).show();
 						((AudioRecorder) audioMediaGroup.getRecorder())
@@ -175,13 +183,14 @@ public class VideoCall extends Activity {
 	@Override
 	protected void onStop() {
 		Log.d(LOG_TAG, "OnStop");
-		finish();
 		super.onStop();
 	}
 
 	@Override
 	protected void onDestroy() {
 		Log.d(LOG_TAG, "OnDestroy");
+		if (wl != null)
+			wl.release();
 		super.onDestroy();
 	}
 
@@ -217,6 +226,14 @@ public class VideoCall extends Activity {
 			Boolean mute = settings.getBoolean("MUTE", false);
 
 		}
+	}
+	
+	@Override
+	public void update(Message message) {
+		// TODO Auto-generated method stub
+		Log.d(LOG_TAG, "Message = " + message);
+		finish();
+		
 	}
 
 }
