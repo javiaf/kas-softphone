@@ -6,7 +6,7 @@ import java.util.Vector;
 
 import javax.media.mscontrol.MsControlException;
 import javax.media.mscontrol.join.JoinableStream.StreamType;
-import javaxt.sdp.SdpException;
+import javax.sdp.SdpException;
 
 import android.os.Environment;
 import android.util.Log;
