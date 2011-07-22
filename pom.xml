@@ -99,7 +99,7 @@
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
-      </repository>
+    </repository>
     <repository>
       <id>kurento-releases</id>
       <name>Kurento Repository</name>
