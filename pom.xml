@@ -7,7 +7,7 @@
 
   <name>SoftPhone</name>
   <description>TODO: Add description here</description>
-  <url>http://193.147.51.37/site/tk-android-softphone</url>
+  <url>http://repository.kurento.com/site/tk-android-softphone</url>
 
   <dependencies>
     <dependency>
@@ -91,7 +91,7 @@
   <distributionManagement>
     <site>
       <id>maven-site</id>
-      <url>scp://193.147.51.37/var/www/site/tk-android-softphone/${project.version}</url>
+      <url>scp://repository.kurento.com/var/www/site/tk-android-softphone/${project.version}</url>
     </site>
   </distributionManagement>
 </project>
