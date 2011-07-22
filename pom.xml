@@ -56,6 +56,9 @@
           <scope>compile</scope>
         </dependency>
       </dependencies>
+      <build>
+        <finalName>${project.artifactId}-android2.2-${version}</finalName>
+      </build>
     </profile>
   </profiles>
 
