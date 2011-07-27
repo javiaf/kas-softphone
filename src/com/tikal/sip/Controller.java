@@ -28,16 +28,10 @@ public class Controller implements SipEndPointListener, SipCallListener,
 	private SipEndPointEvent pendingEndPointEvent;
 	private SipCall currentCall;
 
-	NetworkConnectionImpl networkConnection;
-
 	private CallListener callListener;
 
 	public UA getUa() {
 		return ua;
-	}
-
-	public NetworkConnectionImpl getNetworkConnection() {
-		return networkConnection;
 	}
 
 	// public Controller(VideoInfo vi,

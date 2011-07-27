@@ -1,41 +1,11 @@
 package com.tikal.videocall;
 
-import java.net.URI;
-
-import javax.media.mscontrol.MsControlException;
-import javax.media.mscontrol.Parameters;
-import javax.media.mscontrol.join.Joinable.Direction;
-import javax.media.mscontrol.join.JoinableStream.StreamType;
-import javax.media.mscontrol.mediagroup.MediaGroup;
-import javax.media.mscontrol.resource.RTC;
-import javax.print.attribute.standard.Finishings;
-
 import com.tikal.applicationcontext.ApplicationContext;
-import com.tikal.javax.media.mscontrol.mediagroup.AudioMediaGroup;
-import com.tikal.javax.media.mscontrol.mediagroup.AudioRecorder;
-import com.tikal.javax.media.mscontrol.mediagroup.VideoMediaGroup;
-import com.tikal.javax.media.mscontrol.networkconnection.NetworkConnectionImpl;
 import com.tikal.media.AudioInfo;
 import com.tikal.media.VideoInfo;
 import com.tikal.sip.Controller;
-import com.tikal.softphone.R;
 import com.tikal.softphone.ServiceUpdateUIListener;
 import com.tikal.softphone.SoftPhone;
-
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.media.AudioManager;
-import android.media.AudioRecord;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.util.DisplayMetrics;
-import android.util.Log;
 
 public class VideoCallService extends Service {
 	private final String LOG_TAG = "VideoCallService";
