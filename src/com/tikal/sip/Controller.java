@@ -1,14 +1,19 @@
 package com.tikal.sip;
 
-import javax.media.mscontrol.join.Joinable.Direction;
+import java.net.InetAddress;
+import java.util.ArrayList;
 
 import android.util.Log;
 
-import com.tikal.javax.media.mscontrol.networkconnection.NetworkConnectionFactoryImpl;
-import com.tikal.javax.media.mscontrol.networkconnection.NetworkConnectionImpl;
-import com.tikal.javax.media.mscontrol.networkconnection.NetworkIP;
-import com.tikal.media.AudioInfo;
-import com.tikal.media.VideoInfo;
+import com.tikal.android.media.AudioCodecType;
+import com.tikal.android.media.VideoCodecType;
+import com.tikal.android.mscontrol.MSControlFactory;
+import com.tikal.android.mscontrol.MediaSessionAndroid;
+import com.tikal.android.mscontrol.ParametersImpl;
+import com.tikal.android.mscontrol.networkconnection.ConnectionType;
+import com.tikal.mscontrol.MediaSession;
+import com.tikal.mscontrol.Parameters;
+import com.tikal.mscontrol.join.Joinable.Direction;
 import com.tikal.sip.agent.UaFactory;
 import com.tikal.sip.event.SipCallEvent;
 import com.tikal.sip.event.SipEndPointEvent;
@@ -19,8 +24,7 @@ import com.tikal.softphone.CallListener;
 import com.tikal.softphone.CallNotifier;
 import com.tikal.softphone.IPhone;
 
-public class Controller implements SipEndPointListener, SipCallListener,
-		IPhone, CallNotifier {
+public class Controller implements SipEndPointListener, SipCallListener, IPhone, CallNotifier {
 
 	public final static String LOG_TAG = "Controller";
 	private UA ua = null;
@@ -30,43 +34,50 @@ public class Controller implements SipEndPointListener, SipCallListener,
 
 	private CallListener callListener;
 
+	private MediaSession mediaSession;
+
 	public UA getUa() {
 		return ua;
 	}
 
-	// public Controller(VideoInfo vi,
-	// AudioInfo ai, String proxyIP, int proxyPort, String localUser,
-	// String localRealm) throws Exception {
-	// initUA(vi, ai, proxyIP, proxyPort, localUser, localRealm);
-	// }
+	public MediaSession getMediaSession() {
+		return mediaSession;
+	}
 
-	public void initUA(VideoInfo vi, AudioInfo ai, String proxyIP,
-			int proxyPort, String localUser, String localRealm)
-			throws Exception {
+	public void initUA(ArrayList<AudioCodecType> audioCodecs,
+			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress,
+			ConnectionType connectionType, String proxyIP, int proxyPort, String localUser,
+			String localRealm) throws Exception {
 
-		networkConnection = (NetworkConnectionImpl) new NetworkConnectionFactoryImpl(
-				vi, ai).getInstance();
-		UaFactory.setNetworkConnection(networkConnection);
+		Parameters params = new ParametersImpl();
+		params.put(MediaSessionAndroid.AUDIO_CODECS, audioCodecs);
+		params.put(MediaSessionAndroid.VIDEO_CODECS, videoCodecs);
+		params.put(MediaSessionAndroid.LOCAL_ADDRESS, localAddress);
+		params.put(MediaSessionAndroid.CONNECTION_TYPE, connectionType);
+		
+		mediaSession = MSControlFactory.createMediaSession(params);
+		Log.d(LOG_TAG, "mediaSession: " + this.mediaSession);
+		UaFactory.setMediaSession(mediaSession);
 
-		SipConfig config = new SipConfig();
-		config.setLocalAddress(NetworkIP.getLocalAddress().getHostAddress());
-		config.setLocalPort(6060);
-		config.setProxyAddress(proxyIP);
-		config.setProxyPort(proxyPort);
+		SipConfig sipConfig = new SipConfig();
+		sipConfig.setLocalAddress(localAddress.getHostAddress());
+		sipConfig.setLocalPort(6060);
+		sipConfig.setProxyAddress(proxyIP);
+		sipConfig.setProxyPort(proxyPort);
 
-		Log.d(LOG_TAG, "CONFIGURATION User Agent: " + config);
+		Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig);
 
 		if (ua != null) {
 			ua.terminate();
 			Log.d(LOG_TAG, "UA Terminate");
 		}
 
-		ua = UaFactory.getInstance(config);
+		ua = UaFactory.getInstance(sipConfig);
 
 		register(localUser, localRealm);
 	}
-	
-	public boolean isRegister(){
+
+	public boolean isRegister() {
 		return (endPoint != null);
 	}
 
@@ -90,12 +101,10 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			this.pendingEndPointEvent = event;
 			try {
 
-				Log.d(LOG_TAG, "Call Source: "
-						+ event.getCallSource().toString());
-				Log.d(LOG_TAG, "Me llama Uri: "
-						+ event.getCallSource().getRemoteUri());
+				Log.d(LOG_TAG, "Call Source: " + event.getCallSource().toString());
+				Log.d(LOG_TAG, "Me llama Uri: " + event.getCallSource().getRemoteUri());
 
-				if(callListener != null)
+				if (callListener != null)
 					callListener.incomingCall(event.getCallSource().getRemoteUri());
 
 				// this.aceptCall();
@@ -107,7 +116,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		if (SipEndPointEvent.REGISTER_USER_SUCESSFUL.equals(eventType)) {
 			this.pendingEndPointEvent = event;
 			try {
-				if(callListener != null)
+				if (callListener != null)
 					callListener.registerUserSucessful();
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.toString());
@@ -117,7 +126,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		if (SipEndPointEvent.REGISTER_USER_FAIL.equals(eventType)) {
 			this.pendingEndPointEvent = event;
 			try {
-				if(callListener != null)
+				if (callListener != null)
 					callListener.registerUserFailed();
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.toString());
@@ -134,15 +143,17 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		if (SipCallEvent.CALL_SETUP.equals(eventType)) {
 			currentCall = event.getSource();
 			Log.d(LOG_TAG, "Setting currentCall");
-			if(callListener != null)
-				callListener.callSetup();
+			if (callListener != null) {
+				Log.d(LOG_TAG, "currentCall.getNetworkConnection(null): " + currentCall.getNetworkConnection(null));
+				callListener.callSetup(currentCall.getNetworkConnection(null));
+			}
 		} else if (SipCallEvent.CALL_TERMINATE.equals(eventType)) {
 			Log.d(LOG_TAG, "Call Terminate");
-			if(callListener != null)
+			if (callListener != null)
 				callListener.callTerminate();
 		} else if (SipCallEvent.CALL_REJECT.equals(eventType)) {
 			Log.d(LOG_TAG, "Call Reject");
-			if(callListener != null)
+			if (callListener != null)
 				callListener.callReject();
 		} else if (SipCallEvent.CALL_ERROR.equals(eventType)) {
 			Log.d(LOG_TAG, "Call Error");

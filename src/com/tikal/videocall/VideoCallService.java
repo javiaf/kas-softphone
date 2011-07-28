@@ -1,17 +1,39 @@
 package com.tikal.videocall;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.media.AudioManager;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.util.Log;
+
+import com.tikal.android.mscontrol.ParametersImpl;
+import com.tikal.android.mscontrol.mediacomponent.AudioRecorderComponent;
+import com.tikal.android.mscontrol.mediacomponent.MediaComponentAndroid;
 import com.tikal.applicationcontext.ApplicationContext;
-import com.tikal.media.AudioInfo;
-import com.tikal.media.VideoInfo;
+import com.tikal.mscontrol.MsControlException;
+import com.tikal.mscontrol.MediaSession;
+import com.tikal.mscontrol.Parameters;
+import com.tikal.mscontrol.join.Joinable.Direction;
+import com.tikal.mscontrol.join.JoinableStream.StreamType;
+import com.tikal.mscontrol.mediacomponent.MediaComponent;
+import com.tikal.mscontrol.networkconnection.NetworkConnection;
 import com.tikal.sip.Controller;
+import com.tikal.softphone.R;
 import com.tikal.softphone.ServiceUpdateUIListener;
 import com.tikal.softphone.SoftPhone;
 
 public class VideoCallService extends Service {
 	private final String LOG_TAG = "VideoCallService";
 
-	AudioMediaGroup audioMediaGroup = null;
-	VideoMediaGroup videoMediaGroup = null;
+	MediaComponent audioPlayerComponent = null;
+	MediaComponent audioRecorderComponent = null;
 	
 
 	private NotificationManager mNotificationMgr;
@@ -33,10 +55,7 @@ public class VideoCallService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		// Crear mediagroups y registralos en el context
-
-		/* Notification Video Call Active */
-
+		
 		mNotificationMgr = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -52,94 +71,52 @@ public class VideoCallService extends Service {
 
 		mNotificationMgr.notify(NOTIF_VIDEOCALL, mNotif);
 		mNotificationMgr.cancel(NOTIF_SOFTPHONE);
-
+		
 		Controller controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
+		if (controller == null) {
+			Log.e(LOG_TAG, "controller is NULL");
+			return;
+		}
+		MediaSession mediaSession = controller.getMediaSession();
 
-		// FIXME controller != null
-		NetworkConnectionImpl nc = controller.getNetworkConnection();
-
-		VideoInfo vi = nc.getVideoInfo();
-		AudioInfo ai = nc.getAudioInfo();
-
-		String sdpVideo = nc.getSdpVideo();
-		String sdpAudio = nc.getSdpAudio();
-
-		// if (!sdpAudio.equals("")) {
 		try {
-			audioMediaGroup = new AudioMediaGroup(
-					MediaGroup.PLAYER_RECORDER_SIGNALDETECTOR,
-					ai.getSample_rate(), ai.getFrameSize(), AudioManager.STREAM_MUSIC);
+			audioPlayerComponent = mediaSession.createMediaComponent(MediaComponentAndroid.AUDIO_PLAYER, Parameters.NO_PARAMETER);
 			
+			Parameters params = new ParametersImpl();
+			params.put(AudioRecorderComponent.STREAM_TYPE, AudioManager.STREAM_MUSIC);
+			audioRecorderComponent = mediaSession.createMediaComponent(MediaComponentAndroid.AUDIO_RECORDER, params);
 		} catch (MsControlException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		// }
-		Log.d(LOG_TAG, "sdpVideo:\n" + sdpVideo);
-		 if (!sdpVideo.equals("")) {
-		Log.d(LOG_TAG, "create videoMediaGroup");
-		try {
-			videoMediaGroup = new VideoMediaGroup(
-					MediaGroup.PLAYER_RECORDER_SIGNALDETECTOR, null,
-					vi.getWidth(), vi.getHeight(), null, 0, 0);
-		} catch (MsControlException e) {
-			// TODO Auto-generated catch block
-			Log.e(LOG_TAG, "Error on create videoMediaGroup");
-			e.printStackTrace();
-		}
-		 }
-
-		Log.d(LOG_TAG, "videoMediaGroup: " + videoMediaGroup);
-		ApplicationContext.contextTable.put("audioMediaGroup", audioMediaGroup);
-		ApplicationContext.contextTable.put("videoMediaGroup", videoMediaGroup);
+		ApplicationContext.contextTable.put("audioPlayerComponent", audioPlayerComponent);
+		ApplicationContext.contextTable.put("audioRecorderComponent", audioRecorderComponent);
 	}
 
 	@Override
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
-
-		// hacer joins de los mediagroups con el NC
-		// start play y recorder
-
-		Controller controller = (Controller) ApplicationContext.contextTable
-				.get("controller");
-
-		NetworkConnectionImpl nc = controller.getNetworkConnection();
-
+		
+		NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
+		.get("networkConnection");
+		if (nc == null) {
+			Log.e(LOG_TAG, "networkConnection is NULL");
+			return;
+		}
+		
 		try {
-			if (audioMediaGroup != null) {
-				audioMediaGroup.join(Direction.DUPLEX,
+			if (audioPlayerComponent != null) {
+				audioPlayerComponent.join(Direction.SEND,
 						nc.getJoinableStream(StreamType.audio));
-				Log.d(LOG_TAG, "137");
-				audioMediaGroup.getPlayer().play(URI.create(""), RTC.NO_RTC,
-						Parameters.NO_PARAMETER);
-				Log.d(LOG_TAG, "140");
-				audioMediaGroup.getRecorder().record(URI.create(""),
-						RTC.NO_RTC, Parameters.NO_PARAMETER);
-				Log.d(LOG_TAG, "Audio is OK");
-				// Unjoin example
-				// audioMediaGroup.stop();
-				// audioMediaGroup.unjoin(controller.getNetworkConnection()
-				// .getJoinableStream(StreamType.audio));
+				audioPlayerComponent.start();
+			}
+			if (audioRecorderComponent != null) {
+				audioRecorderComponent.join(Direction.RECV,
+						nc.getJoinableStream(StreamType.audio));
+				audioRecorderComponent.start();
 			}
 			
-			if (videoMediaGroup != null) {
-				videoMediaGroup.join(Direction.DUPLEX,
-						nc.getJoinableStream(StreamType.video));
-				Log.d(LOG_TAG, "151");
-				videoMediaGroup.getPlayer().play(URI.create(""), RTC.NO_RTC,
-						Parameters.NO_PARAMETER);
-				Log.d(LOG_TAG, "154");
-				videoMediaGroup.getRecorder().record(URI.create(""),
-						RTC.NO_RTC, Parameters.NO_PARAMETER);
-
-				// Unjoin example
-				// videoMediaGroup.stop();
-				// videoMediaGroup.unjoin(controller.getNetworkConnection()
-				// .getJoinableStream(StreamType.audio));
-				Log.d(LOG_TAG, "Video is OK");
-			}
 		} catch (MsControlException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -167,11 +144,11 @@ public class VideoCallService extends Service {
 		mNotificationMgr.notify(NOTIF_SOFTPHONE, mNotif);
 		
 			
-		if (audioMediaGroup != null)
-			audioMediaGroup.stop();
+		if (audioPlayerComponent != null)
+			audioPlayerComponent.stop();
 
-		if (videoMediaGroup != null)
-			videoMediaGroup.stop();
+		if (audioRecorderComponent != null)
+			audioRecorderComponent.stop();
 		
 		
 		Message msg = new Message();

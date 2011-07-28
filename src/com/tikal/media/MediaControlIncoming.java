@@ -58,9 +58,6 @@ public class MediaControlIncoming extends Activity {
 		long[] pattern = { 0, 1000, 2000, 3000 };
 
 		vibrator.vibrate(pattern, 1);
-		
-		
-
 	}
 	
 	@Override

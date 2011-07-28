@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -14,9 +13,8 @@ import android.os.Message;
 import android.util.Log;
 
 import com.tikal.applicationcontext.ApplicationContext;
-import com.tikal.media.AudioInfo;
 import com.tikal.media.MediaControlIncoming;
-import com.tikal.media.VideoInfo;
+import com.tikal.mscontrol.networkconnection.NetworkConnection;
 import com.tikal.sip.Controller;
 import com.tikal.videocall.VideoCallService;
 
@@ -71,6 +69,8 @@ public class SoftPhoneService extends Service implements CallListener {
 
 		if (controller != null)
 			controller.addListener(this);
+		
+		Log.e(LOG_TAG, "onCreate OK");
 	}
 
 	// private void sendNotification(int level, String text) {
@@ -133,8 +133,9 @@ public class SoftPhoneService extends Service implements CallListener {
 	}
 
 	@Override
-	public void callSetup() {
-		Log.d(LOG_TAG, "startRTPMedia");
+	public void callSetup(NetworkConnection networkConnection) {
+		ApplicationContext.contextTable.put("networkConnection", networkConnection);
+		
 		Message msg = new Message();
 		Bundle b = new Bundle();
 		b.putString("finishActivity", "MEDIA_CONTROL_OUTGOING");
