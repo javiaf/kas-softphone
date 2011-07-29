@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.PowerManager;
@@ -17,13 +18,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import com.tikal.android.mscontrol.MediaSessionAndroid;
 import com.tikal.android.mscontrol.ParametersImpl;
 import com.tikal.android.mscontrol.mediacomponent.MediaComponentAndroid;
-import com.tikal.android.mscontrol.mediacomponent.VideoPlayerComponent;
-import com.tikal.android.mscontrol.mediacomponent.VideoRecorderComponent;
 import com.tikal.applicationcontext.ApplicationContext;
-import com.tikal.mscontrol.MsControlException;
 import com.tikal.mscontrol.MediaSession;
+import com.tikal.mscontrol.MsControlException;
 import com.tikal.mscontrol.Parameters;
 import com.tikal.mscontrol.join.Joinable.Direction;
 import com.tikal.mscontrol.join.JoinableStream.StreamType;
@@ -58,7 +58,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		MediaSession mediaSession = controller.getMediaSession();
 		try {
 			Parameters params = new ParametersImpl();
-			params.put(VideoPlayerComponent.PREVIEW_SURFACE, (View) findViewById(R.id.video_capture_surface) );
+			params.put(MediaComponentAndroid.PREVIEW_SURFACE,
+					(View) findViewById(R.id.video_capture_surface));
 
 			videoPlayerComponent = mediaSession.createMediaComponent(
 					MediaComponentAndroid.VIDEO_PLAYER, params);
@@ -70,9 +71,10 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 					+ Orientation);
 
 			params = new ParametersImpl();
-			params.put(VideoRecorderComponent.VIEW_SURFACE, (View) findViewById(R.id.video_receive_surface) );
-			params.put(VideoRecorderComponent.DISPLAY_WIDTH, dm.widthPixels);
-			params.put(VideoRecorderComponent.DISPLAY_HEIGHT, dm.heightPixels);
+			params.put(MediaComponentAndroid.VIEW_SURFACE,
+					(View) findViewById(R.id.video_receive_surface));
+			params.put(MediaComponentAndroid.DISPLAY_WIDTH, dm.widthPixels);
+			params.put(MediaComponentAndroid.DISPLAY_HEIGHT, dm.heightPixels);
 			videoRecorderComponent = mediaSession.createMediaComponent(
 					MediaComponentAndroid.VIDEO_RECORDER, params);
 		} catch (MsControlException e) {
@@ -96,33 +98,29 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
+
 		NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
-		.get("networkConnection");
+				.get("networkConnection");
 		Log.e(LOG_TAG, "nc: " + nc);
 		if (nc == null) {
 			Log.e(LOG_TAG, "networkConnection is NULL");
 			return;
 		}
-		
+
 		try {
 			if (videoPlayerComponent != null) {
-				videoPlayerComponent.join(Direction.SEND,
-						nc.getJoinableStream(StreamType.video));
+				videoPlayerComponent.join(Direction.SEND, nc.getJoinableStream(StreamType.video));
 				videoPlayerComponent.start();
 			}
 			if (videoRecorderComponent != null) {
-				videoRecorderComponent.join(Direction.RECV,
-						nc.getJoinableStream(StreamType.video));
+				videoRecorderComponent.join(Direction.RECV, nc.getJoinableStream(StreamType.video));
 				videoRecorderComponent.start();
 			}
-			
+
 		} catch (MsControlException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
 
 		final Button buttonTerminateCall = (Button) findViewById(R.id.button_terminate_call);
 		buttonTerminateCall.setOnClickListener(new OnClickListener() {
@@ -138,57 +136,77 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				finish();
 			}
 		});
-//		final Button buttonMute = (Button) findViewById(R.id.button_mute);
-//
-//		buttonMute.setOnClickListener(new OnClickListener() {
-//
-//			@Override
-//			public void onClick(View v) {
-//				AudioMediaGroup audioMediaGroup = (AudioMediaGroup) ApplicationContext.contextTable
-//						.get("audioMediaGroup");
-//				try {
-//					Log.d(LOG_TAG, " Button Mute push");
-//
-//					if (((AudioPlayer) audioMediaGroup.getPlayer()).isPlaying()) {
-//						Toast.makeText(VideoCall.this, "Mute", Toast.LENGTH_SHORT).show();
-//						audioMediaGroup.getPlayer().stop(true);
-//					} else {
-//						Toast.makeText(VideoCall.this, "Speak", Toast.LENGTH_SHORT).show();
-//						audioMediaGroup.getPlayer().play(URI.create(""), RTC.NO_RTC,
-//								Parameters.NO_PARAMETER);
-//					}
-//
-//				} catch (MsControlException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//
-//		final Button buttonSpeaker = (Button) findViewById(R.id.button_headset);
-//
-//		buttonSpeaker.setOnClickListener(new OnClickListener() {
-//
-//			@Override
-//			public void onClick(View v) {
-//				AudioMediaGroup audioMediaGroup = (AudioMediaGroup) ApplicationContext.contextTable
-//						.get("audioMediaGroup");
-//				try {
-//					if (((AudioRecorder) audioMediaGroup.getRecorder()).getStreamType() == AudioManager.STREAM_MUSIC) {
-//						Toast.makeText(VideoCall.this, "Speaker", Toast.LENGTH_SHORT).show();
-//						((AudioRecorder) audioMediaGroup.getRecorder())
-//								.setStreamType(AudioManager.STREAM_VOICE_CALL);
-//					} else {
-//						Toast.makeText(VideoCall.this, "HeadSet", Toast.LENGTH_SHORT).show();
-//						((AudioRecorder) audioMediaGroup.getRecorder())
-//								.setStreamType(AudioManager.STREAM_MUSIC);
-//					}
-//					audioMediaGroup.getRecorder().record(URI.create(""), RTC.NO_RTC,
-//							Parameters.NO_PARAMETER);
-//				} catch (MsControlException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
+		final Button buttonMute = (Button) findViewById(R.id.button_mute);
+
+		buttonMute.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				MediaComponentAndroid audioPlayerComponent = (MediaComponentAndroid) ApplicationContext.contextTable
+						.get("audioPlayerComponent");
+
+				Log.d(LOG_TAG, "Button Mute push");
+				Log.d(LOG_TAG, "isStarted(): " + audioPlayerComponent.isStarted());
+				try {
+					if (audioPlayerComponent.isStarted())
+						audioPlayerComponent.stop();
+					else
+						audioPlayerComponent.start();
+				} catch (MsControlException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		final Button buttonSpeaker = (Button) findViewById(R.id.button_headset);
+
+		buttonSpeaker.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+
+				Controller controller = (Controller) ApplicationContext.contextTable
+						.get("controller");
+				if (controller == null) {
+					Log.e(LOG_TAG, "controller is NULL");
+					return;
+				}
+
+				NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
+						.get("networkConnection");
+				if (nc == null) {
+					Log.e(LOG_TAG, "networkConnection is NULL");
+					return;
+				}
+
+				MediaSessionAndroid mediaSession = controller.getMediaSession();
+				MediaComponentAndroid audioRecorderComponent = (MediaComponentAndroid) ApplicationContext.contextTable
+						.get("audioRecorderComponent");
+
+				try {
+					// TODO: solo cambia al altavoz interno. El control de que
+					// altavoz se está usando habrá que hacerlo a nivel de
+					// aplicación. El API no ofrece tanto detalle
+					if (audioRecorderComponent != null) {
+						audioRecorderComponent.stop();
+						audioRecorderComponent.unjoin(nc.getJoinableStream(StreamType.audio));
+					}
+
+					Parameters params = new ParametersImpl();
+					params.put(MediaComponentAndroid.STREAM_TYPE, AudioManager.STREAM_VOICE_CALL);
+					audioRecorderComponent = mediaSession.createMediaComponent(
+							MediaComponentAndroid.AUDIO_RECORDER, params);
+
+					if (audioRecorderComponent != null) {
+						audioRecorderComponent.join(Direction.RECV,
+								nc.getJoinableStream(StreamType.audio));
+						audioRecorderComponent.start();
+					}
+				} catch (MsControlException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 
 		Log.e(LOG_TAG, "onResume OK");
 	}

@@ -13,16 +13,14 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 
+import com.tikal.android.mscontrol.MediaSessionAndroid;
 import com.tikal.android.mscontrol.ParametersImpl;
-import com.tikal.android.mscontrol.mediacomponent.AudioRecorderComponent;
 import com.tikal.android.mscontrol.mediacomponent.MediaComponentAndroid;
 import com.tikal.applicationcontext.ApplicationContext;
 import com.tikal.mscontrol.MsControlException;
-import com.tikal.mscontrol.MediaSession;
 import com.tikal.mscontrol.Parameters;
 import com.tikal.mscontrol.join.Joinable.Direction;
 import com.tikal.mscontrol.join.JoinableStream.StreamType;
-import com.tikal.mscontrol.mediacomponent.MediaComponent;
 import com.tikal.mscontrol.networkconnection.NetworkConnection;
 import com.tikal.sip.Controller;
 import com.tikal.softphone.R;
@@ -32,8 +30,8 @@ import com.tikal.softphone.SoftPhone;
 public class VideoCallService extends Service {
 	private final String LOG_TAG = "VideoCallService";
 
-	MediaComponent audioPlayerComponent = null;
-	MediaComponent audioRecorderComponent = null;
+	MediaComponentAndroid audioPlayerComponent = null;
+	MediaComponentAndroid audioRecorderComponent = null;
 	
 
 	private NotificationManager mNotificationMgr;
@@ -78,13 +76,13 @@ public class VideoCallService extends Service {
 			Log.e(LOG_TAG, "controller is NULL");
 			return;
 		}
-		MediaSession mediaSession = controller.getMediaSession();
+		MediaSessionAndroid mediaSession = controller.getMediaSession();
 
 		try {
 			audioPlayerComponent = mediaSession.createMediaComponent(MediaComponentAndroid.AUDIO_PLAYER, Parameters.NO_PARAMETER);
 			
 			Parameters params = new ParametersImpl();
-			params.put(AudioRecorderComponent.STREAM_TYPE, AudioManager.STREAM_MUSIC);
+			params.put(MediaComponentAndroid.STREAM_TYPE, AudioManager.STREAM_MUSIC);
 			audioRecorderComponent = mediaSession.createMediaComponent(MediaComponentAndroid.AUDIO_RECORDER, params);
 		} catch (MsControlException e) {
 			// TODO Auto-generated catch block

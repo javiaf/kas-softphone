@@ -11,7 +11,6 @@ import com.tikal.android.mscontrol.MSControlFactory;
 import com.tikal.android.mscontrol.MediaSessionAndroid;
 import com.tikal.android.mscontrol.ParametersImpl;
 import com.tikal.android.mscontrol.networkconnection.ConnectionType;
-import com.tikal.mscontrol.MediaSession;
 import com.tikal.mscontrol.Parameters;
 import com.tikal.mscontrol.join.Joinable.Direction;
 import com.tikal.sip.agent.UaFactory;
@@ -34,13 +33,13 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone,
 
 	private CallListener callListener;
 
-	private MediaSession mediaSession;
+	private MediaSessionAndroid mediaSession;
 
 	public UA getUa() {
 		return ua;
 	}
 
-	public MediaSession getMediaSession() {
+	public MediaSessionAndroid getMediaSession() {
 		return mediaSession;
 	}
 
