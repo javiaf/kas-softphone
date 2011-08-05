@@ -6,7 +6,8 @@
 
 	<application android:icon="@drawable/icon" android:label="@string/app_name">
 		<activity android:name="SoftPhone" android:label="@string/app_name"
-			 android:launchMode="singleTask" android:screenOrientation="portrait">
+			android:launchMode="singleTask">
+			<!-- android:screenOrientation="portrait"> -->
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
@@ -30,18 +31,19 @@
 
 		</activity>
 		<activity android:name="com.tikal.media.MediaControlIncoming"
-			android:label="Media Control Incoming" >
+			android:label="Media Control Incoming">
 			<action android:name="android.intent.action.MAIN" />
 
 		</activity>
 
 		<activity android:name="com.tikal.media.MediaControlOutgoing"
-			android:label="Media Control Outgoing" android:screenOrientation="portrait">
+			android:label="Media Control Outgoing">
+			<!-- android:screenOrientation="portrait"> -->
 		</activity>
 
 		<activity android:name="com.tikal.videocall.VideoCall"
-			android:label="Video Call"  android:theme="@android:style/Theme.NoTitleBar.Fullscreen" android:screenOrientation="portrait">
-
+			android:label="Video Call" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+			android:screenOrientation="landscape" android:launchMode="singleTop" >
 			<!-- android:screenOrientation="portrait"> android:launchMode="singleTask" 
 				android:theme="@android:style/Theme.NoTitleBar.Fullscreen"> -->
 
@@ -78,7 +80,6 @@
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
 	<uses-permission android:name="android.permission.READ_CONTACTS"></uses-permission>
-
 	<uses-permission android:name="android.permission.WRITE_CONTACTS"></uses-permission>
 
 </manifest>

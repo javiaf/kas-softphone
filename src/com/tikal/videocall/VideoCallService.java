@@ -42,6 +42,7 @@ public class VideoCallService extends Service {
 	private PendingIntent mNotifContentIntent;
 	private Intent notifIntent;
 	private String notificationTitle = "VideoCall";
+	private String notificationTitleSoft = "SoftPhone";
 	
 	private Intent videoCallIntent;
 
@@ -53,7 +54,7 @@ public class VideoCallService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
+		Log.d(LOG_TAG, "VideoCallService Create");
 		mNotificationMgr = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -130,13 +131,13 @@ public class VideoCallService extends Service {
 		Log.d(LOG_TAG, "On Destroy");
 		
 		mNotificationMgr.cancel(NOTIF_VIDEOCALL);
-		mNotif = new Notification(R.drawable.icon, notificationTitle,
+		mNotif = new Notification(R.drawable.icon, notificationTitleSoft,
 				System.currentTimeMillis());
 		
 		notifIntent = new Intent(this, SoftPhone.class);
 		mNotifContentIntent = PendingIntent
 				.getActivity(this, 0, notifIntent, 0);
-		mNotif.setLatestEventInfo(this, notificationTitle, "",
+		mNotif.setLatestEventInfo(this, notificationTitleSoft, "",
 				mNotifContentIntent);
 
 		mNotificationMgr.notify(NOTIF_SOFTPHONE, mNotif);

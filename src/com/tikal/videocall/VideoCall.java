@@ -38,6 +38,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private static final String LOG_TAG = "VideoCall";
 	private static final int SHOW_PREFERENCES = 1;
 	private PowerManager.WakeLock wl;
+	private boolean hang = false;
 
 	MediaComponent videoPlayerComponent = null;
 	MediaComponent videoRecorderComponent = null;
@@ -48,39 +49,52 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		setContentView(R.layout.videocall);
 
 		VideoCallService.setUpdateListener(this);
-		Log.d(LOG_TAG, "OnCreate");
+		hang = false;
+		Log.d(LOG_TAG, "OnCreate " + hang);
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "VideoCall");
 		wl.acquire();
 
-		Controller controller = (Controller) ApplicationContext.contextTable.get("controller");
+		Controller controller = (Controller) ApplicationContext.contextTable
+				.get("controller");
 		// FIXME controller != null
-		MediaSession mediaSession = controller.getMediaSession();
-		try {
-			Parameters params = new ParametersImpl();
-			params.put(MediaComponentAndroid.PREVIEW_SURFACE,
-					(View) findViewById(R.id.video_capture_surface));
+		if (controller != null) {
+			MediaSession mediaSession = controller.getMediaSession();
+			try {
+				DisplayMetrics dm = new DisplayMetrics();
+				getWindowManager().getDefaultDisplay().getMetrics(dm);
+				int Orientation = getWindowManager().getDefaultDisplay()
+						.getOrientation();
 
-			videoPlayerComponent = mediaSession.createMediaComponent(
-					MediaComponentAndroid.VIDEO_PLAYER, params);
+				Log.d(LOG_TAG, "W: " + dm.widthPixels + " H:" + dm.heightPixels
+						+ " Orientation = " + Orientation);
 
-			DisplayMetrics dm = new DisplayMetrics();
-			getWindowManager().getDefaultDisplay().getMetrics(dm);
-			int Orientation = getWindowManager().getDefaultDisplay().getOrientation();
-			Log.d(LOG_TAG, "W: " + dm.widthPixels + " H:" + dm.heightPixels + " Orientation = "
-					+ Orientation);
+				Parameters params = new ParametersImpl();
+				params.put(MediaComponentAndroid.PREVIEW_SURFACE,
+						(View) findViewById(R.id.video_capture_surface));
+				params.put(MediaComponentAndroid.DISPLAY_ORIENTATION,
+						Orientation);
 
-			params = new ParametersImpl();
-			params.put(MediaComponentAndroid.VIEW_SURFACE,
-					(View) findViewById(R.id.video_receive_surface));
-			params.put(MediaComponentAndroid.DISPLAY_WIDTH, dm.widthPixels);
-			params.put(MediaComponentAndroid.DISPLAY_HEIGHT, dm.heightPixels);
-			videoRecorderComponent = mediaSession.createMediaComponent(
-					MediaComponentAndroid.VIDEO_RECORDER, params);
-		} catch (MsControlException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+				videoPlayerComponent = mediaSession.createMediaComponent(
+						MediaComponentAndroid.VIDEO_PLAYER, params);
+
+				params = new ParametersImpl();
+				params.put(MediaComponentAndroid.VIEW_SURFACE,
+						(View) findViewById(R.id.video_receive_surface));
+				params.put(MediaComponentAndroid.DISPLAY_WIDTH, dm.widthPixels);
+				params.put(MediaComponentAndroid.DISPLAY_HEIGHT,
+						dm.heightPixels);
+				videoRecorderComponent = mediaSession.createMediaComponent(
+						MediaComponentAndroid.VIDEO_RECORDER, params);
+			} catch (MsControlException e) {
+				// TODO Auto-generated catch block
+				Log.e(LOG_TAG, e.getMessage());
+				e.printStackTrace();
+			} catch (Exception e) {
+				Log.e(LOG_TAG, e.getMessage());
+			}
+		} else
+			Log.e(LOG_TAG, "Controller is null");
 	}
 
 	@Override
@@ -98,117 +112,131 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	@Override
 	protected void onResume() {
 		super.onResume();
-
-		NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
-				.get("networkConnection");
-		Log.e(LOG_TAG, "nc: " + nc);
-		if (nc == null) {
-			Log.e(LOG_TAG, "networkConnection is NULL");
-			return;
-		}
-
-		try {
-			if (videoPlayerComponent != null) {
-				videoPlayerComponent.join(Direction.SEND, nc.getJoinableStream(StreamType.video));
-				videoPlayerComponent.start();
-			}
-			if (videoRecorderComponent != null) {
-				videoRecorderComponent.join(Direction.RECV, nc.getJoinableStream(StreamType.video));
-				videoRecorderComponent.start();
+		Log.d(LOG_TAG, "HANG = " + hang);
+		if (!hang) {
+			NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
+					.get("networkConnection");
+			Log.e(LOG_TAG, "nc: " + nc);
+			if (nc == null) {
+				Log.e(LOG_TAG, "networkConnection is NULL");
+				return;
 			}
 
-		} catch (MsControlException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		final Button buttonTerminateCall = (Button) findViewById(R.id.button_terminate_call);
-		buttonTerminateCall.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Log.d(LOG_TAG, "Hang ...");
-				Controller controller = (Controller) ApplicationContext.contextTable
-						.get("controller");
-				if (controller != null) {
-					controller.hang();
+			try {
+				if (videoPlayerComponent != null) {
+					videoPlayerComponent.join(Direction.SEND,
+							nc.getJoinableStream(StreamType.video));
+					videoPlayerComponent.start();
 				}
-				finish();
+				if (videoRecorderComponent != null) {
+					videoRecorderComponent.join(Direction.RECV,
+							nc.getJoinableStream(StreamType.video));
+					videoRecorderComponent.start();
+				}
+
+			} catch (MsControlException e) {
+				Log.e(LOG_TAG, e.getMessage());
+				e.printStackTrace();
+			} catch (Exception e) {
+				Log.e(LOG_TAG, e.getMessage());
 			}
-		});
-		final Button buttonMute = (Button) findViewById(R.id.button_mute);
 
-		buttonMute.setOnClickListener(new OnClickListener() {
+			final Button buttonTerminateCall = (Button) findViewById(R.id.button_terminate_call);
+			buttonTerminateCall.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				MediaComponentAndroid audioPlayerComponent = (MediaComponentAndroid) ApplicationContext.contextTable
-						.get("audioPlayerComponent");
-
-				Log.d(LOG_TAG, "Button Mute push");
-				Log.d(LOG_TAG, "isStarted(): " + audioPlayerComponent.isStarted());
-				try {
-					if (audioPlayerComponent.isStarted())
-						audioPlayerComponent.stop();
-					else
-						audioPlayerComponent.start();
-				} catch (MsControlException e) {
-					e.printStackTrace();
+				@Override
+				public void onClick(View v) {
+					Log.d(LOG_TAG, "Hang ...");
+					Controller controller = (Controller) ApplicationContext.contextTable
+							.get("controller");
+					if (controller != null) {
+						controller.hang();
+						hang = true;
+					}
+					finish();
 				}
-			}
-		});
+			});
+			final Button buttonMute = (Button) findViewById(R.id.button_mute);
 
-		final Button buttonSpeaker = (Button) findViewById(R.id.button_headset);
+			buttonMute.setOnClickListener(new OnClickListener() {
 
-		buttonSpeaker.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					MediaComponentAndroid audioPlayerComponent = (MediaComponentAndroid) ApplicationContext.contextTable
+							.get("audioPlayerComponent");
 
-			@Override
-			public void onClick(View v) {
-
-				Controller controller = (Controller) ApplicationContext.contextTable
-						.get("controller");
-				if (controller == null) {
-					Log.e(LOG_TAG, "controller is NULL");
-					return;
+					Log.d(LOG_TAG, "Button Mute push");
+					Log.d(LOG_TAG,
+							"isStarted(): " + audioPlayerComponent.isStarted());
+					try {
+						if (audioPlayerComponent.isStarted())
+							audioPlayerComponent.stop();
+						else
+							audioPlayerComponent.start();
+					} catch (MsControlException e) {
+						e.printStackTrace();
+					}
 				}
+			});
 
-				NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
-						.get("networkConnection");
-				if (nc == null) {
-					Log.e(LOG_TAG, "networkConnection is NULL");
-					return;
-				}
+			final Button buttonSpeaker = (Button) findViewById(R.id.button_headset);
 
-				MediaSessionAndroid mediaSession = controller.getMediaSession();
-				MediaComponentAndroid audioRecorderComponent = (MediaComponentAndroid) ApplicationContext.contextTable
-						.get("audioRecorderComponent");
+			buttonSpeaker.setOnClickListener(new OnClickListener() {
 
-				try {
-					// TODO: solo cambia al altavoz interno. El control de que
-					// altavoz se está usando habrá que hacerlo a nivel de
-					// aplicación. El API no ofrece tanto detalle
-					if (audioRecorderComponent != null) {
-						audioRecorderComponent.stop();
-						audioRecorderComponent.unjoin(nc.getJoinableStream(StreamType.audio));
+				@Override
+				public void onClick(View v) {
+
+					Controller controller = (Controller) ApplicationContext.contextTable
+							.get("controller");
+					if (controller == null) {
+						Log.e(LOG_TAG, "controller is NULL");
+						return;
 					}
 
-					Parameters params = new ParametersImpl();
-					params.put(MediaComponentAndroid.STREAM_TYPE, AudioManager.STREAM_VOICE_CALL);
-					audioRecorderComponent = mediaSession.createMediaComponent(
-							MediaComponentAndroid.AUDIO_RECORDER, params);
-
-					if (audioRecorderComponent != null) {
-						audioRecorderComponent.join(Direction.RECV,
-								nc.getJoinableStream(StreamType.audio));
-						audioRecorderComponent.start();
+					NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
+							.get("networkConnection");
+					if (nc == null) {
+						Log.e(LOG_TAG, "networkConnection is NULL");
+						return;
 					}
-				} catch (MsControlException e) {
-					e.printStackTrace();
-				}
-			}
-		});
 
-		Log.e(LOG_TAG, "onResume OK");
+					MediaSessionAndroid mediaSession = controller
+							.getMediaSession();
+					MediaComponentAndroid audioRecorderComponent = (MediaComponentAndroid) ApplicationContext.contextTable
+							.get("audioRecorderComponent");
+
+					try {
+						// TODO: solo cambia al altavoz interno. El control de
+						// que
+						// altavoz se está usando habrá que hacerlo a nivel de
+						// aplicación. El API no ofrece tanto detalle
+						if (audioRecorderComponent != null) {
+							audioRecorderComponent.stop();
+							audioRecorderComponent.unjoin(nc
+									.getJoinableStream(StreamType.audio));
+						}
+
+						Parameters params = new ParametersImpl();
+						params.put(MediaComponentAndroid.STREAM_TYPE,
+								AudioManager.STREAM_VOICE_CALL);
+						audioRecorderComponent = mediaSession
+								.createMediaComponent(
+										MediaComponentAndroid.AUDIO_RECORDER,
+										params);
+
+						if (audioRecorderComponent != null) {
+							audioRecorderComponent.join(Direction.RECV,
+									nc.getJoinableStream(StreamType.audio));
+							audioRecorderComponent.start();
+						}
+					} catch (MsControlException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+
+			Log.e(LOG_TAG, "onResume OK");
+		}
 	}
 
 	@Override
@@ -220,6 +248,10 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	@Override
 	protected void onPause() {
 		Log.d(LOG_TAG, "OnPause");
+		if (videoRecorderComponent != null)
+			videoRecorderComponent.stop();
+		if (videoPlayerComponent != null)
+			videoPlayerComponent.stop();
 		super.onPause();
 	}
 
@@ -237,7 +269,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 	@Override
 	protected void onDestroy() {
-		Log.d(LOG_TAG, "OnDestroy");
+		Log.d(LOG_TAG, "OnDestroy ");
 		if (wl != null)
 			wl.release();
 		super.onDestroy();
@@ -256,7 +288,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case (R.id.menu_videocall_preferences):
-			Intent videoCallPreferences = new Intent(this, VideoCall_Preferences.class);
+			Intent videoCallPreferences = new Intent(this,
+					VideoCall_Preferences.class);
 			startActivityForResult(videoCallPreferences, SHOW_PREFERENCES);
 			return true;
 		}
