@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -48,6 +49,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private ArrayList<VideoCodecType> videoCodecs;
 	private InetAddress localAddress;
 	private ConnectionType connectionType;
+	// ConnectivityManager ConnectManager;
+	ConnectivityManager connManager;
+	NetworkInfo ni;
 
 	private String localUser;
 	private String localRealm;
@@ -63,10 +67,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private TextView text;
 
 	private Controller controller;
+	private boolean isRegister = false;
 
 	private boolean isExit = false;
-
-	ConnectivityManager ConnectManager;
 
 	// =(ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 	//
@@ -85,7 +88,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		PreferenceManager.setDefaultValues(this, R.layout.video_preferences, true);
+		PreferenceManager.setDefaultValues(this, R.layout.video_preferences,
+				true);
 		SoftPhoneService.setUpdateListener(this);
 		// PowerManager pm = (PowerManager)
 		// getSystemService(Context.POWER_SERVICE);
@@ -96,31 +100,60 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		// wl.acquire(tiempo);
 
 		/* If first time */
-		controller = (Controller) ApplicationContext.contextTable.get("controller");
+		controller = (Controller) ApplicationContext.contextTable
+				.get("controller");
 
 		String texto = (String) ApplicationContext.contextTable.get("texto");
 		Log.d(LOG_TAG, "Text: " + texto);
 		if (texto == null)
 			ApplicationContext.contextTable.put("texto", "Estoy dentro");
 
-		initControllerUAFromSettings();
-		if (controller == null) {
-			Log.d(LOG_TAG, "Controller is null");
-			register();
+		connectionType = null;
+		connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+		ni = connManager.getActiveNetworkInfo();
+
+		if (ni != null) {
+
+			if (initControllerUAFromSettings()) {
+				if (controller == null) {
+					Log.d(LOG_TAG, "Controller is null");
+					register();
+				} else {
+					Log.d(LOG_TAG, "Controller not is null");
+					try {
+						if ((Boolean) ApplicationContext.contextTable
+								.get("isRegister"))
+							registerSucessful();
+					} catch (Exception e) {
+						isRegister = false;
+						ApplicationContext.contextTable.put("isRegister",
+								isRegister);
+					}
+				}
+				// Estoy registrado?
+				checkCallIntent(getIntent());
+			}
 		} else {
-			Log.d(LOG_TAG, "Controller not is null");
-			if (controller.isRegister())
-				registerSucessful();
+			Log.e(LOG_TAG, "Network interface unable.");
+			Toast.makeText(SoftPhone.this,
+					"SoftPhone: Please enable any network interface.",
+					Toast.LENGTH_SHORT).show();
+
+			finish();
 		}
-		// Estoy registrado?
-		checkCallIntent(getIntent());
 	}
 
 	@Override
 	protected void onNewIntent(Intent intent) {
 		// TODO Auto-generated method stub
 		super.onNewIntent(intent);
+		
 		Log.d(LOG_TAG, "onNewIntent Is first or is call??");
+		
+		connectionType = null;
+		connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+		ni = connManager.getActiveNetworkInfo();
+		if (ni != null) {
 		if (intent.getData() == null)
 			return;
 		// Log.d(LOG_TAG, "onNewIntent Tlf: " +
@@ -141,6 +174,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		// }
 
 		checkCallIntent(intent);
+		}else {
+			Log.e(LOG_TAG, "Network interface unable.");
+			Toast.makeText(SoftPhone.this,
+					"SoftPhone: Please enable any network interface.",
+					Toast.LENGTH_SHORT).show();
+
+			finish();
+		}
+		
 	}
 
 	private void checkCallIntent(Intent intent) {
@@ -149,7 +191,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			return;
 
 		if (Intent.ACTION_CALL.equalsIgnoreCase(intent.getAction())) {
-			Log.d(LOG_TAG, " ********* CALL" + intent.getData().getSchemeSpecificPart());
+			Log.d(LOG_TAG, " ********* CALL"
+					+ intent.getData().getSchemeSpecificPart());
 		} else if (Intent.ACTION_SENDTO.equals(intent.getAction())) {
 			Log.d(LOG_TAG, "sip:" + intent.getData().getLastPathSegment());
 			if (controller == null)
@@ -165,12 +208,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					name = controlcontacts.getName(idContact);
 
 				if (sip != null) {
-					Toast.makeText(SoftPhone.this, name + ". SIP:" + sip, Toast.LENGTH_SHORT)
-							.show();
+					Toast.makeText(SoftPhone.this, name + ". SIP:" + sip,
+							Toast.LENGTH_SHORT).show();
 					call("sip:" + sip, idContact);
 				} else
-					Toast.makeText(SoftPhone.this, name + ". No tiene SIP:", Toast.LENGTH_SHORT)
-							.show();
+					Toast.makeText(SoftPhone.this, name + ". No tiene SIP:",
+							Toast.LENGTH_SHORT).show();
 			} catch (Exception e) {
 				Log.e("onActivityResult", e.toString());
 			}
@@ -206,16 +249,20 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					try {
 						TextView textRemoteUri = (TextView) findViewById(R.id.textRemoteUri);
 						String remoteURI = "sip:";
-						if (textRemoteUri.getText().toString().equals("user@host")
-								|| textRemoteUri.getText().toString().equals("")) {
+						if (textRemoteUri.getText().toString()
+								.equals("user@host")
+								|| textRemoteUri.getText().toString()
+										.equals("")) {
 							openContacts();
 
 						} else {
 							remoteURI += textRemoteUri.getText().toString();
 							Integer idContact;
-							idContact = controlcontacts.getId(textRemoteUri.getText().toString());
+							idContact = controlcontacts.getId(textRemoteUri
+									.getText().toString());
 
-							Log.d(LOG_TAG, "remoteURI: " + remoteURI + " IdContact = " + idContact);
+							Log.d(LOG_TAG, "remoteURI: " + remoteURI
+									+ " IdContact = " + idContact);
 							call(remoteURI, idContact);
 						}
 
@@ -223,6 +270,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 						Log.e(LOG_TAG, e.toString());
 						e.printStackTrace();
 					}
+
 				} else
 					notRegister();
 			}
@@ -268,6 +316,18 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			if (isExit) {
 				if (controller != null)
 					controller.finishUA();
+				isRegister = false;
+				ApplicationContext.contextTable.put("isRegister", isRegister);
+				
+				intentService = (Intent) ApplicationContext.contextTable.put("intentService", intentService);
+				try {
+					stopService(intentService);
+				} catch (Exception e) {
+					Log.e(LOG_TAG,
+							"stopService " + e.getMessage() + "; "
+									+ e.toString());
+				}
+				ApplicationContext.contextTable.clear();
 				Log.d(LOG_TAG, " FinishUA");
 			}
 
@@ -294,7 +354,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				}
 
 			} else
-				Log.d(LOG_TAG, "Media Control Outgoing; ResultCode = " + resultCode);
+				Log.d(LOG_TAG, "Media Control Outgoing; ResultCode = "
+						+ resultCode);
 		}
 
 		if (requestCode == SHOW_PREFERENCES) {
@@ -305,13 +366,14 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			SoftPhone.this.text.setTextSize(20);
 			SoftPhone.this.text.setTextColor(Color.WHITE);
 			SoftPhone.this.text.setText("Connecting...");
-
+			isRegister = false;
+			ApplicationContext.contextTable.put("isRegister", isRegister);
 			// dialog = ProgressDialog.show(SoftPhone.this, "",
 			// "Connecting ...");
 
 			Log.d(LOG_TAG, "Reconfigure Preferences");
-			initControllerUAFromSettings();
-			initUA();
+			if (initControllerUAFromSettings())
+				initUA();
 
 		}
 
@@ -330,12 +392,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				Log.d(LOG_TAG, "Name: " + name);
 
 				if (sip != null) {
-					Toast.makeText(SoftPhone.this, name + ", SIP:" + sip, Toast.LENGTH_SHORT)
-							.show();
+					Toast.makeText(SoftPhone.this, name + ", SIP:" + sip,
+							Toast.LENGTH_SHORT).show();
 					call("sip:" + sip, id);
 				} else
-					Toast.makeText(SoftPhone.this, name + ", No tiene SIP:", Toast.LENGTH_SHORT)
-							.show();
+					Toast.makeText(SoftPhone.this, name + ", No tiene SIP:",
+							Toast.LENGTH_SHORT).show();
 			}
 		}
 	}
@@ -348,7 +410,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			try {
 
 				controller.call(remoteURI);
-				Intent mediaIntent = new Intent(SoftPhone.this, MediaControlOutgoing.class);
+				Intent mediaIntent = new Intent(SoftPhone.this,
+						MediaControlOutgoing.class);
 
 				mediaIntent.putExtra("Id", id);
 				mediaIntent.putExtra("Uri", remoteURI);
@@ -359,6 +422,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				Log.e(LOG_TAG, e.toString());
 				e.printStackTrace();
 			}
+
 		} else
 			notRegister();
 	}
@@ -377,11 +441,17 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		switch (item.getItemId()) {
 		case (R.id.menu_exit):
 			isExit = true;
-			stopService(intentService);
+			// try {
+			// stopService(intentService);
+			// } catch (Exception e) {
+			// Log.e(LOG_TAG,
+			// "stopService " + e.getMessage() + "; " + e.toString());
+			// }
 			finish();
 			return true;
 		case (R.id.menu_conection_preferences):
-			Intent localPreferences = new Intent(this, Connection_Preferences.class);
+			Intent localPreferences = new Intent(this,
+					Connection_Preferences.class);
 			startActivityForResult(localPreferences, SHOW_PREFERENCES);
 			return true;
 		case (R.id.menu_video_preferences):
@@ -389,6 +459,10 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			startActivityForResult(remotePreferences, SHOW_PREFERENCES);
 			return true;
 		case (R.id.menu_register):
+			SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
+			SoftPhone.this.text.setTextSize(20);
+			SoftPhone.this.text.setTextColor(Color.WHITE);
+			SoftPhone.this.text.setText("Connecting...");
 			register();
 			return true;
 		}
@@ -401,13 +475,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 		if (intentService == null) {
 			intentService = new Intent(this, SoftPhoneService.class);
+			ApplicationContext.contextTable.put("intentService", intentService);
 			startService(intentService);
+			
+			Log.d(LOG_TAG, "StartService");
 			SoftPhoneService.setUpdateListener(this);
 		}
 
-		// dialog = ProgressDialog.show(SoftPhone.this, "", "Connecting ...");
-		initControllerUAFromSettings();
-		initUA();
+		if (initControllerUAFromSettings())
+			initUA();
 	}
 
 	public void registerSucessful() {
@@ -417,6 +493,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		SoftPhone.this.text.setTextSize(20);
 		SoftPhone.this.text.setTextColor(Color.GREEN);
 		SoftPhone.this.text.setText("Register Sucessful");
+		isRegister = true;
+		ApplicationContext.contextTable.put("isRegister", isRegister);
 
 	}
 
@@ -426,6 +504,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		SoftPhone.this.text.setTextSize(20);
 		SoftPhone.this.text.setTextColor(Color.RED);
 		SoftPhone.this.text.setText("Register Failed");
+		isRegister = false;
+		ApplicationContext.contextTable.put("isRegister", isRegister);
 	}
 
 	public void notRegister() {
@@ -433,6 +513,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		SoftPhone.this.text.setTextSize(20);
 		SoftPhone.this.text.setTextColor(Color.BLUE);
 		SoftPhone.this.text.setText("Not Register, please register.");
+		isRegister = false;
+		ApplicationContext.contextTable.put("isRegister", isRegister);
 	}
 
 	private ArrayList<VideoCodecType> getVideoCodecsFromSettings() {
@@ -465,30 +547,41 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		return selectedAudioCodecs;
 	}
 
-	private void initControllerUAFromSettings() {
+	private boolean initControllerUAFromSettings() {
+		try {
+			SharedPreferences settings = PreferenceManager
+					.getDefaultSharedPreferences(getBaseContext());
+			localUser = settings.getString("LOCAL_USERNAME", "android1");
+			localRealm = settings.getString("LOCAL_DOMAIN", "urjc.es");
+			proxyIP = settings.getString("PROXY_IP", "193.147.51.17");
+			proxyPort = Integer.parseInt(settings.getString("PROXY_PORT",
+					"5060"));
 
-		SharedPreferences settings = PreferenceManager
-				.getDefaultSharedPreferences(getBaseContext());
-		localUser = settings.getString("LOCAL_USERNAME", "android1");
-		localRealm = settings.getString("LOCAL_DOMAIN", "urjc.es");
-		proxyIP = settings.getString("PROXY_IP", "193.147.51.17");
-		proxyPort = Integer.parseInt(settings.getString("PROXY_PORT", "5060"));
+			// Controlar si ni == null .
 
-		ConnectionType connectionType = null;
-		ConnectivityManager connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-		NetworkInfo ni = connManager.getActiveNetworkInfo();
-		String conType = ni.getTypeName();
-		
-		Log.d(LOG_TAG, "conType : " + conType);
-		if ("WIFI".equalsIgnoreCase(conType))
-			connectionType = ConnectionType.WIFI;
-		else if ("MOBILE".equalsIgnoreCase(conType))
-			connectionType = ConnectionType.MOBILE;
+			String conType = ni.getTypeName();
 
-		this.audioCodecs = getAudioCodecsFromSettings();
-		this.videoCodecs = getVideoCodecsFromSettings();
-		this.localAddress = NetworkIP.getLocalAddress();
-		this.connectionType = connectionType;
+			Log.d(LOG_TAG, "conType : " + conType);
+			if ("WIFI".equalsIgnoreCase(conType))
+				connectionType = ConnectionType.WIFI;
+			else if ("MOBILE".equalsIgnoreCase(conType))
+				connectionType = ConnectionType.MOBILE;
+
+			this.audioCodecs = getAudioCodecsFromSettings();
+			this.videoCodecs = getVideoCodecsFromSettings();
+			this.localAddress = NetworkIP.getLocalAddress();
+			this.connectionType = connectionType;
+			return true;
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "Network interface unable.");
+			Toast.makeText(SoftPhone.this,
+					"SoftPhone: Please enable any network interface.",
+					Toast.LENGTH_SHORT).show();
+
+			finish();
+			return false;
+		}
+
 	}
 
 	public static Context getContext() {
@@ -497,11 +590,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	private void initUA() {
 		try {
-			Log.d(LOG_TAG, "LocalUser : " + localUser + "; localReal : " + localRealm
-					+ " proxyIP: " + proxyIP + "; localPort : " + proxyPort);
+			Log.d(LOG_TAG, "LocalUser : " + localUser + "; localReal : "
+					+ localRealm + " proxyIP: " + proxyIP + "; localPort : "
+					+ proxyPort);
 
-			controller.initUA(audioCodecs, videoCodecs, localAddress, connectionType, proxyIP,
-					proxyPort, localUser, localRealm);
+			controller.initUA(audioCodecs, videoCodecs, localAddress,
+					connectionType, proxyIP, proxyPort, localUser, localRealm);
 			ApplicationContext.contextTable.put("controller", controller);
 			Log.e(LOG_TAG, "put controller in context");
 		} catch (Exception e) {
@@ -525,7 +619,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				registerFailed();
 			}
 		} else if (message.getData().containsKey("finishActivity")) {
-			if (message.getData().getString("finishActivity").equals("MEDIA_CONTROL_OUTGOING")) {
+			if (message.getData().getString("finishActivity")
+					.equals("MEDIA_CONTROL_OUTGOING")) {
 				Log.d(LOG_TAG, "Finish Activity MEDIA_CONTROL_OUTGOING");
 				finishActivity(MEDIA_CONTROL_OUTGOING);
 			}
