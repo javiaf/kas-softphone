@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.tikal.android</groupId>
 	<artifactId>tk-android-softphone</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>apk</packaging>
 
   <name>SoftPhone</name>
