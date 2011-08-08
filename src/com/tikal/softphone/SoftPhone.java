@@ -65,6 +65,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private ControlContacts controlcontacts = new ControlContacts(this);
 
 	private TextView text;
+	private TextView textUser;
+	private TextView textServer;
 
 	private Controller controller;
 	private boolean isRegister = false;
@@ -493,6 +495,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		SoftPhone.this.text.setTextSize(20);
 		SoftPhone.this.text.setTextColor(Color.GREEN);
 		SoftPhone.this.text.setText("Register Sucessful");
+		
 		isRegister = true;
 		ApplicationContext.contextTable.put("isRegister", isRegister);
 
@@ -504,6 +507,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		SoftPhone.this.text.setTextSize(20);
 		SoftPhone.this.text.setTextColor(Color.RED);
 		SoftPhone.this.text.setText("Register Failed");
+		
 		isRegister = false;
 		ApplicationContext.contextTable.put("isRegister", isRegister);
 	}
@@ -513,6 +517,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		SoftPhone.this.text.setTextSize(20);
 		SoftPhone.this.text.setTextColor(Color.BLUE);
 		SoftPhone.this.text.setText("Not Register, please register.");
+		
 		isRegister = false;
 		ApplicationContext.contextTable.put("isRegister", isRegister);
 	}
@@ -556,6 +561,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			proxyIP = settings.getString("PROXY_IP", "193.147.51.17");
 			proxyPort = Integer.parseInt(settings.getString("PROXY_PORT",
 					"5060"));
+			
+			this.textUser = (TextView) findViewById(R.id.textUser);
+			this.textUser.setText("User: " + localUser + "@" + localRealm);
+			
+			this.textServer = (TextView) findViewById(R.id.textServer);
+			this.textServer.setText("Server: " + proxyIP + ":" + proxyPort);
 
 			// Controlar si ni == null .
 

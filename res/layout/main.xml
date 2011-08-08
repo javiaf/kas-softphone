@@ -2,8 +2,9 @@
 <FrameLayout android:id="@+id/FrameLayout01"
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
 	xmlns:android="http://schemas.android.com/apk/res/android">
-	<TableLayout android:layout_height="wrap_content" android:id="@+id/tableLayout1"
-		android:layout_gravity="top" android:layout_width="match_parent">
+	<TableLayout android:layout_height="wrap_content"
+		android:id="@+id/tableLayout1" android:layout_gravity="top"
+		android:layout_width="match_parent">
 		<TableRow android:id="@+id/TableRow01">
 			<TextView android:id="@+id/textRegister"
 				android:layout_width="fill_parent" android:layout_height="wrap_content"
@@ -11,19 +12,28 @@
 		</TableRow>
 		<TableRow android:id="@+id/TableRow01">
 			<EditText android:id="@+id/textRemoteUri" android:hint="user@host"
-				android:text="" android:layout_gravity="top" android:layout_height="match_parent" android:layout_width="200dip"></EditText>
+				android:text="" android:layout_gravity="top" android:layout_height="match_parent"
+				android:layout_width="200dip"></EditText>
+		</TableRow>
+		<TableRow android:id="@+id/TableRow01">
+			<TextView android:id="@+id/textUser" android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:text="" />
+		</TableRow>
+		<TableRow android:id="@+id/TableRow01">
+			<TextView android:id="@+id/textServer" android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:text="" />
 		</TableRow>
 	</TableLayout>
 
+
 	<Button android:id="@+id/contacts" android:layout_width="wrap_content"
 		android:text="" android:layout_height="wrap_content"
-		android:layout_alignParentBottom="true"
-		android:background="@drawable/peoplecontactsicon"
+		android:layout_alignParentBottom="true" android:background="@drawable/peoplecontactsicon"
 		android:layout_alignParentRight="true" android:layout_gravity="left|bottom" />
 
-<Button android:id="@+id/call" android:layout_height="wrap_content"
-				android:layout_alignParentBottom="true" android:background="@drawable/ic_jog_dial_answer"
-				android:layout_alignParentRight="true" android:layout_width="100dip"
-				android:layout_gravity="center|center_horizontal|bottom" />
+	<Button android:id="@+id/call" android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true" android:background="@drawable/ic_jog_dial_answer"
+		android:layout_alignParentRight="true" android:layout_width="100dip"
+		android:layout_gravity="center|center_horizontal|bottom" />
 </FrameLayout>
 
