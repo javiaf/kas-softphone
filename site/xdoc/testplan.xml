@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+
+	<properties>
+		<title>Test Plan</title>
+		<author email="raul.benitez.mejias@urjc.es">Raúl Benítez</author>
+	</properties>
+
+	<body>
+
+		<!-- The body of the document contains a number of sections -->
+		<section name="Test plan for application Softphone">
+			<table>
+				<tr>
+					<td>
+						<center>
+							<b>Test</b>
+						</center>
+					</td>
+					<td>
+						<center>
+							<b>Status</b>
+						</center>
+					</td>
+				</tr>
+
+				<tr>
+					<td>Start application and it register to server SIP automatically
+					</td>
+					<td bgcolor="#00FF00">Ok</td>
+				</tr>
+
+				<tr>
+					<td>Try to register to a server when there not server SIP</td>
+					<td bgcolor="#00FF00">Ok</td>
+				</tr>
+
+				<tr>
+					<td>Start service softphone after to start application</td>
+					<td bgcolor="#00FF00">Ok</td>
+				</tr>
+
+				<tr>
+					<td>Exit application and stop the service softphone</td>
+					<td bgcolor="#00FF00">Ok</td>
+				</tr>
+
+				<tr>
+					<td>Do not allow to open the application without any active network
+					</td>
+					<td bgcolor="#00FF00">Ok</td>
+				</tr>
+
+				<tr>
+					<td>Access to phonebook</td>
+					<td bgcolor="#00FF00">Ok</td>
+				</tr>
+
+				<tr>
+					<td>If you're registered. Call a contact that has SIP user. Don't
+						call a contact that doesn't have SIP user</td>
+					<td bgcolor="#00FF00">Ok</td>
+				</tr>
+
+				<tr>
+					<td>If you're not registered. Call a contact that has SIP user.
+						Don't call a contact that doesn't have SIP user</td>
+					<td bgcolor="#FF0000">Fail</td>
+				</tr>
+
+				<tr>
+					<td>Make a videocall</td>
+					<td bgcolor="#00FF00">Ok</td>
+				</tr>
+
+
+				<tr>
+					<td>Receiving a call when the application is not the foreground
+					</td>
+					<td bgcolor="#00FF00">Ok</td>
+				</tr>
+
+				<tr>
+					<td>Push the Home button to exit the application and reopen the
+						application during a call.</td>
+					<td bgcolor="#00FF00">Ok</td>
+				</tr>
+
+				<tr>
+					<td>Make a videocall when the video preferences are different
+						between two phone</td>
+					<td bgcolor="#00FF00">Ok</td>
+				</tr>
+
+				<tr>
+					<td>Make a videocall when the audio preferences are different
+						between two phone</td>
+					<td bgcolor="#00FF00">Ok</td>
+				</tr>
+
+				<tr>
+					<td>To hang a videocall</td>
+					<td bgcolor="#00FF00">Ok</td>
+				</tr>
+
+				<tr>
+					<td>To change the speaker</td>
+					<td bgcolor="#00FF00">Ok</td>
+				</tr>
+				
+				<tr>
+					<td>To mute</td>
+					<td bgcolor="#00FF00">Ok</td>
+				</tr>
+				
+				<tr>
+					<td>Disable the network during a videocall</td>
+					<td bgcolor="#00FF00">Ok</td>
+				</tr>
+
+			</table>
+
+		</section>
+
+	</body>
+
+</document>
