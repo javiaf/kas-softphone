@@ -1,0 +1,15 @@
+
+Configuration
+
+	For configuration the application, you need:
+	
+	* Username SIP: demo
+	
+	* Domain SIP: kurento.com
+	
+	* Proxy Server SIP: 193.147.51.37
+	
+	* Proxy Port SIP: 5080
+	
+	In {{{./basicmanual.html}basic manual}}, you can see how configurate the application. 
+	

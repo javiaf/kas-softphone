@@ -1,0 +1,84 @@
+
+Basic user manual:
+
+* The application is divided into 4 parts
+
+[image/init210x350.png] Init
+
+	* A message will inform us if wh registered correctly or not.
+       
+	* A text box to enter the SIP address of the contact you want to call.
+	
+	* Data connection.
+	   
+	* Two buttons:
+	   
+		* Direct access to contacs.
+	      
+		* If text box not empty, it make a call to that contact. If text box is empty, opens the phonebook for to select one contact.
+		
+* Menu
+
+[image/pushmenu210x350.png] Menu
+
+     When we push the menu button, we can: register manually, to access preferences or exit the application.
+     
+     * '''Register''': Application to register with the data that there are on preferences.
+     
+     *  '''Preferences''': Show the application preferences.
+ 
+ 
+[image/menupreferences210x350.png] Menu Preferences
+     
+        * Connection Preferences.
+        	
+        	In connection preferences, you can configure connection parameters SIP how the username, domain, server proxy and port.
+
+[image/connetionpreferences210x350.png] Connection Preferences
+
+        * Video Preferences.
+        	
+        	In video  preferences, you can configure codecs video and audio, also the size  of the video.
+ 
+[image/videopreferences210x350.png] Video Preferences
+        
+     * '''Exit''': Exit the application.
+     
+* Make a call: You can make a call in various ways.
+
+[image/outgoingcall210x350.png] Outgoing Call  
+
+     * From the phonebook, choose the contact and opens the application to make the call.
+     
+     * From the application:
+     
+       * Enter the contact's address in the text box and press the call button.
+       
+       * Access phonebook from the contacts button.
+       
+       * Press the call button, if the text box is empty then opens phonebook.
+       
+   
+* Accepting a call
+
+[image/incomingcall210x350.png] Incoming Call
+
+	Accepting the call by pressing the call button.
+	
+* Hang up a call
+
+	Hanging the call by pressing the hang button.
+
+* Set the mute
+
+	Press the mute button.
+
+* Change speaker
+
+	We may change the internal speaker or external speaker. Press the button to change speaker.
+
+[image/videocall210x350.png] VideoCall
+
+* To exit a call and return to it, we will use the notification called ''VideoCall'' in the notification bar.
+
+* To access the application once opened, we will use the notification called ''Softphone'' in the notification bar.

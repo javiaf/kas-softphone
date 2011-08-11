@@ -7,7 +7,7 @@
 	<packaging>apk</packaging>
 
   <name>SoftPhone</name>
-  <description>TODO: Add description here</description>
+  <description>Softphone application for Android. It can make video calls using SIP with different video formats and audio formats.</description>
   <url>http://repository.kurento.com/site/tk-android-softphone</url>
 
 	<dependencies>
@@ -90,6 +90,13 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<configuration>
+					<siteDirectory>${basedir}/site</siteDirectory>
 				</configuration>
 			</plugin>
 		</plugins>
