@@ -17,6 +17,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.telephony.PhoneStateListener;
+import android.telephony.SignalStrength;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -149,34 +152,34 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	protected void onNewIntent(Intent intent) {
 		// TODO Auto-generated method stub
 		super.onNewIntent(intent);
-		
+
 		Log.d(LOG_TAG, "onNewIntent Is first or is call??");
-		
+
 		connectionType = null;
 		connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 		ni = connManager.getActiveNetworkInfo();
 		if (ni != null) {
-		if (intent.getData() == null)
-			return;
-		// Log.d(LOG_TAG, "onNewIntent Tlf: " +
-		// intent.getData().getSchemeSpecificPart() + "; Action: " +
-		// intent.getData().getScheme());
-		// if (intent.getData().getScheme().equalsIgnoreCase("tel")){
-		// try {
-		// Intent callIntent = new Intent(Intent.ACTION_DIAL);
-		// callIntent.setData(Uri.parse("tel:" +
-		// intent.getData().getSchemeSpecificPart()));
-		// startActivity(callIntent);
-		// } catch (ActivityNotFoundException activityException) {
-		// Log.e("dialing-example", "Call failed", activityException);
-		// }
-		//
-		//
-		//
-		// }
+			if (intent.getData() == null)
+				return;
+			// Log.d(LOG_TAG, "onNewIntent Tlf: " +
+			// intent.getData().getSchemeSpecificPart() + "; Action: " +
+			// intent.getData().getScheme());
+			// if (intent.getData().getScheme().equalsIgnoreCase("tel")){
+			// try {
+			// Intent callIntent = new Intent(Intent.ACTION_DIAL);
+			// callIntent.setData(Uri.parse("tel:" +
+			// intent.getData().getSchemeSpecificPart()));
+			// startActivity(callIntent);
+			// } catch (ActivityNotFoundException activityException) {
+			// Log.e("dialing-example", "Call failed", activityException);
+			// }
+			//
+			//
+			//
+			// }
 
-		checkCallIntent(intent);
-		}else {
+			checkCallIntent(intent);
+		} else {
 			Log.e(LOG_TAG, "Network interface unable.");
 			Toast.makeText(SoftPhone.this,
 					"SoftPhone: Please enable any network interface.",
@@ -184,7 +187,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 			finish();
 		}
-		
+
 	}
 
 	private void checkCallIntent(Intent intent) {
@@ -237,8 +240,13 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	@Override
 	protected void onResume() {
 		super.onResume();
-
 		Log.d(LOG_TAG, "On Resume");
+
+		/* Listener for change of networking */
+
+		TelephonyManager signalManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		signalManager.listen(signalListener,
+				PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
 
 		final Button buttonCall = (Button) findViewById(R.id.call);
 		buttonCall.setOnClickListener(new OnClickListener() {
@@ -320,8 +328,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					controller.finishUA();
 				isRegister = false;
 				ApplicationContext.contextTable.put("isRegister", isRegister);
-				
-				intentService = (Intent) ApplicationContext.contextTable.put("intentService", intentService);
+
+				intentService = (Intent) ApplicationContext.contextTable
+						.get("intentService");
 				try {
 					stopService(intentService);
 				} catch (Exception e) {
@@ -474,12 +483,13 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private void register() {
 		if (controller == null)
 			controller = new Controller();
-
+		intentService = (Intent) ApplicationContext.contextTable
+				.get("intentService");
 		if (intentService == null) {
 			intentService = new Intent(this, SoftPhoneService.class);
 			ApplicationContext.contextTable.put("intentService", intentService);
 			startService(intentService);
-			
+
 			Log.d(LOG_TAG, "StartService");
 			SoftPhoneService.setUpdateListener(this);
 		}
@@ -495,7 +505,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		SoftPhone.this.text.setTextSize(20);
 		SoftPhone.this.text.setTextColor(Color.GREEN);
 		SoftPhone.this.text.setText("Register Sucessful");
-		
+
 		isRegister = true;
 		ApplicationContext.contextTable.put("isRegister", isRegister);
 
@@ -507,7 +517,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		SoftPhone.this.text.setTextSize(20);
 		SoftPhone.this.text.setTextColor(Color.RED);
 		SoftPhone.this.text.setText("Register Failed");
-		
+
 		isRegister = false;
 		ApplicationContext.contextTable.put("isRegister", isRegister);
 	}
@@ -517,7 +527,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		SoftPhone.this.text.setTextSize(20);
 		SoftPhone.this.text.setTextColor(Color.BLUE);
 		SoftPhone.this.text.setText("Not Register, please register.");
-		
+
 		isRegister = false;
 		ApplicationContext.contextTable.put("isRegister", isRegister);
 	}
@@ -561,10 +571,10 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			proxyIP = settings.getString("PROXY_IP", "193.147.51.17");
 			proxyPort = Integer.parseInt(settings.getString("PROXY_PORT",
 					"5060"));
-			
+
 			this.textUser = (TextView) findViewById(R.id.textUser);
 			this.textUser.setText("User: " + localUser + "@" + localRealm);
-			
+
 			this.textServer = (TextView) findViewById(R.id.textServer);
 			this.textServer.setText("Server: " + proxyIP + ":" + proxyPort);
 
@@ -638,5 +648,45 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		}
 
 	}
+
+	private final PhoneStateListener signalListener = new PhoneStateListener() {
+
+		public void onDataConnectionStateChanged(int state) {
+
+			ConnectivityManager ConnectManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+			String sNetworkType = "No Activate";
+			/* Control para sólo transmitir cuando tengamos conexión si es false */
+			boolean backgroundEnabled = ConnectManager
+					.getBackgroundDataSetting();
+			int networkType = -1;
+			NetworkInfo activeNetwork = ConnectManager.getActiveNetworkInfo();
+			if (activeNetwork != null) {
+				networkType = activeNetwork.getType();
+			}
+			switch (networkType) {
+			case ConnectivityManager.TYPE_WIFI: // Disconnected
+				// Register() with new ip.
+				Log.d(LOG_TAG, "Connection OK, Register... WIFI");
+				ApplicationContext.contextTable.put("isNetworking", true);
+				break;
+			case ConnectivityManager.TYPE_MOBILE: // Connecting
+				// Register() with new ip.
+				Log.d(LOG_TAG, "Connection OK, Register...MOBILE");
+				ApplicationContext.contextTable.put("isNetworking", true);
+				break;
+			case -1: // Disconneted
+				Log.d(LOG_TAG, "No Activate");
+				ApplicationContext.contextTable.put("isNetworking", false);
+				break;
+			default:
+				break;
+			}
+
+		
+			
+
+		}
+	};
 
 }
