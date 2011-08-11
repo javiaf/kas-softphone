@@ -29,6 +29,7 @@
 			<groupId>com.tikal.android</groupId>
 			<artifactId>tk-android-mscontrol</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+			<type>apklib</type>
 		</dependency>
 		<dependency>
 			<groupId>com.tikal</groupId>
