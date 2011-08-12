@@ -484,10 +484,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	}
 
 	private void register() {
-		if (controller == null) {
-			Log.d(LOG_TAG, "Controller is null on register");
+		if (controller == null)
 			controller = new Controller();
-		}
 		intentService = (Intent) ApplicationContext.contextTable
 				.get("intentService");
 		if (intentService == null) {

@@ -27,5 +27,10 @@
 			<type>2</type>
 			<locationURI>_android_tk_android_media_fabf4e30/src</locationURI>
 		</link>
+		<link>
+			<name>tk-android-mscontrol_src</name>
+			<type>2</type>
+			<locationURI>_android_tk_android_mscontrol_55a1a943/src</locationURI>
+		</link>
 	</linkedResources>
 </projectDescription>
