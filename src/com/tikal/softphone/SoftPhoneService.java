@@ -69,6 +69,7 @@ public class SoftPhoneService extends Service implements CallListener {
 
 		if (controller != null)
 			controller.addListener(this);
+		else Log.e(LOG_TAG, "Controller is null, not addListener");
 		
 		Log.e(LOG_TAG, "onCreate OK");
 	}

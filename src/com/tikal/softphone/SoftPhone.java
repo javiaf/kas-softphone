@@ -63,6 +63,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	private ProgressDialog dialog;
 	private Intent intentService;
+	private TelephonyManager signalManager;
 
 	private Handler handler = new Handler();
 	private ControlContacts controlcontacts = new ControlContacts(this);
@@ -244,7 +245,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 		/* Listener for change of networking */
 
-		TelephonyManager signalManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+		 signalManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 		signalManager.listen(signalListener,
 				PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
 
@@ -324,6 +325,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		Log.d(LOG_TAG, "On Destroy");
 		try {
 			if (isExit) {
+				signalManager.listen(signalListener, PhoneStateListener.LISTEN_NONE);
 				if (controller != null)
 					controller.finishUA();
 				isRegister = false;
@@ -591,6 +593,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			this.audioCodecs = getAudioCodecsFromSettings();
 			this.videoCodecs = getVideoCodecsFromSettings();
 			this.localAddress = NetworkIP.getLocalAddress();
+			ApplicationContext.contextTable.put("localAddress", localAddress);
 			this.connectionType = connectionType;
 			return true;
 		} catch (Exception e) {
@@ -664,27 +667,113 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			if (activeNetwork != null) {
 				networkType = activeNetwork.getType();
 			}
+			boolean isAddressEqual = false;
+			boolean isNetworking = false;
+			InetAddress lAddressNew;
+			InetAddress lAddress;
+
 			switch (networkType) {
 			case ConnectivityManager.TYPE_WIFI: // Disconnected
 				// Register() with new ip.
 				Log.d(LOG_TAG, "Connection OK, Register... WIFI");
-				ApplicationContext.contextTable.put("isNetworking", true);
+				lAddressNew = NetworkIP.getLocalAddress();
+				lAddress = (InetAddress) ApplicationContext.contextTable
+						.get("localAddress");
+				if (lAddress != null)
+					if (lAddressNew.equals(lAddress))
+						isAddressEqual = true;
+					else
+						isAddressEqual = false;
+				isNetworking = true;
 				break;
 			case ConnectivityManager.TYPE_MOBILE: // Connecting
 				// Register() with new ip.
 				Log.d(LOG_TAG, "Connection OK, Register...MOBILE");
 				ApplicationContext.contextTable.put("isNetworking", true);
+				lAddressNew = NetworkIP.getLocalAddress();
+				lAddress = (InetAddress) ApplicationContext.contextTable
+						.get("localAddress");
+				if (lAddress != null)
+					if (lAddressNew.equals(lAddress))
+						isAddressEqual = true;
+					else
+						isAddressEqual = false;
+				isNetworking = true;
 				break;
 			case -1: // Disconneted
 				Log.d(LOG_TAG, "No Activate");
-				ApplicationContext.contextTable.put("isNetworking", false);
+				isNetworking = false;
 				break;
 			default:
 				break;
 			}
 
-		
-			
+			if (isNetworking) {
+				// Destruir Service and UA
+				if (!isAddressEqual) {
+//					if (controller != null)
+//						try {
+//							controller.finishUA();
+//						} catch (Exception e1) {
+//							// TODO Auto-generated catch block
+//							Log.e(LOG_TAG,
+//									"controller.finishUA " + e1.getMessage()
+//											+ "; " + e1.toString());
+//							// e1.printStackTrace();
+//						}
+					controller = null;
+					isRegister = false;
+					ApplicationContext.contextTable.put("isRegister",
+							isRegister);
+
+					intentService = (Intent) ApplicationContext.contextTable
+							.get("intentService");
+					try {
+						stopService(intentService);
+					} catch (Exception e) {
+						Log.e(LOG_TAG, "stopService " + e.getMessage() + "; "
+								+ e.toString());
+					}
+					Log.d(LOG_TAG, "All Destroy");
+					ApplicationContext.contextTable.clear();
+					// Registar
+					if (initControllerUAFromSettings()) {
+						Log.d(LOG_TAG, "Register on new networking");
+						register();
+					}
+				}
+			} else {
+				try {
+					if ((Boolean) ApplicationContext.contextTable
+							.get("isRegister")) {
+						// Destruir
+						if (controller != null)
+							try {
+								controller.finishUA();
+								controller = null;
+							} catch (Exception e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						isRegister = false;
+						ApplicationContext.contextTable.put("isRegister",
+								isRegister);
+
+						intentService = (Intent) ApplicationContext.contextTable
+								.get("intentService");
+						try {
+							stopService(intentService);
+						} catch (Exception e) {
+							Log.e(LOG_TAG, "stopService " + e.getMessage()
+									+ "; " + e.toString());
+						}
+						ApplicationContext.contextTable.clear();
+						Log.d(LOG_TAG, "All Destroy");
+					}
+				} catch (Exception e) {
+
+				}
+			}
 
 		}
 	};
