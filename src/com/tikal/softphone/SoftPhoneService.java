@@ -1,5 +1,7 @@
 package com.tikal.softphone;
 
+import javax.print.attribute.standard.Finishings;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -69,6 +71,7 @@ public class SoftPhoneService extends Service implements CallListener {
 
 		if (controller != null)
 			controller.addListener(this);
+		else Log.e(LOG_TAG, "Controller is null, not addListener");
 		
 		Log.e(LOG_TAG, "onCreate OK");
 	}
@@ -108,6 +111,7 @@ public class SoftPhoneService extends Service implements CallListener {
 		mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		mediaIntent.putExtra("Uri", uri);
 		startActivity(mediaIntent);
+		
 	}
 
 	@Override
@@ -163,6 +167,7 @@ public class SoftPhoneService extends Service implements CallListener {
 		b.putString("Call", "Reject");
 		msg.setData(b);
 		handler.sendMessage(msg);
+		
 	}
 
 	public static ServiceUpdateUIListener UI_UPDATE_LISTENER;

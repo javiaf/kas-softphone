@@ -174,7 +174,7 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone,
 
 	@Override
 	public void call(String remoteURI) throws Exception {
-		Log.d(LOG_TAG, "calling...");
+		Log.d(LOG_TAG, "calling..." + remoteURI);
 		currentCall = endPoint.dial(remoteURI, Direction.DUPLEX, this);
 	}
 
