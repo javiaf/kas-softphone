@@ -161,13 +161,12 @@ public class SoftPhoneService extends Service implements CallListener {
 	@Override
 	public void callReject() {
 		Log.d(LOG_TAG, "Call Reject Received");
-		// finishActivity(MEDIA_CONTROL_OUTGOING);
 		Message msg = new Message();
 		Bundle b = new Bundle();
-		b.putString("Call", "Reject");
+		b.putString("finishActivity", "MEDIA_CONTROL_OUTGOING");
 		msg.setData(b);
 		handler.sendMessage(msg);
-		
+				
 	}
 
 	public static ServiceUpdateUIListener UI_UPDATE_LISTENER;
