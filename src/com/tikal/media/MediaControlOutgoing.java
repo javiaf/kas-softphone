@@ -10,7 +10,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.tikal.applicationcontext.ApplicationContext;
 import com.tikal.controlcontacts.ControlContacts;
+import com.tikal.sip.Controller;
 import com.tikal.softphone.R;
 
 public class MediaControlOutgoing extends Activity {
@@ -61,13 +63,19 @@ public class MediaControlOutgoing extends Activity {
 
 		final Button buttonReject = (Button) findViewById(R.id.button_call_reject);
 		buttonReject.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
-				Log.d(LOG_TAG, "Call Canceled");
+				Log.d(LOG_TAG, "Call Canceled...");
+				Controller controller = (Controller) ApplicationContext.contextTable
+				.get("controller");
+				Log.d(LOG_TAG, "controller: " + controller);
+				try {
+					controller.cancel();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				finish();
-				setResult(RESULT_OK);
-
+//				setResult(RESULT_OK);
 			}
 		});
 
