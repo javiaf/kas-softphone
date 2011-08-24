@@ -12,4 +12,6 @@ public interface IPhone {
 	
 	public void call(String remoteURI) throws Exception;
 	public void hang();
+	
+	public void cancel();
 }

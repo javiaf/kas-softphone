@@ -23,13 +23,15 @@ import com.tikal.softphone.CallListener;
 import com.tikal.softphone.CallNotifier;
 import com.tikal.softphone.IPhone;
 
-public class Controller implements SipEndPointListener, SipCallListener, IPhone, CallNotifier {
+public class Controller implements SipEndPointListener, SipCallListener,
+		IPhone, CallNotifier {
 
 	public final static String LOG_TAG = "Controller";
 	private UA ua = null;
 	private SipEndPoint endPoint = null;;
 	private SipEndPointEvent pendingEndPointEvent;
 	private SipCall currentCall;
+	private SipCall incomingCall;
 
 	private CallListener callListener;
 
@@ -45,15 +47,15 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone,
 
 	public void initUA(ArrayList<AudioCodecType> audioCodecs,
 			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress,
-			ConnectionType connectionType, String proxyIP, int proxyPort, String localUser,
-			String localRealm) throws Exception {
+			ConnectionType connectionType, String proxyIP, int proxyPort,
+			String localUser, String localRealm) throws Exception {
 
 		Parameters params = new ParametersImpl();
 		params.put(MediaSessionAndroid.AUDIO_CODECS, audioCodecs);
 		params.put(MediaSessionAndroid.VIDEO_CODECS, videoCodecs);
 		params.put(MediaSessionAndroid.LOCAL_ADDRESS, localAddress);
 		params.put(MediaSessionAndroid.CONNECTION_TYPE, connectionType);
-		
+
 		mediaSession = MSControlFactory.createMediaSession(params);
 		Log.d(LOG_TAG, "mediaSession: " + this.mediaSession);
 		UaFactory.setMediaSession(mediaSession);
@@ -88,7 +90,7 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone,
 
 	private void register(String localUser, String localRealm) throws Exception {
 		Log.d(LOG_TAG, "localUser: " + localUser + "; localReal: " + localRealm);
-		endPoint = ua.registerEndPoint(localUser, localRealm, 3600, this);
+		endPoint = ua.registerEndPoint(localUser, localRealm, null, 3600, this);
 	}
 
 	@Override
@@ -98,15 +100,17 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone,
 
 		if (SipEndPointEvent.INCOMING_CALL.equals(eventType)) {
 			this.pendingEndPointEvent = event;
+			incomingCall = pendingEndPointEvent.getCallSource();
+			incomingCall.addListener(this);
 			try {
 
-				Log.d(LOG_TAG, "Call Source: " + event.getCallSource().toString());
-				Log.d(LOG_TAG, "Me llama Uri: " + event.getCallSource().getRemoteUri());
-
+				Log.d(LOG_TAG, "Call Source: "
+						+ event.getCallSource().toString());
+				Log.d(LOG_TAG, "Me llama Uri: "
+						+ event.getCallSource().getRemoteUri());
 				if (callListener != null)
-					callListener.incomingCall(event.getCallSource().getRemoteUri());
-
-				// this.aceptCall();
+					callListener.incomingCall(event.getCallSource()
+							.getRemoteUri());
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.toString());
 				e.printStackTrace();
@@ -143,7 +147,8 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone,
 			currentCall = event.getSource();
 			Log.d(LOG_TAG, "Setting currentCall");
 			if (callListener != null) {
-				Log.d(LOG_TAG, "currentCall.getNetworkConnection(null): " + currentCall.getNetworkConnection(null));
+				Log.d(LOG_TAG, "currentCall.getNetworkConnection(null): "
+						+ currentCall.getNetworkConnection(null));
 				callListener.callSetup(currentCall.getNetworkConnection(null));
 			}
 		} else if (SipCallEvent.CALL_TERMINATE.equals(eventType)) {
@@ -154,6 +159,10 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone,
 			Log.d(LOG_TAG, "Call Reject");
 			if (callListener != null)
 				callListener.callReject();
+		} else if (SipCallEvent.CALL_CANCEL.equals(eventType)) {
+			Log.d(LOG_TAG, "Call Cancel");
+			if (callListener != null)
+				callListener.callCancel();
 		} else if (SipCallEvent.CALL_ERROR.equals(eventType)) {
 			Log.d(LOG_TAG, "Call Error");
 
@@ -162,9 +171,11 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone,
 
 	@Override
 	public void aceptCall() throws Exception {
-		SipCall sipCall = pendingEndPointEvent.getCallSource();
-		sipCall.addListener(this);
-		sipCall.accept();
+		// SipCall sipCall = pendingEndPointEvent.getCallSource();
+		// sipCall.addListener(this);
+		// sipCall.accept();
+		if (incomingCall != null)
+			incomingCall.accept();
 	}
 
 	@Override
@@ -184,6 +195,17 @@ public class Controller implements SipEndPointListener, SipCallListener, IPhone,
 		if (currentCall != null)
 			try {
 				currentCall.hangup();
+			} catch (ServerInternalErrorException e) {
+				e.printStackTrace();
+			}
+	}
+
+	@Override
+	public void cancel() {
+		Log.d(LOG_TAG, "canceling...");
+		if (currentCall != null)
+			try {
+				currentCall.cancel();
 			} catch (ServerInternalErrorException e) {
 				e.printStackTrace();
 			}

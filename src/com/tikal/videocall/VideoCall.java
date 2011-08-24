@@ -311,10 +311,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 	@Override
 	public void update(Message message) {
-		// TODO Auto-generated method stub
 		Log.d(LOG_TAG, "Message = " + message);
 		finish();
-
 	}
 
 }

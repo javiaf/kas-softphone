@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 
 import android.app.Activity;
-import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -18,7 +17,6 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.telephony.PhoneStateListener;
-import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
@@ -356,21 +354,19 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == MEDIA_CONTROL_OUTGOING) {
-			if (resultCode == RESULT_OK) {
-				Log.d(LOG_TAG, "Outgoing: Rejected Call");
-				try {
-					// TODO
-					// ************Aquí iria el Cancel no el Reject
-					// controller.reject();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-			} else
-				Log.d(LOG_TAG, "Media Control Outgoing; ResultCode = "
-						+ resultCode);
-		}
+		// if (requestCode == MEDIA_CONTROL_OUTGOING) {
+		// if (resultCode == RESULT_OK) {
+		// Log.d(LOG_TAG, "Outgoing: Canceled Call");
+		// try {
+		// controller.cancel();
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+		//
+		// } else
+		// Log.d(LOG_TAG, "Media Control Outgoing; ResultCode = "
+		// + resultCode);
+		// }
 
 		if (requestCode == SHOW_PREFERENCES) {
 			/*
@@ -635,11 +631,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	public void update(Message message) {
 		Log.d(LOG_TAG, "Message : " + message.getData());
 
-		if (message.getData().containsKey("Call")) {
-			// if (message.getData().getString("Call").equals("Invite")) {
-			// inviteReceived(message.getData().getString("Contact"));
-			// }
-		} else if (message.getData().containsKey("Register")) {
+		if (message.getData().containsKey("Register")) {
 			if (message.getData().getString("Register").equals("Sucessful")) {
 				registerSucessful();
 			} else if (message.getData().getString("Register").equals("Failed")) {

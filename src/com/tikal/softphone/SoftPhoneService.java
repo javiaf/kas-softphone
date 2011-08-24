@@ -1,6 +1,6 @@
 package com.tikal.softphone;
 
-import javax.print.attribute.standard.Finishings;
+import java.util.ArrayList;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -39,8 +39,6 @@ public class SoftPhoneService extends Service implements CallListener {
 
 	private Intent videoCallIntent;
 
-	
-
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
@@ -71,8 +69,9 @@ public class SoftPhoneService extends Service implements CallListener {
 
 		if (controller != null)
 			controller.addListener(this);
-		else Log.e(LOG_TAG, "Controller is null, not addListener");
-		
+		else
+			Log.e(LOG_TAG, "Controller is null, not addListener");
+
 		Log.e(LOG_TAG, "onCreate OK");
 	}
 
@@ -111,7 +110,6 @@ public class SoftPhoneService extends Service implements CallListener {
 		mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		mediaIntent.putExtra("Uri", uri);
 		startActivity(mediaIntent);
-		
 	}
 
 	@Override
@@ -138,8 +136,9 @@ public class SoftPhoneService extends Service implements CallListener {
 
 	@Override
 	public void callSetup(NetworkConnection networkConnection) {
-		ApplicationContext.contextTable.put("networkConnection", networkConnection);
-		
+		ApplicationContext.contextTable.put("networkConnection",
+				networkConnection);
+
 		Message msg = new Message();
 		Bundle b = new Bundle();
 		b.putString("finishActivity", "MEDIA_CONTROL_OUTGOING");
@@ -150,6 +149,7 @@ public class SoftPhoneService extends Service implements CallListener {
 		videoCallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		Log.d(LOG_TAG, "Start Service " + videoCallIntent);
 		startService(videoCallIntent);
+
 	}
 
 	@Override
@@ -166,23 +166,32 @@ public class SoftPhoneService extends Service implements CallListener {
 		b.putString("finishActivity", "MEDIA_CONTROL_OUTGOING");
 		msg.setData(b);
 		handler.sendMessage(msg);
-				
 	}
 
-	public static ServiceUpdateUIListener UI_UPDATE_LISTENER;
-	
+	@Override
+	public void callCancel() {
+		Log.d(LOG_TAG, "Call Cancel Received");
+		Message msg = new Message();
+		Bundle b = new Bundle();
+		b.putString("Call", "Cancel");
+		msg.setData(b);
+		handler.sendMessage(msg);
+	}
+
+	public static ArrayList<ServiceUpdateUIListener> UI_UPDATE_LISTENERS = new ArrayList<ServiceUpdateUIListener>();
+
 	public static void setUpdateListener(ServiceUpdateUIListener l) {
-		UI_UPDATE_LISTENER = l;
+		UI_UPDATE_LISTENERS.add(l);
 	}
 
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
 			Log.d(LOG_TAG, "Message = " + msg.getData());
-			UI_UPDATE_LISTENER.update(msg);
-
+			for (ServiceUpdateUIListener l : UI_UPDATE_LISTENERS) {
+				l.update(msg);
+			}
 		}
 	};
-	
 
 }
