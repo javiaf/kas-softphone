@@ -1,5 +1,7 @@
-package com.tikal.videocall;
+package com.kurento.kas.phone.videocall;
 
+
+import com.kurento.kas.phone.softphone.R;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,19 +15,18 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 
-import com.tikal.android.mscontrol.MediaSessionAndroid;
-import com.tikal.android.mscontrol.ParametersImpl;
-import com.tikal.android.mscontrol.mediacomponent.MediaComponentAndroid;
-import com.tikal.applicationcontext.ApplicationContext;
-import com.tikal.mscontrol.MsControlException;
-import com.tikal.mscontrol.Parameters;
-import com.tikal.mscontrol.join.Joinable.Direction;
-import com.tikal.mscontrol.join.JoinableStream.StreamType;
-import com.tikal.mscontrol.networkconnection.NetworkConnection;
-import com.tikal.sip.Controller;
-import com.tikal.softphone.R;
-import com.tikal.softphone.ServiceUpdateUIListener;
-import com.tikal.softphone.SoftPhone;
+import com.kurento.commons.mscontrol.MsControlException;
+import com.kurento.commons.mscontrol.Parameters;
+import com.kurento.commons.mscontrol.join.Joinable.Direction;
+import com.kurento.commons.mscontrol.join.JoinableStream.StreamType;
+import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
+import com.kurento.kas.mscontrol.MediaSessionAndroid;
+import com.kurento.kas.mscontrol.ParametersImpl;
+import com.kurento.kas.mscontrol.mediacomponent.MediaComponentAndroid;
+import com.kurento.kas.phone.applicationcontext.ApplicationContext;
+import com.kurento.kas.phone.sip.Controller;
+import com.kurento.kas.phone.softphone.ServiceUpdateUIListener;
+import com.kurento.kas.phone.softphone.SoftPhone;
 
 public class VideoCallService extends Service {
 	private final String LOG_TAG = "VideoCallService";

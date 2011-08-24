@@ -1,4 +1,4 @@
-package com.tikal.controlcontacts;
+package com.kurento.kas.phone.controlcontacts;
 
 import android.content.Context;
 import android.content.Intent;

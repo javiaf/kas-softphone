@@ -23,6 +23,16 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>kas-media_src</name>
+			<type>2</type>
+			<locationURI>_android_kas_media_6b5287f4/src</locationURI>
+		</link>
+		<link>
+			<name>kas-mscontrol_src</name>
+			<type>2</type>
+			<locationURI>_android_kas_mscontrol_72ba6107/src</locationURI>
+		</link>
+		<link>
 			<name>tk-android-media_src</name>
 			<type>2</type>
 			<locationURI>_android_tk_android_media_fabf4e30/src</locationURI>

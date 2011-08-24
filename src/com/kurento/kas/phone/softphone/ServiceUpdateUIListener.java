@@ -1,4 +1,4 @@
-package com.tikal.softphone;
+package com.kurento.kas.phone.softphone;
 
 import android.os.Message;
 

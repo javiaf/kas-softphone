@@ -1,39 +1,39 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.tikal.android</groupId>
-	<artifactId>tk-android-softphone</artifactId>
+	<groupId>com.kurento.kas</groupId>
+	<artifactId>kas-softphone</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>apk</packaging>
 
-  <name>SoftPhone</name>
-  <description>Softphone application for Android. It can make video calls using SIP with different video formats and audio formats.</description>
-  <url>http://repository.kurento.com/site/tk-android-softphone</url>
+	<name>SoftPhone</name>
+	<description>Softphone application for Android. It can make video calls using SIP with different video formats and audio formats.</description>
+	<url>http://repository.kurento.com/site/kas-softphone</url>
 
 	<dependencies>
 		<dependency>
-			<groupId>com.tikal.media</groupId>
-			<artifactId>tk-mediaspec</artifactId>
+			<groupId>com.kurento.commons</groupId>
+			<artifactId>kc-mediaspec</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.tikal.android</groupId>
-			<artifactId>tk-android-media</artifactId>
+			<groupId>com.kurento.kas</groupId>
+			<artifactId>kas-media</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<type>apklib</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.tikal.android</groupId>
-			<artifactId>tk-android-mscontrol</artifactId>
+			<groupId>com.kurento.kas</groupId>
+			<artifactId>kas-mscontrol</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<type>apklib</type>
 		</dependency>
 		<dependency>
-			<groupId>com.tikal</groupId>
-			<artifactId>tk-android-sipua</artifactId>
+			<groupId>com.kurento.commons</groupId>
+			<artifactId>kc-sipua-impl</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
@@ -102,45 +102,45 @@
 		</plugins>
 	</build>
 
-  <repositories>
-    <repository>
-      <id>kurento-snapshots</id>
-      <name>Kurento Snapshot Repository</name>
-      <url>http://repository.kurento.com/archiva/repository/snapshots/</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>kurento-releases</id>
-      <name>Kurento Repository</name>
-      <url>http://repository.kurento.com/archiva/repository/internal/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
+	<repositories>
+		<repository>
+			<id>kurento-snapshots</id>
+			<name>Kurento Snapshot Repository</name>
+			<url>http://repository.kurento.com/archiva/repository/snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>kurento-releases</id>
+			<name>Kurento Repository</name>
+			<url>http://repository.kurento.com/archiva/repository/internal/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
-  <distributionManagement>
-    <site>
-      <id>maven-site</id>
-      <url>scp://repository.kurento.com/var/www/site/tk-android-softphone/${project.version}</url>
-    </site>
-      <repository>
-      <id>releases</id>
-      <name>Kurento releases repository</name>
-      <url>scp://repository.kurento.com/opt/tomcat/current/data/repositories/internal</url>
-    </repository>
-    <snapshotRepository>
-      <id>snapshots</id>
-      <name>Kurento snapshots repository</name>
-      <url>scp://repository.kurento.com/opt/tomcat/current/data/repositories/snapshots</url>
-    </snapshotRepository>
-  </distributionManagement>
+	<distributionManagement>
+		<site>
+			<id>maven-site</id>
+			<url>scp://repository.kurento.com/var/www/site/kas-softphone/${project.version}</url>
+		</site>
+		<repository>
+			<id>releases</id>
+			<name>Kurento releases repository</name>
+			<url>scp://repository.kurento.com/opt/tomcat/current/data/repositories/internal</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>Kurento snapshots repository</name>
+			<url>scp://repository.kurento.com/opt/tomcat/current/data/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>

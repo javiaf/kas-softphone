@@ -1,7 +1,8 @@
-package com.tikal.softphone;
+package com.kurento.kas.phone.softphone;
 
 import java.util.ArrayList;
 
+import com.kurento.kas.phone.softphone.R;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -14,11 +15,11 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 
-import com.tikal.applicationcontext.ApplicationContext;
-import com.tikal.media.MediaControlIncoming;
-import com.tikal.mscontrol.networkconnection.NetworkConnection;
-import com.tikal.sip.Controller;
-import com.tikal.videocall.VideoCallService;
+import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
+import com.kurento.kas.phone.applicationcontext.ApplicationContext;
+import com.kurento.kas.phone.media.MediaControlIncoming;
+import com.kurento.kas.phone.sip.Controller;
+import com.kurento.kas.phone.videocall.VideoCallService;
 
 public class SoftPhoneService extends Service implements CallListener {
 	private static final String LOG_TAG = "SoftPhoneService";

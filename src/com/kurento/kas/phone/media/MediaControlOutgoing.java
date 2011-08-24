@@ -1,4 +1,4 @@
-package com.tikal.media;
+package com.kurento.kas.phone.media;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -10,10 +10,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.tikal.applicationcontext.ApplicationContext;
-import com.tikal.controlcontacts.ControlContacts;
-import com.tikal.sip.Controller;
-import com.tikal.softphone.R;
+import com.kurento.kas.phone.applicationcontext.ApplicationContext;
+import com.kurento.kas.phone.controlcontacts.ControlContacts;
+import com.kurento.kas.phone.sip.Controller;
+import com.kurento.kas.phone.softphone.R;
 
 public class MediaControlOutgoing extends Activity {
 	private static final String LOG_TAG = "MediaControlOutgoing";

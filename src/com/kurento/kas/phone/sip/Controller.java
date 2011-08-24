@@ -1,27 +1,32 @@
-package com.tikal.sip;
+package com.kurento.kas.phone.sip;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
 
 import android.util.Log;
 
-import com.tikal.android.media.AudioCodecType;
-import com.tikal.android.media.VideoCodecType;
-import com.tikal.android.mscontrol.MSControlFactory;
-import com.tikal.android.mscontrol.MediaSessionAndroid;
-import com.tikal.android.mscontrol.ParametersImpl;
-import com.tikal.android.mscontrol.networkconnection.ConnectionType;
-import com.tikal.mscontrol.Parameters;
-import com.tikal.mscontrol.join.Joinable.Direction;
-import com.tikal.sip.agent.UaFactory;
-import com.tikal.sip.event.SipCallEvent;
-import com.tikal.sip.event.SipEndPointEvent;
-import com.tikal.sip.event.SipEventType;
-import com.tikal.sip.exception.ServerInternalErrorException;
-import com.tikal.sip.util.SipConfig;
-import com.tikal.softphone.CallListener;
-import com.tikal.softphone.CallNotifier;
-import com.tikal.softphone.IPhone;
+import com.kurento.commons.mscontrol.Parameters;
+import com.kurento.commons.sip.SipCall;
+import com.kurento.commons.sip.SipCallListener;
+import com.kurento.commons.sip.SipEndPoint;
+import com.kurento.commons.sip.SipEndPointListener;
+import com.kurento.commons.sip.UA;
+import com.kurento.commons.sip.agent.UaFactory;
+import com.kurento.commons.sip.event.SipCallEvent;
+import com.kurento.commons.sip.event.SipEndPointEvent;
+import com.kurento.commons.sip.event.SipEventType;
+import com.kurento.commons.sip.exception.ServerInternalErrorException;
+import com.kurento.commons.sip.util.SipConfig;
+import com.kurento.kas.media.AudioCodecType;
+import com.kurento.kas.media.VideoCodecType;
+import com.kurento.kas.mscontrol.MSControlFactory;
+import com.kurento.kas.mscontrol.MediaSessionAndroid;
+import com.kurento.kas.mscontrol.ParametersImpl;
+import com.kurento.kas.mscontrol.networkconnection.ConnectionType;
+import com.kurento.commons.mscontrol.join.Joinable.Direction;
+import com.kurento.kas.phone.softphone.CallListener;
+import com.kurento.kas.phone.softphone.CallNotifier;
+import com.kurento.kas.phone.softphone.IPhone;
 
 public class Controller implements SipEndPointListener, SipCallListener,
 		IPhone, CallNotifier {

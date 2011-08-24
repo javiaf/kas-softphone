@@ -1,4 +1,4 @@
-package com.tikal.media;
+package com.kurento.kas.phone.media;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -12,13 +12,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.tikal.applicationcontext.ApplicationContext;
-import com.tikal.controlcontacts.ControlContacts;
-import com.tikal.sip.Controller;
-import com.tikal.softphone.R;
-import com.tikal.softphone.ServiceUpdateUIListener;
-import com.tikal.softphone.SoftPhoneService;
-import com.tikal.videocall.VideoCallService;
+import com.kurento.kas.phone.applicationcontext.ApplicationContext;
+import com.kurento.kas.phone.controlcontacts.ControlContacts;
+import com.kurento.kas.phone.sip.Controller;
+import com.kurento.kas.phone.softphone.R;
+import com.kurento.kas.phone.softphone.ServiceUpdateUIListener;
+import com.kurento.kas.phone.softphone.SoftPhoneService;
+import com.kurento.kas.phone.videocall.VideoCallService;
 
 public class MediaControlIncoming extends Activity implements
 		ServiceUpdateUIListener {

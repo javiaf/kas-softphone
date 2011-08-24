@@ -1,4 +1,4 @@
-package com.tikal.applicationcontext;
+package com.kurento.kas.phone.applicationcontext;
 
 import java.util.HashMap;
 

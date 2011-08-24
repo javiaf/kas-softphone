@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.tikal.softphone" android:versionCode="1"
+	package="com.kurento.kas.phone.softphone" android:versionCode="1"
 	android:versionName="1.0" android:installLocation="preferExternal">
 
 
@@ -30,37 +30,40 @@
 			</intent-filter>
 
 		</activity>
-		<activity android:name="com.tikal.media.MediaControlIncoming"
+		<activity android:name="com.kurento.kas.phone.media.MediaControlIncoming"
 			android:label="Media Control Incoming">
 			<action android:name="android.intent.action.MAIN" />
 
 		</activity>
 
-		<activity android:name="com.tikal.media.MediaControlOutgoing"
+		<activity android:name="com.kurento.kas.phone.media.MediaControlOutgoing"
 			android:label="Media Control Outgoing">
 			<!-- android:screenOrientation="portrait"> -->
 		</activity>
 
-		<activity android:name="com.tikal.videocall.VideoCall"
+		<activity android:name="com.kurento.kas.phone.videocall.VideoCall"
 			android:label="Video Call" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-			android:screenOrientation="landscape" android:launchMode="singleTop" >
+			android:screenOrientation="landscape" android:launchMode="singleTop">
 			<!-- android:screenOrientation="portrait"> android:launchMode="singleTask" 
 				android:theme="@android:style/Theme.NoTitleBar.Fullscreen"> -->
 
 		</activity>
 
-		<activity android:name="com.tikal.preferences.Connection_Preferences"
+		<activity android:name="com.kurento.kas.phone.preferences.Connection_Preferences"
 			android:label="Connection Preferences" android:screenOrientation="portrait"></activity>
 
-		<activity android:name="com.tikal.preferences.Video_Preferences"
+		<activity android:name="com.kurento.kas.phone.preferences.Video_Preferences"
 			android:label="Video Preferences" android:screenOrientation="portrait"></activity>
 
-		<activity android:name="com.tikal.preferences.VideoCall_Preferences"
+		<activity android:name="com.kurento.kas.phone.preferences.VideoCall_Preferences"
 			android:label="Video Call Preferences" android:screenOrientation="portrait"></activity>
+
+
 		<service android:enabled="true"
-			android:name="com.tikal.softphone.SoftPhoneService" />
+			android:name="com.kurento.kas.phone.softphone.SoftPhoneService" />
+
 		<service android:enabled="true"
-			android:name="com.tikal.videocall.VideoCallService" />
+			android:name="com.kurento.kas.phone.videocall.VideoCallService" />
 	</application>
 
 

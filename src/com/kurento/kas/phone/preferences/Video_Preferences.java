@@ -1,9 +1,9 @@
-package com.tikal.preferences;
+package com.kurento.kas.phone.preferences;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
-import com.tikal.softphone.R;
+import com.kurento.kas.phone.softphone.R;
 
 
 public class Video_Preferences extends PreferenceActivity {

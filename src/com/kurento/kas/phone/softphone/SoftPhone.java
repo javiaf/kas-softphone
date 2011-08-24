@@ -1,8 +1,9 @@
-package com.tikal.softphone;
+package com.kurento.kas.phone.softphone;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
 
+import com.kurento.kas.phone.softphone.R;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -28,16 +29,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tikal.android.media.AudioCodecType;
-import com.tikal.android.media.VideoCodecType;
-import com.tikal.android.mscontrol.networkconnection.ConnectionType;
-import com.tikal.applicationcontext.ApplicationContext;
-import com.tikal.controlcontacts.ControlContacts;
-import com.tikal.media.MediaControlOutgoing;
-import com.tikal.network.NetworkIP;
-import com.tikal.preferences.Connection_Preferences;
-import com.tikal.preferences.Video_Preferences;
-import com.tikal.sip.Controller;
+import com.kurento.kas.media.AudioCodecType;
+import com.kurento.kas.media.VideoCodecType;
+import com.kurento.kas.mscontrol.networkconnection.ConnectionType;
+import com.kurento.kas.phone.applicationcontext.ApplicationContext;
+import com.kurento.kas.phone.controlcontacts.ControlContacts;
+import com.kurento.kas.phone.media.MediaControlOutgoing;
+import com.kurento.kas.phone.network.NetworkIP;
+import com.kurento.kas.phone.preferences.Connection_Preferences;
+import com.kurento.kas.phone.preferences.Video_Preferences;
+import com.kurento.kas.phone.sip.Controller;
 
 public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private final int MEDIA_CONTROL_OUTGOING = 0;

@@ -1,4 +1,4 @@
-package com.tikal.network;
+package com.kurento.kas.phone.network;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
