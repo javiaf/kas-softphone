@@ -3,7 +3,6 @@ package com.kurento.kas.phone.softphone;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
-import com.kurento.kas.phone.softphone.R;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -20,12 +19,15 @@ import android.provider.ContactsContract;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -247,6 +249,30 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		signalManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 		signalManager.listen(signalListener,
 				PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
+		
+		final EditText textRemoteUri = (EditText) findViewById(R.id.textRemoteUri);
+		textRemoteUri.setOnKeyListener(new OnKeyListener() {
+			
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+			            (keyCode == KeyEvent.KEYCODE_ENTER)) {
+			          // Perform action on key press
+			          Toast.makeText(SoftPhone.this, textRemoteUri.getText(), Toast.LENGTH_SHORT).show();
+			      	String remoteURI = "sip:";
+			          remoteURI += textRemoteUri.getText().toString();
+						Integer idContact;
+						idContact = controlcontacts.getId(textRemoteUri
+								.getText().toString());
+
+						Log.d(LOG_TAG, "remoteURI: " + remoteURI
+								+ " IdContact = " + idContact);
+						call(remoteURI, idContact);
+			          return true;
+			        }
+			        return false;
+			}
+		});
 
 		final Button buttonCall = (Button) findViewById(R.id.call);
 		buttonCall.setOnClickListener(new OnClickListener() {

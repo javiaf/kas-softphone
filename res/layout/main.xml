@@ -11,9 +11,12 @@
 				android:text="@string/hello" />
 		</TableRow>
 		<TableRow android:id="@+id/TableRow01">
-			<EditText android:id="@+id/textRemoteUri" android:hint="user@host"
-				android:text="" android:layout_gravity="top" android:layout_height="match_parent"
-				android:layout_width="200dip"></EditText>
+			<EditText android:id="@+id/textRemoteUri"
+				android:hint="Write User SIP, SIP format: user@host" android:text=""
+				android:layout_gravity="top" android:layout_width="match_parent"
+				android:singleLine="true" android:imeActionLabel="actionGo" android:imeOptions="actionGo">
+			</EditText>
+		
 		</TableRow>
 		<TableRow android:id="@+id/TableRow01">
 			<TextView android:id="@+id/textUser" android:layout_width="fill_parent"
