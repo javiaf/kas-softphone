@@ -98,6 +98,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		PreferenceManager.setDefaultValues(this, R.layout.video_preferences,
 				true);
 		SoftPhoneService.setUpdateListener(this);
+		
 		// PowerManager pm = (PowerManager)
 		// getSystemService(Context.POWER_SERVICE);
 		// PowerManager.WakeLock wl =
@@ -109,11 +110,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		/* If first time */
 		controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
-
-		String texto = (String) ApplicationContext.contextTable.get("texto");
-		Log.d(LOG_TAG, "Text: " + texto);
-		if (texto == null)
-			ApplicationContext.contextTable.put("texto", "Estoy dentro");
 
 		connectionType = null;
 		connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
@@ -317,11 +313,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 			@Override
 			public void onClick(View v) {
-				try {
-					openContacts();
-				} catch (Exception e) {
-					Log.e("Error Search", e.toString());
-				}
+				Intent mediaIntent = new Intent(SoftPhone.this,
+						Register.class);
+
+				startActivityForResult(mediaIntent, MEDIA_CONTROL_OUTGOING);
+//				try {
+//					openContacts();
+//				} catch (Exception e) {
+//					Log.e("Error Search", e.toString());
+//				}
 			}
 		});
 	}

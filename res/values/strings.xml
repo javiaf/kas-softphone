@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="hello">Connecting...</string>
-	<string name="app_name">SoftPhone</string>
+	<string name="app_name">KurentoPhone</string>
 
 	<string name="sip_log">SIP Log</string>
 	<string name="incoming_call">Incoming Call</string>
@@ -44,6 +44,9 @@
 	<string name="incoming_sip">Unknown</string>
 	<string name="outgoing_sip">Unknown</string>
 	<string name="outgoing_call">Outgoing Call</string>
+	<string name="welcome">Welcome to KurentoPhone. Please register your data.</string>
+	<string name="ok_register">Ok</string>
+	<string name="cancel_register">Cancel</string>
 	
 
 </resources>

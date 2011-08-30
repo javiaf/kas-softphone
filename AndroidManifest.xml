@@ -20,8 +20,6 @@
 				<data android:scheme="tel" />
 				<data android:scheme="sip" />
 			</intent-filter>
-
-
 			<intent-filter>
 				<action android:name="android.intent.action.SENDTO" />
 				<category android:name="android.intent.category.DEFAULT" />
@@ -30,6 +28,8 @@
 			</intent-filter>
 
 		</activity>
+		<activity android:name="com.kurento.kas.phone.softphone.Register"
+			android:label="Register"></activity>
 		<activity android:name="com.kurento.kas.phone.media.MediaControlIncoming"
 			android:label="Media Control Incoming">
 			<action android:name="android.intent.action.MAIN" />
