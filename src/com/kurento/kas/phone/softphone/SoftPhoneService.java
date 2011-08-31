@@ -31,7 +31,7 @@ public class SoftPhoneService extends Service implements CallListener {
 	private Notification mNotif;
 	private PendingIntent mNotifContentIntent;
 	private Intent notifIntent;
-	private String notificationTitle = "Softphone";
+	private String notificationTitle = "KurentoPhone";
 	private static final int IC_LEVEL_ORANGE = 0;
 	/*
 	 * private static final int IC_LEVEL_GREEN=1; private static final int

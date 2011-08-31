@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="match_parent"
+	android:layout_height="match_parent" android:background="@android:color/white">
+
+	<ImageView android:id="@+id/logo_kurento" android:src="@drawable/logo_kurento"
+		android:layout_height="wrap_content" android:scaleType="center"
+		android:layout_width="wrap_content" />
+	<ScrollView android:id="@+id/scroll" android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			android:orientation="vertical" android:layout_width="match_parent"
+			android:layout_height="match_parent">
+
+			<TextView android:text="@string/welcome" android:id="@+id/welcome"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:textStyle="bold|italic" android:textSize="14.5sp"
+				android:textColor="@android:color/black" />
+
+
+			<TextView android:text="@string/preference_local_username"
+				android:id="@+id/preference_local_username" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+			<EditText android:text="" android:id="@+id/Textpreference_local_username"
+				android:layout_width="match_parent" android:layout_height="wrap_content"
+				android:singleLine="true" />
+
+			<TextView android:text="@string/preference_local_domain"
+				android:id="@+id/preference_local_domain" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+			<EditText android:text="" android:id="@+id/Textpreference_local_domain"
+				android:layout_width="match_parent" android:layout_height="wrap_content"
+				android:singleLine="true" />
+
+			<TextView android:text="@string/preference_proxy_ip"
+				android:id="@+id/preference_proxy_ip" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+			<EditText android:text="" android:id="@+id/Textpreference_proxy_ip"
+				android:layout_width="match_parent" android:layout_height="wrap_content"
+				android:singleLine="true" />
+
+			<TextView android:text="@string/preference_proxy_port"
+				android:id="@+id/preference_proxy_port" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+			<EditText android:text="" android:id="@+id/Textpreference_proxy_port"
+				android:layout_width="match_parent" android:layout_height="wrap_content"
+				android:singleLine="true" />
+
+			<TableLayout android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:id="@+id/tableLayout1"
+				android:layout_gravity="center|bottom">
+				<TableRow android:id="@+id/TableRow01"
+					android:layout_gravity="center">
+					<Button android:id="@+id/cancel_register" android:text="@string/cancel_register"
+						android:layout_height="match_parent" android:layout_width="match_parent"
+						android:foregroundGravity="left" />
+					<Button android:id="@+id/ok_register" android:text="@string/ok_register"
+						android:layout_height="match_parent" android:layout_width="match_parent"
+						android:foregroundGravity="right" />
+				</TableRow>
+			</TableLayout>
+		</LinearLayout>
+	</ScrollView>
+
+</LinearLayout>
