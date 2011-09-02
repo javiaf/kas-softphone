@@ -1,5 +1,9 @@
 package com.kurento.kas.phone.media;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -13,6 +17,7 @@ import android.widget.TextView;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.controlcontacts.ControlContacts;
 import com.kurento.kas.phone.sip.Controller;
+import com.kurento.kas.phone.softphone.ListViewHistoryItem;
 import com.kurento.kas.phone.softphone.R;
 
 public class MediaControlOutgoing extends Activity {
@@ -26,21 +31,47 @@ public class MediaControlOutgoing extends Activity {
 		Bundle extras = getIntent().getExtras();
 		String uri = (String) extras.getSerializable("Uri");
 		Integer id = (Integer) extras.getSerializable("Id");
-		Log.d(LOG_TAG, "Media Control Outgoing Created; uri = " + uri
-				+ " id = " + id);
+	
 		TextView text = (TextView) findViewById(R.id.outgoing_sip);
 		text.setText(uri);
+		
 
 		ImageView imageCall = (ImageView) findViewById(R.id.image_call);
 
 		ControlContacts controlcontacts = new ControlContacts(this);
-
+		
+		String name = uri;
+		if (id != -1) 
+			name = controlcontacts.getName(id);
+		
+		Log.d(LOG_TAG, "Media Control Outgoing Created; uri = " + uri
+				+ " id = " + id + "; Name = " + name);
+	
 		Bitmap bm = controlcontacts.getPhoto(id);
+		
+		
 
 		if (bm != null) {
 
 			imageCall.setImageBitmap(bm);
 		}
+
+		
+		
+		@SuppressWarnings("unchecked")
+		ArrayList<ListViewHistoryItem> items = (ArrayList<ListViewHistoryItem>) ApplicationContext.contextTable
+				.get("itemsHistory");
+
+		String[] onlyUri = uri.split(":");
+		if (items == null)
+			items = new ArrayList<ListViewHistoryItem>();
+
+		Calendar date = new GregorianCalendar();
+		
+		items.add(new ListViewHistoryItem(id, onlyUri[1], name, false, date));
+
+		Log.d(LOG_TAG, "items size = " + items.size());
+		ApplicationContext.contextTable.put("itemsHistory", items);
 
 	}
 
@@ -67,7 +98,7 @@ public class MediaControlOutgoing extends Activity {
 			public void onClick(View v) {
 				Log.d(LOG_TAG, "Call Canceled...");
 				Controller controller = (Controller) ApplicationContext.contextTable
-				.get("controller");
+						.get("controller");
 				Log.d(LOG_TAG, "controller: " + controller);
 				try {
 					controller.cancel();
@@ -75,7 +106,7 @@ public class MediaControlOutgoing extends Activity {
 					e.printStackTrace();
 				}
 				finish();
-//				setResult(RESULT_OK);
+				// setResult(RESULT_OK);
 			}
 		});
 

@@ -1,5 +1,9 @@
 package com.kurento.kas.phone.media;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -15,10 +19,10 @@ import android.widget.TextView;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.controlcontacts.ControlContacts;
 import com.kurento.kas.phone.sip.Controller;
+import com.kurento.kas.phone.softphone.ListViewHistoryItem;
 import com.kurento.kas.phone.softphone.R;
 import com.kurento.kas.phone.softphone.ServiceUpdateUIListener;
 import com.kurento.kas.phone.softphone.SoftPhoneService;
-import com.kurento.kas.phone.videocall.VideoCallService;
 
 public class MediaControlIncoming extends Activity implements
 		ServiceUpdateUIListener {
@@ -54,7 +58,11 @@ public class MediaControlIncoming extends Activity implements
 
 		Log.d(LOG_TAG, "sipUri = " + sipUri);
 		Integer idContact = controlcontacts.getId(sipUri);
-		Log.d(LOG_TAG, "idContact = " + idContact);
+		String name = sipUri;
+		if (idContact != -1)
+			name = controlcontacts.getName(idContact);
+
+		Log.d(LOG_TAG, "idContact = " + idContact + "; name = " + name);
 		if (!idContact.equals("")) {
 			ImageView imageCall = (ImageView) findViewById(R.id.image_call);
 			Bitmap bm = controlcontacts.getPhoto(idContact);
@@ -67,6 +75,19 @@ public class MediaControlIncoming extends Activity implements
 		long[] pattern = { 0, 1000, 2000, 3000 };
 
 		vibrator.vibrate(pattern, 1);
+
+		@SuppressWarnings("unchecked")
+		ArrayList<ListViewHistoryItem> items = (ArrayList<ListViewHistoryItem>) ApplicationContext.contextTable
+				.get("itemsHistory");
+
+		if (items == null)
+			items = new ArrayList<ListViewHistoryItem>();
+
+		Calendar date = new GregorianCalendar();
+		items.add(new ListViewHistoryItem(idContact, sipUri, name, true, date));
+
+		Log.d(LOG_TAG, "items size = " + items.size());
+		ApplicationContext.contextTable.put("itemsHistory", items);
 	}
 
 	@Override

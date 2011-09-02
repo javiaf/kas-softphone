@@ -38,11 +38,11 @@ public class Register extends Activity {
 								+ textlocaldomain.getText() + "; "
 								+ textproxyip.getText() + "; "
 								+ textproxyport.getText());
-				
-				if (textlocalusername.getText().toString().isEmpty()
-						|| textlocaldomain.getText().toString().isEmpty()
-						|| textproxyip.getText().toString().isEmpty()
-						|| textproxyport.getText().toString().isEmpty()) {
+
+				if (textlocalusername.getText().toString().length() == 0
+						|| textlocaldomain.getText().toString().length() == 0
+						|| textproxyip.getText().toString().length() == 0
+						|| textproxyport.getText().toString().length() == 0) {
 					Log.d(LOG_TAG, "Data empty");
 					Toast.makeText(Register.this, "Register all data, please",
 							Toast.LENGTH_LONG);
@@ -77,13 +77,14 @@ public class Register extends Activity {
 			}
 		});
 	}
-	
+
 	@Override
 	protected void onPause() {
 		Log.d(LOG_TAG, "onPause");
 		super.onPause();
 	}
-		@Override
+
+	@Override
 	protected void onDestroy() {
 		Log.d(LOG_TAG, "onDestroy");
 		super.onDestroy();
