@@ -1,4 +1,4 @@
-package com.kurento.kas.phone.softphone;
+package com.kurento.kas.phone.historycall;
 
 import java.util.Calendar;
 
@@ -8,10 +8,12 @@ public class ListViewHistoryItem {
 	private String uri;
 	private String name;
 	private Boolean type; //True: in; False: out
-	private Calendar date;
+	private String date;
 
-
-	public ListViewHistoryItem(Integer id, String uri, String name, Boolean type, Calendar date) {
+	public ListViewHistoryItem(){
+		
+	}
+	public ListViewHistoryItem(Integer id, String uri, String name, Boolean type, String date) {
 		super();
 		this.setId(id);
 		this.uri = uri;
@@ -52,11 +54,11 @@ public class ListViewHistoryItem {
 		return type;
 	}
 
-	public void setDate(Calendar date) {
+	public void setDate(String date) {
 		this.date = date;
 	}
 
-	public Calendar getDate() {
+	public String getDate() {
 		return date;
 	}
 }

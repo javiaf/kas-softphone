@@ -7,19 +7,21 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.provider.Contacts.People;
 import android.provider.ContactsContract;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -31,7 +33,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +41,8 @@ import com.kurento.kas.media.VideoCodecType;
 import com.kurento.kas.mscontrol.networkconnection.ConnectionType;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.controlcontacts.ControlContacts;
+import com.kurento.kas.phone.historycall.HistoryCall;
+import com.kurento.kas.phone.historycall.ListViewHistoryItem;
 import com.kurento.kas.phone.media.MediaControlOutgoing;
 import com.kurento.kas.phone.network.NetworkIP;
 import com.kurento.kas.phone.preferences.Connection_Preferences;
@@ -267,65 +270,64 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		signalManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 		signalManager.listen(signalListener,
 				PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
-		
+
 		video = (Button) findViewById(R.id.video_button);
 		video.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				final Dialog dialog = new Dialog(v.getContext());
 				dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-				info_video = "Codecs: \n " + info_video_aux + "\n " + info_audio_aux;
+				info_video = "Codecs: \n " + info_video_aux + "\n "
+						+ info_audio_aux;
 				dialog.setContentView(R.layout.info_video);
 				((TextView) dialog.findViewById(R.id.info_video))
-				.setText(info_video);
+						.setText(info_video);
 				dialog.show();
 			}
 		});
 
 		wifi = (Button) findViewById(R.id.wifi_button);
 		wifi.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				final Dialog dialog = new Dialog(v.getContext());
 				dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 				dialog.setContentView(R.layout.info_wifi);
 				((TextView) dialog.findViewById(R.id.info_wifi))
-				.setText(info_wifi);
+						.setText(info_wifi);
 				dialog.show();
 			}
 		});
-		
+
 		_3g = (Button) findViewById(R.id.info_3g_button);
 		_3g.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				final Dialog dialog = new Dialog(v.getContext());
 				dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 				dialog.setContentView(R.layout.info_3g);
-				((TextView) dialog.findViewById(R.id.info_3g))
-				.setText(info_3g);
+				((TextView) dialog.findViewById(R.id.info_3g)).setText(info_3g);
 				dialog.show();
 			}
 		});
-		
+
 		connection = (Button) findViewById(R.id.connection_button);
 		connection.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				final Dialog dialog = new Dialog(v.getContext());
 				dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 				dialog.setContentView(R.layout.info_connection);
 				((TextView) dialog.findViewById(R.id.info_connect))
-				.setText(info_connect);
+						.setText(info_connect);
 				dialog.show();
 			}
 		});
-				
-		
+
 		final Button buttonCall = (Button) findViewById(R.id.call);
 		buttonCall.setOnClickListener(new OnClickListener() {
 
@@ -352,6 +354,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	}
 
 	private void openContacts() {
+
+		
 		Intent intentContacts = new Intent(Intent.ACTION_PICK,
 				ContactsContract.Contacts.CONTENT_URI);
 		startActivityForResult(intentContacts, PICK_CONTACT_REQUEST);
@@ -390,6 +394,39 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 							"stopService " + e.getMessage() + "; "
 									+ e.toString());
 				}
+
+				// // Save DB
+				SQLiteDatabase db = (SQLiteDatabase) ApplicationContext.contextTable
+						.get("db");
+
+				// Si hemos abierto correctamente la base de datos
+
+				if (db.isOpen()) {
+					// Insertamos 5 usuarios de ejemplo
+
+					// Creamos el registro a insertar como objeto ContentValues
+
+					@SuppressWarnings("unchecked")
+					ArrayList<ListViewHistoryItem> items = (ArrayList<ListViewHistoryItem>) ApplicationContext.contextTable
+							.get("itemsHistory");
+					db.delete("DBHistoryCall", null, null);
+
+					for (int i = 0; i < items.size(); i++) {
+						ContentValues nValue = new ContentValues();
+						nValue.put("id", items.get(i).getId());
+						nValue.put("date", items.get(i).getDate());
+						nValue.put("uri", items.get(i).getUri());
+						nValue.put("name", items.get(i).getName());
+						nValue.put("type", items.get(i).getType());
+						db.insert("DBHistoryCall", null, nValue);
+						Log.d(LOG_TAG, "************insert data");
+					}
+
+					// Cerramos la base de datos
+					db.close();
+				} else
+					Log.d(LOG_TAG, "************data base closed");
+
 				ApplicationContext.contextTable.clear();
 				Log.d(LOG_TAG, " FinishUA");
 			}
@@ -442,9 +479,11 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			/*
 			 * CARGAR LAS PREFERENCIAS
 			 */
-			
+
 			connection.setBackgroundResource(R.drawable.connecting_icon);
-			info_connect = "Connection .... \n\n User: \n " + localUser + "@" + localRealm + "\n\n Server:\n " + proxyIP + ":" + proxyPort;
+			info_connect = "Connection .... \n\n User: \n " + localUser + "@"
+					+ localRealm + "\n\n Server:\n " + proxyIP + ":"
+					+ proxyPort;
 			isRegister = false;
 			ApplicationContext.contextTable.put("isRegister", isRegister);
 			// dialog = ProgressDialog.show(SoftPhone.this, "",
@@ -588,13 +627,14 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		Log.d(LOG_TAG, "Register Sucessful");
 		SoftPhone.this.connection = (Button) findViewById(R.id.connection_button);
 		connection.setBackgroundResource(R.drawable.connect_icon);
-		
-		info_connect = "The connection is ok. \n\n User: \n " + localUser + "@" + localRealm + "\n\n Server:\n " + proxyIP + ":" + proxyPort;
-//		if (connection != null)
-//		SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
-//		SoftPhone.this.text.setTextSize(20);
-//		SoftPhone.this.text.setTextColor(Color.GREEN);
-//		SoftPhone.this.text.setText("Register Sucessful");
+
+		info_connect = "The connection is ok. \n\n User: \n " + localUser + "@"
+				+ localRealm + "\n\n Server:\n " + proxyIP + ":" + proxyPort;
+		// if (connection != null)
+		// SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
+		// SoftPhone.this.text.setTextSize(20);
+		// SoftPhone.this.text.setTextColor(Color.GREEN);
+		// SoftPhone.this.text.setText("Register Sucessful");
 
 		isRegister = true;
 		ApplicationContext.contextTable.put("isRegister", isRegister);
@@ -604,13 +644,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	public void registerFailed() {
 		Log.d(LOG_TAG, "Register Failed");
 
-		info_connect = "The connection is failed. \n\n User: \n " + localUser + "@" + localRealm + "\n\n Server:\n " + proxyIP + ":" + proxyPort;
+		info_connect = "The connection is failed. \n\n User: \n " + localUser
+				+ "@" + localRealm + "\n\n Server:\n " + proxyIP + ":"
+				+ proxyPort;
 		SoftPhone.this.connection = (Button) findViewById(R.id.connection_button);
 		connection.setBackgroundResource(R.drawable.disconnect_icon);
-//		SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
-//		SoftPhone.this.text.setTextSize(20);
-//		SoftPhone.this.text.setTextColor(Color.RED);
-//		SoftPhone.this.text.setText("Register Failed");
+		// SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
+		// SoftPhone.this.text.setTextSize(20);
+		// SoftPhone.this.text.setTextColor(Color.RED);
+		// SoftPhone.this.text.setText("Register Failed");
 
 		isRegister = false;
 		ApplicationContext.contextTable.put("isRegister", isRegister);
@@ -625,15 +667,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				.getDefaultSharedPreferences(getBaseContext());
 
 		ArrayList<VideoCodecType> selectedVideoCodecs = new ArrayList<VideoCodecType>();
-		if (settings.getBoolean("H263_CODEC", false)){
+		if (settings.getBoolean("H263_CODEC", false)) {
 			selectedVideoCodecs.add(VideoCodecType.H263);
 			info_video_aux = "Codec de Video:\n H263";
 		}
-		if (settings.getBoolean("MPEG4_CODEC", false)){
+		if (settings.getBoolean("MPEG4_CODEC", false)) {
 			selectedVideoCodecs.add(VideoCodecType.MPEG4);
 			info_video_aux = "Codec de Video:\n MPEG4";
 		}
-		if (settings.getBoolean("H264_CODEC", false)){
+		if (settings.getBoolean("H264_CODEC", false)) {
 			selectedVideoCodecs.add(VideoCodecType.H264);
 			info_video_aux = "Codec de Video:\n H264";
 		}
@@ -646,19 +688,19 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				.getDefaultSharedPreferences(getBaseContext());
 
 		ArrayList<AudioCodecType> selectedAudioCodecs = new ArrayList<AudioCodecType>();
-		if (settings.getBoolean("AMR_AUDIO_CODEC", false)){
+		if (settings.getBoolean("AMR_AUDIO_CODEC", false)) {
 			selectedAudioCodecs.add(AudioCodecType.AMR);
 			info_audio_aux = "Codec de Audio:\n AMR";
 		}
-		if (settings.getBoolean("MP2_AUDIO_CODEC", false)){
+		if (settings.getBoolean("MP2_AUDIO_CODEC", false)) {
 			selectedAudioCodecs.add(AudioCodecType.MP2);
 			info_audio_aux = "Codec de Audio:\n MP2";
 		}
-		if (settings.getBoolean("AAC_AUDIO_CODEC", false)){
+		if (settings.getBoolean("AAC_AUDIO_CODEC", false)) {
 			selectedAudioCodecs.add(AudioCodecType.AAC);
 			info_audio_aux = "Codec de Audio:\n AAC";
 		}
-		
+
 		return selectedAudioCodecs;
 	}
 
@@ -671,11 +713,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			proxyIP = settings.getString("PROXY_IP", "");
 			proxyPort = Integer.parseInt(settings.getString("PROXY_PORT", ""));
 
-			info_connect = "Connecting ... \n\n User: \n " + localUser + "@" + localRealm + "\n\n Server:\n " + proxyIP + ":" + proxyPort;
+			info_connect = "Connecting ... \n\n User: \n " + localUser + "@"
+					+ localRealm + "\n\n Server:\n " + proxyIP + ":"
+					+ proxyPort;
 
 			this.audioCodecs = getAudioCodecsFromSettings();
 			this.videoCodecs = getVideoCodecsFromSettings();
-			
 
 			return true;
 		} catch (Exception e) {
@@ -804,10 +847,10 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					lAddressNew = NetworkIP.getLocalAddress();
 					lAddress = (InetAddress) ApplicationContext.contextTable
 							.get("localAddress");
-					
+
 					wifi.setBackgroundResource(R.drawable.wifi_off_120);
 					_3g.setBackgroundResource(R.drawable.icon_3g_on_120);
-					info_wifi = "Not connected" ;
+					info_wifi = "Not connected";
 					info_3g = "3G enable. \n IP: \n " + lAddressNew;
 					if (lAddress != null)
 						if (lAddressNew.equals(lAddress))
@@ -820,8 +863,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					Log.d(LOG_TAG, "No Activate");
 					wifi.setBackgroundResource(R.drawable.wifi_off_120);
 					_3g.setBackgroundResource(R.drawable.icon_3g_off_120);
-					info_wifi = "Not connected" ;
-					info_3g = "Not connected" ;
+					info_wifi = "Not connected";
+					info_3g = "Not connected";
 					isNetworking = false;
 					break;
 				default:

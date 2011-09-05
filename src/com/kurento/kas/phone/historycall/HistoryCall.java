@@ -1,17 +1,18 @@
-package com.kurento.kas.phone.softphone;
+package com.kurento.kas.phone.historycall;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Locale;
 
 import android.app.Dialog;
 import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -31,16 +32,59 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
+import com.kurento.kas.phone.softphone.R;
 
 public class HistoryCall extends ListActivity {
 	/** Called when the activity is first created. */
 	private ListViewAdapter listViewAdapter;
 	private static final String LOG_TAG = "HistoryCall";
+	private static final String DB = "DBHistoryCall";
+	private SQLiteDatabase db = null;
+
+	private SQLiteDatabase openOrCreateBD() {
+
+		db = openOrCreateDatabase(DB + ".db",
+				SQLiteDatabase.CREATE_IF_NECESSARY, null);
+		db.setVersion(1);
+		db.setLocale(Locale.getDefault());
+		db.setLockingEnabled(true);
+
+		try {
+
+			ListViewHistoryItem l = new ListViewHistoryItem();
+
+			@SuppressWarnings("rawtypes")
+			Class progClass = l.getClass();
+
+			String sqlData = "";
+			Field[] fields = progClass.getDeclaredFields();
+			for (int i = 0; i < fields.length; i++) {
+				String type = fields[i].getType().getSimpleName();
+				String name = fields[i].getName();
+				if ((i + 1) == fields.length) {
+					sqlData += name + " " + type;
+				} else {
+					sqlData += name + " " + type + ", ";
+				}
+			}
+			sqlData += ");";
+			String sqlCreate = "CREATE TABLE " + DB
+					+ " (idTable INTEGER PRIMARY KEY AUTOINCREMENT,";
+			sqlCreate += sqlData;
+			Log.d(LOG_TAG, "onCreate " + sqlCreate);
+			db.execSQL(sqlCreate);
+		} catch (Exception e) {
+			Log.d(LOG_TAG, "Ya está creada ");
+		}
+		return db;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.history_call);
+
+		SQLiteDatabase db = openOrCreateBD();
 
 		@SuppressWarnings("unchecked")
 		ArrayList<ListViewHistoryItem> items = (ArrayList<ListViewHistoryItem>) ApplicationContext.contextTable
@@ -50,16 +94,38 @@ public class HistoryCall extends ListActivity {
 				R.layout.listview_history_call,
 				new ArrayList<ListViewHistoryItem>());
 
-		if (items == null)
+		if (items == null) {
 			items = new ArrayList<ListViewHistoryItem>();
 
-		for (int i = 0; i < items.size(); i++) {
-			listViewAdapter.add(items.get(i));
+			if (db != null) {
+				Cursor cur = db.query(DB, null, null, null, null, null, null);
+				Log.d(LOG_TAG, "Cursos = " + cur.getCount());
+				cur.moveToFirst();
+				while (cur.isAfterLast() == false) {
+
+					ListViewHistoryItem item = new ListViewHistoryItem(
+							cur.getInt(cur.getColumnIndex("id")),
+							cur.getString(cur.getColumnIndex("uri")),
+							cur.getString(cur.getColumnIndex("name")),
+							Boolean.getBoolean(cur.getString(cur
+									.getColumnIndex("type"))),
+							cur.getString(cur.getColumnIndex("date")));
+					items.add(item);
+					listViewAdapter.add(item);
+					cur.moveToNext();
+				}
+			}
+		} else {
+			for (int i = 0; i < items.size(); i++) {
+				listViewAdapter.add(items.get(i));
+			}
 		}
 		setListAdapter(listViewAdapter);
 
 		ApplicationContext.contextTable.put("itemsHistory", items);
 		ApplicationContext.contextTable.put("listViewAdapter", listViewAdapter);
+		ApplicationContext.contextTable.put("db", db);
+
 	}
 
 	@Override
@@ -150,13 +216,12 @@ public class HistoryCall extends ListActivity {
 				ApplicationContext.contextTable.put("itemsHistory", items);
 				listViewAdapter.clear();
 				setListAdapter(listViewAdapter);
+				db.delete(DB, null, null);
 			}
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
-	
-	
 	// --------
 	public class ListViewAdapter extends ArrayAdapter<ListViewHistoryItem> {
 
@@ -200,29 +265,9 @@ public class HistoryCall extends ListActivity {
 				holder = (ViewHolder) v.getTag();
 			}
 			ListViewHistoryItem listViewItem = items.get(position);
-		
-			Integer minute = listViewItem.getDate().get(Calendar.MINUTE);
-			Integer day = listViewItem.getDate().get(Calendar.DAY_OF_MONTH);
-			Integer month = listViewItem.getDate().get(Calendar.MONTH) + 1;
-			
-			String tMinute = String.valueOf(minute);
-			String tDay = String.valueOf(day);
-			String tMonth = String.valueOf(month);
-			
-			if (minute < 10) tMinute = "0" + minute;
-			if (day < 10) tDay = "0" + day;
-			if (month < 10) tMonth = "0" + tMonth;
-			
-			
-			String date = listViewItem.getDate().get(Calendar.HOUR_OF_DAY)
-					+ ":" + tMinute + " "
-					+ tDay + "/"
-					+ tMonth + "/"
-					+ listViewItem.getDate().get(Calendar.YEAR);
-		
-			
+
 			holder.uri.setText(listViewItem.getUri());
-			holder.date.setText("   " + date);
+			holder.date.setText("   " + listViewItem.getDate());
 			holder.icon.setImageBitmap(listViewItem.getType() ? mIconIn
 					: mIconOut);
 			return v;

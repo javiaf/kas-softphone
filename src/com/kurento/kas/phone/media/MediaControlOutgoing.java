@@ -16,8 +16,8 @@ import android.widget.TextView;
 
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.controlcontacts.ControlContacts;
+import com.kurento.kas.phone.historycall.ListViewHistoryItem;
 import com.kurento.kas.phone.sip.Controller;
-import com.kurento.kas.phone.softphone.ListViewHistoryItem;
 import com.kurento.kas.phone.softphone.R;
 
 public class MediaControlOutgoing extends Activity {
@@ -66,9 +66,28 @@ public class MediaControlOutgoing extends Activity {
 		if (items == null)
 			items = new ArrayList<ListViewHistoryItem>();
 
-		Calendar date = new GregorianCalendar();
 		
-		items.add(new ListViewHistoryItem(id, onlyUri[1], name, false, date));
+		Calendar date = new GregorianCalendar();
+		Integer minute = date.get(Calendar.MINUTE);
+		Integer day = date.get(Calendar.DAY_OF_MONTH);
+		Integer month = date.get(Calendar.MONTH) + 1;
+
+		String tMinute = String.valueOf(minute);
+		String tDay = String.valueOf(day);
+		String tMonth = String.valueOf(month);
+
+		if (minute < 10)
+			tMinute = "0" + minute;
+		if (day < 10)
+			tDay = "0" + day;
+		if (month < 10)
+			tMonth = "0" + tMonth;
+
+		String dateS = date.get(Calendar.HOUR_OF_DAY)
+				+ ":" + tMinute + " " + tDay + "/" + tMonth + "/"
+				+ date.get(Calendar.YEAR);
+		
+		items.add(new ListViewHistoryItem(id, onlyUri[1], name, false, dateS));
 
 		Log.d(LOG_TAG, "items size = " + items.size());
 		ApplicationContext.contextTable.put("itemsHistory", items);
