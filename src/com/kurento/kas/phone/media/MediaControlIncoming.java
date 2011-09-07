@@ -5,6 +5,11 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Message;
@@ -22,11 +27,24 @@ import com.kurento.kas.phone.historycall.ListViewHistoryItem;
 import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.softphone.R;
 import com.kurento.kas.phone.softphone.ServiceUpdateUIListener;
+import com.kurento.kas.phone.softphone.SoftPhone;
 import com.kurento.kas.phone.softphone.SoftPhoneService;
 
 public class MediaControlIncoming extends Activity implements
 		ServiceUpdateUIListener {
 	private static final String LOG_TAG = "MediaControlIncoming";
+
+	private NotificationManager mNotificationMgr;
+	private final static int NOTIF_CALLING_IN = 4;
+	private final static int NOTIF_CALLING_OUT = 3;
+	private final static int NOTIF_VIDEOCALL = 2;
+	private final static int NOTIF_SOFTPHONE = 1;
+
+	private Notification mNotif;
+	private PendingIntent mNotifContentIntent;
+	private Intent notifIntent;
+	private String notificationTitle = "Calling ...";
+	private String notificationTitleSoft = "KurentoPhone";
 
 	private ControlContacts controlcontacts = new ControlContacts(this);
 	Vibrator vibrator;
@@ -39,9 +57,30 @@ public class MediaControlIncoming extends Activity implements
 		setContentView(R.layout.control_call_incomingcall);
 		Log.d(LOG_TAG, "Media Control Incoming Created");
 
+		mNotificationMgr = (NotificationManager) this
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		mNotif = new Notification(R.drawable.sym_call_incoming,
+				notificationTitle, System.currentTimeMillis());
+		mNotif.flags |= Notification.FLAG_ONGOING_EVENT;
+
+		notifIntent = new Intent(this, MediaControlIncoming.class);
+		mNotifContentIntent = PendingIntent
+				.getActivity(this, 0, notifIntent, 0);
+		mNotif.setLatestEventInfo(this, notificationTitle, "",
+				mNotifContentIntent);
+
+		mNotificationMgr.notify(NOTIF_CALLING_IN, mNotif);
+		mNotificationMgr.cancel(NOTIF_SOFTPHONE);
+
 		SoftPhoneService.setUpdateListener(this);
 
 		Bundle extras = getIntent().getExtras();
+
+		if (extras == null)
+			extras = (Bundle) ApplicationContext.contextTable.get("extrasIn");
+		else
+			ApplicationContext.contextTable.put("extrasIn", extras);
 
 		String uri = (String) extras.getSerializable("Uri");
 
@@ -99,10 +138,9 @@ public class MediaControlIncoming extends Activity implements
 		if (month < 10)
 			tMonth = "0" + tMonth;
 
-		String dateS = date.get(Calendar.HOUR_OF_DAY)
-				+ ":" + tMinute + " " + tDay + "/" + tMonth + "/"
-				+ date.get(Calendar.YEAR);
-		
+		String dateS = date.get(Calendar.HOUR_OF_DAY) + ":" + tMinute + " "
+				+ tDay + "/" + tMonth + "/" + date.get(Calendar.YEAR);
+
 		items.add(new ListViewHistoryItem(idContact, sipUri, name, true, dateS));
 
 		Log.d(LOG_TAG, "items size = " + items.size());
@@ -180,9 +218,22 @@ public class MediaControlIncoming extends Activity implements
 
 	@Override
 	protected void onDestroy() {
-		super.onDestroy();
-		Log.d(LOG_TAG, "onDestroy");
+
 		vibrator.cancel();
+		mNotificationMgr.cancel(NOTIF_CALLING_IN);
+		mNotif = new Notification(R.drawable.icon, notificationTitleSoft,
+				System.currentTimeMillis());
+
+		notifIntent = new Intent(this, SoftPhone.class);
+		mNotifContentIntent = PendingIntent
+				.getActivity(this, 0, notifIntent, 0);
+		mNotif.setLatestEventInfo(this, notificationTitleSoft, "",
+				mNotifContentIntent);
+
+		mNotificationMgr.notify(NOTIF_SOFTPHONE, mNotif);
+		Log.d(LOG_TAG, "onDestroy");
+		super.onDestroy();
+
 	}
 
 	@Override
