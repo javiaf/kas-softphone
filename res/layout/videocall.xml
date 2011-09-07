@@ -14,6 +14,13 @@
 		android:layout_gravity="center|bottom">
 		<TableRow android:id="@+id/TableRow01"
 			android:layout_gravity="center">
+			<Button android:id="@+id/button_terminate_call"
+				android:layout_width="wrap_content" android:background="@drawable/ic_jog_dial_decline"
+				android:layout_height="wrap_content"
+				android:layout_alignParentBottom="true"
+				android:layout_alignParentRight="true" android:layout_gravity="left|bottom" />
+			<TextView android:id="@+id/TextView02" android:text=""
+				android:width="30px" />
 			<ToggleButton android:id="@+id/button_headset"
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
 				android:textOn="" android:textOff="" android:padding="10dp"
@@ -21,18 +28,12 @@
 
 			<TextView android:id="@+id/TextView01" android:text=""
 				android:width="30px" />
-
 			<ToggleButton android:id="@+id/button_mute"
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
 				android:textOn="" android:textOff="" android:padding="10dp"
 				android:background="@drawable/mute_button" />
-		</TableRow>
-		<TableRow android:id="@+id/TableRow01">
-			<Button android:id="@+id/button_terminate_call"
-				android:layout_width="wrap_content" android:background="@drawable/ic_jog_dial_decline"
-				android:layout_height="wrap_content"
-				android:layout_alignParentBottom="true"
-				android:layout_alignParentRight="true" android:layout_gravity="left|bottom" />
+
+
 		</TableRow>
 	</TableLayout>
 </FrameLayout>

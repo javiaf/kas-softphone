@@ -165,6 +165,21 @@ public class HistoryCall extends ListActivity {
 			}
 		});
 
+		final Button buttonCall = (Button) findViewById(R.id.buttonCallHistory);
+		buttonCall.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (!textRemoteUri.getText().toString().equals("")) {
+					String remoteURI = textRemoteUri.getText().toString();
+					Intent resultIntent = new Intent();
+					resultIntent.putExtra("contact", remoteURI);
+					resultIntent.putExtra("type", "new");
+					setResult(RESULT_OK, resultIntent);
+					finish();
+				}
+			}
+		});
+
 		final Button infoRemoteUri = (Button) findViewById(R.id.infoRemoteUri);
 		infoRemoteUri.setOnClickListener(new OnClickListener() {
 
