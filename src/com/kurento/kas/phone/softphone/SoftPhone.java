@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,8 +20,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.provider.Contacts.People;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.PhoneLookup;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -343,7 +342,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		buttonContacts.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-
 				try {
 					openContacts();
 				} catch (Exception e) {
@@ -354,10 +352,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	}
 
 	private void openContacts() {
-
-		
-		Intent intentContacts = new Intent(Intent.ACTION_PICK,
-				ContactsContract.Contacts.CONTENT_URI);
+		 Intent intentContacts = new Intent(Intent.ACTION_PICK,
+		 ContactsContract.Contacts.CONTENT_URI);
 		startActivityForResult(intentContacts, PICK_CONTACT_REQUEST);
 	}
 

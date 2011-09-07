@@ -15,7 +15,7 @@
 			<TextView android:text="@string/welcome" android:id="@+id/welcome"
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
 				android:textStyle="bold|italic" android:textSize="14.5sp"
-				android:textColor="@android:color/black" />
+				android:textColor="@android:color/black"/>
 
 
 			<TextView android:text="@string/preference_local_username"
@@ -28,23 +28,23 @@
 			<TextView android:text="@string/preference_local_domain"
 				android:id="@+id/preference_local_domain" android:layout_width="wrap_content"
 				android:layout_height="wrap_content" />
-			<EditText android:text="" android:id="@+id/Textpreference_local_domain"
+			<EditText android:id="@+id/Textpreference_local_domain"
 				android:layout_width="match_parent" android:layout_height="wrap_content"
-				android:singleLine="true" />
+				android:singleLine="true" android:text="urjc.es" />
 
 			<TextView android:text="@string/preference_proxy_ip"
 				android:id="@+id/preference_proxy_ip" android:layout_width="wrap_content"
 				android:layout_height="wrap_content" />
-			<EditText android:text="" android:id="@+id/Textpreference_proxy_ip"
+			<EditText  android:id="@+id/Textpreference_proxy_ip"
 				android:layout_width="match_parent" android:layout_height="wrap_content"
-				android:singleLine="true" />
+				android:singleLine="true" android:text="193.147.51.17" />
 
 			<TextView android:text="@string/preference_proxy_port"
 				android:id="@+id/preference_proxy_port" android:layout_width="wrap_content"
 				android:layout_height="wrap_content" />
-			<EditText android:text="" android:id="@+id/Textpreference_proxy_port"
+			<EditText android:id="@+id/Textpreference_proxy_port"
 				android:layout_width="match_parent" android:layout_height="wrap_content"
-				android:singleLine="true" />
+				android:singleLine="true"  android:text="5060"/>
 
 			<TableLayout android:layout_width="wrap_content"
 				android:layout_height="wrap_content" android:id="@+id/tableLayout1"
