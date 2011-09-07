@@ -176,6 +176,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		super.onNewIntent(intent);
 
 		Log.d(LOG_TAG, "onNewIntent Is first or is call??");
+		
+		SoftPhoneService.setUpdateListener(this);
 
 		connectionType = null;
 		connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
