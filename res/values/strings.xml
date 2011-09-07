@@ -4,7 +4,7 @@
 	<string name="app_name">K-Phone</string>
 
 	<string name="sip_log">SIP Log</string>
-	<string name="incoming_call">Incoming Call</string>
+	<string name="incoming_call">Calling ...</string>
 
 	<!-- menu -->
 	<string name="txt_preferences">Preferences</string>
@@ -45,7 +45,7 @@
 	<string name="txt_exit">Exit</string>
 	<string name="incoming_sip">Unknown</string>
 	<string name="outgoing_sip">Unknown</string>
-	<string name="outgoing_call">Outgoing Call</string>
+	<string name="outgoing_call">Calling ...</string>
 	<string name="welcome">Welcome to KurentoPhone. Please register your data.</string>
 	<string name="ok_register">Save</string>
 	<string name="cancel_register">Cancel</string>
