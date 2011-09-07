@@ -1,42 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout android:id="@+id/FrameLayout01"
-	android:layout_width="fill_parent" android:layout_height="fill_parent"
-	xmlns:android="http://schemas.android.com/apk/res/android">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent" android:layout_weight="1"
+	android:background="@android:color/white">
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="horizontal" android:layout_width="match_parent"
+		android:layout_height="40dp" android:background="@android:color/darker_gray">
+		<Button android:id="@+id/connection_button"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:background="@drawable/connecting_icon" />
+		<TextView android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:text="				" />
+		<Button android:id="@+id/wifi_button" android:layout_width="50dip"
+			android:layout_height="wrap_content" android:background="@drawable/wifi_off_120" />
+		<TextView android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:text="				" />
+		<Button android:id="@+id/info_3g_button" android:layout_width="50dip"
+			android:layout_height="wrap_content" android:background="@drawable/icon_3g_off_120" />
+		<TextView android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:text="				" />
+		<Button android:id="@+id/video_button" android:layout_width="50dip"
+			android:layout_height="wrap_content" android:background="@drawable/info_video" />
+	</LinearLayout>
+	<ImageView android:id="@+id/logo_kurento" android:src="@drawable/logo_kurento"
+		android:layout_height="wrap_content" android:scaleType="center"
+		android:layout_width="wrap_content" />
+
 	<TableLayout android:layout_height="wrap_content"
-		android:id="@+id/tableLayout1" android:layout_gravity="top"
-		android:layout_width="match_parent">
+		android:layout_width="wrap_content" android:id="@+id/tableLayout1">
 		<TableRow android:id="@+id/TableRow01">
-			<TextView android:id="@+id/textRegister"
-				android:layout_width="fill_parent" android:layout_height="wrap_content"
-				android:text="@string/hello" />
+			<Button android:id="@+id/contacts" android:layout_width="110dip"
+				android:layout_height="110dip" android:background="@drawable/peoplecontactsicon" />
+			<TextView android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:text="   " />
+			<Button android:id="@+id/call" android:layout_height="120dip"
+				android:layout_width="120dip" android:background="@drawable/phone" />
 		</TableRow>
 		<TableRow android:id="@+id/TableRow01">
-			<EditText android:id="@+id/textRemoteUri"
-				android:hint="Write User SIP, SIP format: user@host" android:text=""
-				android:layout_gravity="top" android:layout_width="match_parent"
-				android:singleLine="true" android:imeActionLabel="actionGo" android:imeOptions="actionGo">
-			</EditText>
-		
-		</TableRow>
-		<TableRow android:id="@+id/TableRow01">
-			<TextView android:id="@+id/textUser" android:layout_width="fill_parent"
-				android:layout_height="wrap_content" android:text="" />
-		</TableRow>
-		<TableRow android:id="@+id/TableRow01">
-			<TextView android:id="@+id/textServer" android:layout_width="fill_parent"
-				android:layout_height="wrap_content" android:text="" />
+			<TextView android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:text="Contacts"
+				android:textColor="@android:color/black" />
+			<TextView android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:text="                  " />
+			<TextView android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:text="Calls"
+				android:textColor="@android:color/black" />
 		</TableRow>
 	</TableLayout>
 
-
-	<Button android:id="@+id/contacts" android:layout_width="wrap_content"
-		android:text="" android:layout_height="wrap_content"
-		android:layout_alignParentBottom="true" android:background="@drawable/peoplecontactsicon"
-		android:layout_alignParentRight="true" android:layout_gravity="left|bottom" />
-
-	<Button android:id="@+id/call" android:layout_height="wrap_content"
-		android:layout_alignParentBottom="true" android:background="@drawable/ic_jog_dial_answer"
-		android:layout_alignParentRight="true" android:layout_width="100dip"
-		android:layout_gravity="center|center_horizontal|bottom" />
-</FrameLayout>
+</LinearLayout>
 

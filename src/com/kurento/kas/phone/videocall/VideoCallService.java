@@ -43,7 +43,7 @@ public class VideoCallService extends Service {
 	private PendingIntent mNotifContentIntent;
 	private Intent notifIntent;
 	private String notificationTitle = "VideoCall";
-	private String notificationTitleSoft = "SoftPhone";
+	private String notificationTitleSoft = "KurentoPhone";
 	
 	private Intent videoCallIntent;
 

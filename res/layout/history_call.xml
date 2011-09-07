@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent" android:background="@android:color/white">
+	<TextView android:layout_height="wrap_content"
+		android:layout_width="wrap_content" android:text="Texto explicativo de la caja de texto"
+		android:textColor="@android:color/black" android:textSize="16dp" />
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="horizontal" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:background="@android:color/white">
+
+		<EditText android:id="@+id/textRemoteUri" android:hint="SIP format: user@host"
+			android:text="" android:layout_gravity="top" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:singleLine="true"
+			android:imeActionLabel="Call" android:imeOptions="actionGo">
+		</EditText>
+		<Button android:id="@+id/infoRemoteUri" android:layout_width="wrap_content"
+			android:text="" android:layout_height="wrap_content"
+			android:background="@drawable/ic_menu_help" />
+	</LinearLayout>
+	<Button android:id="@+id/contactsHistory" android:layout_width="75dip"
+		android:layout_height="75dip" android:background="@drawable/peoplecontactsicon" />
+	<TextView android:layout_height="wrap_content"
+		android:layout_width="wrap_content" android:text="--------------" />
+	<TextView android:layout_height="wrap_content"
+		android:layout_width="wrap_content" android:text="History Call"
+		android:textColor="@android:color/black" android:textSize="16dp" />
+	<ListView android:id="@android:id/list" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:focusable="true" android:cacheColorHint="#00000000" >
+	</ListView>
+</LinearLayout>
+

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="hello">Connecting...</string>
-	<string name="app_name">SoftPhone</string>
+	<string name="app_name">K-Phone</string>
 
 	<string name="sip_log">SIP Log</string>
-	<string name="incoming_call">Incoming Call</string>
+	<string name="incoming_call">Calling ...</string>
 
 	<!-- menu -->
 	<string name="txt_preferences">Preferences</string>
@@ -36,6 +36,8 @@
 	<string name="txt_video_codec_preferences">Video Codec</string>
 	
 	<string name="txt_menu_register">Register</string>
+	
+	<string name="txt_menu_about">About</string>
 
 	<!-- <string name="txt_record">Record</string> <string name="txt_send_RTP">Send 
 		RTP</string> -->
@@ -43,7 +45,15 @@
 	<string name="txt_exit">Exit</string>
 	<string name="incoming_sip">Unknown</string>
 	<string name="outgoing_sip">Unknown</string>
-	<string name="outgoing_call">Outgoing Call</string>
+	<string name="outgoing_call">Calling ...</string>
+	<string name="welcome">Welcome to KurentoPhone. Please register your data.</string>
+	<string name="ok_register">Save</string>
+	<string name="cancel_register">Cancel</string>
+	
+	<string name="about_comments">*KurentoPhone*</string>
+	<string name="txt_clear">Clear history</string>
+	<string name="infoRemoteUri">Format SIP Uri</string>
+	<string name="textInfoRemoteUri">Add text \n that has to explain \n how is the format</string>
 	
 
 </resources>

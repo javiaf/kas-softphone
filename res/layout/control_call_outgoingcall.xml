@@ -7,19 +7,26 @@
 		android:layout_width="fill_parent" android:layout_height="fill_parent"
 		android:scaleType="center" />
 
-	<TextView android:id="@+id/outgoing_call"
-		android:layout_width="wrap_content" android:layout_height="wrap_content"
-		android:layout_marginBottom="20dip" android:layout_gravity="center_horizontal|top"
-		android:padding="10dip" android:textColor="#FFFFFF" android:textStyle="bold"
-		android:textSize="25px" android:background="#00000000" android:text="@string/outgoing_call"/>
-		
-		<TextView android:text="@string/outgoing_sip" android:id="@+id/outgoing_sip"
-		android:layout_width="wrap_content" android:layout_height="wrap_content"
-		android:layout_marginBottom="20dip" android:padding="10dip" android:textColor="#FFFFFF" android:textStyle="bold"
-		android:textSize="20px" android:background="#00000000" android:layout_gravity="bottom"/>
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="vertical" android:layout_width="match_parent"
+		android:layout_height="match_parent" android:layout_gravity="center_horizontal|top">
+		<TextView android:id="@+id/outgoing_call"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_marginBottom="20dip" android:layout_gravity="center_horizontal|top"
+			android:padding="10dip" android:textColor="#FFFFFF"
+			android:textStyle="bold" android:textSize="25px" android:background="#00000000"
+			android:text="@string/outgoing_call" />
 
+		<TextView android:text="@string/outgoing_sip" android:id="@+id/outgoing_sip"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_marginBottom="20dip" android:padding="10dip"
+			android:textColor="#FFFFFF" android:textStyle="bold"
+			android:textSize="20px" android:background="#00000000"
+			android:layout_gravity="center_horizontal|top" />
+	</LinearLayout>
 	<Button android:id="@+id/button_call_reject" android:background="@drawable/ic_jog_dial_decline"
 		android:layout_alignParentBottom="true"
-		android:layout_alignParentRight="true" android:layout_gravity="right|center_horizontal|bottom" android:layout_height="wrap_content" android:layout_width="100dip"/>
+		android:layout_alignParentRight="true" android:layout_gravity="left|center_horizontal|bottom"
+		android:layout_height="wrap_content" android:layout_width="100dip" />
 
 </FrameLayout>

@@ -1,7 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
 	android:name="Context Menu">
-	<item android:icon="@drawable/ic_menu_register" android:title="@string/txt_menu_register"
-		android:id="@+id/menu_register"></item>
+
 	<item android:icon="@drawable/ic_menu_preferences" android:title="@string/txt_preferences"
 		android:id="@+id/menu_preferences">
 		<menu>
@@ -18,4 +17,6 @@
 
 	<item android:icon="@drawable/ic_menu_exit" android:title="@string/txt_exit"
 		android:id="@+id/menu_exit"></item>
+	<item android:icon="@drawable/menu_info_icon" android:title="@string/txt_menu_about"
+		android:id="@+id/menu_about"></item>
 </menu>

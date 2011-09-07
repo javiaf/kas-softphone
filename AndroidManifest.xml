@@ -20,8 +20,6 @@
 				<data android:scheme="tel" />
 				<data android:scheme="sip" />
 			</intent-filter>
-
-
 			<intent-filter>
 				<action android:name="android.intent.action.SENDTO" />
 				<category android:name="android.intent.category.DEFAULT" />
@@ -30,14 +28,21 @@
 			</intent-filter>
 
 		</activity>
+		<activity android:name="com.kurento.kas.phone.softphone.Register"
+			android:label="Register"></activity>
+		<activity android:name="com.kurento.kas.phone.historycall.HistoryCall"
+			android:label="HistoryCall"></activity>
+
+
 		<activity android:name="com.kurento.kas.phone.media.MediaControlIncoming"
-			android:label="Media Control Incoming">
+			android:label="Media Control Incoming" android:launchMode="singleInstance">
 			<action android:name="android.intent.action.MAIN" />
 
 		</activity>
 
 		<activity android:name="com.kurento.kas.phone.media.MediaControlOutgoing"
-			android:label="Media Control Outgoing">
+			android:label="Media Control Outgoing" android:launchMode="singleTop">
+			<action android:name="android.intent.action.MAIN" />
 			<!-- android:screenOrientation="portrait"> -->
 		</activity>
 
