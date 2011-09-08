@@ -31,8 +31,9 @@
 	<string name="preference_proxy_port">SIP Proxy port</string>
 	<string name="preference_proxy_port_summary">SIP Proxy TCP port where we will receive register
 	</string>
-
-	<string name="txt_video_preferences">Video Preferences</string>
+	
+	<string name="txt_call_type_preferences">Call Preferences</string>
+	<string name="txt_video_preferences">Media Preferences</string>
 	<string name="txt_video_codec_preferences">Video Codec</string>
 	
 	<string name="txt_menu_register">Register</string>

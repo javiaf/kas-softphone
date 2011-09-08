@@ -44,6 +44,7 @@ import com.kurento.kas.phone.historycall.HistoryCall;
 import com.kurento.kas.phone.historycall.ListViewHistoryItem;
 import com.kurento.kas.phone.media.MediaControlOutgoing;
 import com.kurento.kas.phone.network.NetworkIP;
+import com.kurento.kas.phone.preferences.Call_Preferences;
 import com.kurento.kas.phone.preferences.Connection_Preferences;
 import com.kurento.kas.phone.preferences.Video_Preferences;
 import com.kurento.kas.phone.sip.Controller;
@@ -559,6 +560,10 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		case (R.id.menu_video_preferences):
 			Intent remotePreferences = new Intent(this, Video_Preferences.class);
 			startActivityForResult(remotePreferences, SHOW_PREFERENCES);
+			return true;
+		case (R.id.menu_call_type_preferences):
+			Intent callPreferences = new Intent(this, Call_Preferences.class);
+			startActivityForResult(callPreferences, SHOW_PREFERENCES);
 			return true;
 		case (R.id.menu_about):
 			final Dialog dialog = new Dialog(this);

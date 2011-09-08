@@ -39,4 +39,5 @@
 				android:defaultValue="false" android:key="AAC_AUDIO_CODEC" />
 		</PreferenceScreen>
 	</PreferenceCategory>
+
 </PreferenceScreen>
