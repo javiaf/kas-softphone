@@ -93,33 +93,33 @@ public class HistoryCall extends ListActivity {
 		listViewAdapter = new ListViewAdapter(this,
 				R.layout.listview_history_call,
 				new ArrayList<ListViewHistoryItem>());
-
+		items = null;
 		if (items == null) {
 			items = new ArrayList<ListViewHistoryItem>();
 
 			if (db != null) {
-				Cursor cur = db.query(DB, null, null, null, null, null, null);
+				Cursor cur = db.query(DB, null, null, null, null, null, "idTable DESC");
 				Log.d(LOG_TAG, "Cursos = " + cur.getCount());
 				cur.moveToFirst();
 				while (cur.isAfterLast() == false) {
 
+					Boolean mType = false;
+					mType = (cur.getString(cur
+							.getColumnIndex("type")).equals("1")) ? true
+							: false;
 					ListViewHistoryItem item = new ListViewHistoryItem(
 							cur.getInt(cur.getColumnIndex("id")),
 							cur.getString(cur.getColumnIndex("uri")),
 							cur.getString(cur.getColumnIndex("name")),
-							Boolean.getBoolean(cur.getString(cur
-									.getColumnIndex("type"))),
+							mType,
 							cur.getString(cur.getColumnIndex("date")));
 					items.add(item);
+					
 					listViewAdapter.add(item);
 					cur.moveToNext();
 				}
 			}
-		} else {
-			for (int i = 0; i < items.size(); i++) {
-				listViewAdapter.add(items.get(i));
-			}
-		}
+		} 
 		setListAdapter(listViewAdapter);
 
 		ApplicationContext.contextTable.put("itemsHistory", items);
@@ -283,6 +283,7 @@ public class HistoryCall extends ListActivity {
 
 			holder.uri.setText(listViewItem.getUri());
 			holder.date.setText("   " + listViewItem.getDate());
+			Log.d(LOG_TAG, "Type = " + listViewItem.getType());
 			holder.icon.setImageBitmap(listViewItem.getType() ? mIconIn
 					: mIconOut);
 			return v;

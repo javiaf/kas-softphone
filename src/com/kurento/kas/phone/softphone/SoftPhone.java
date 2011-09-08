@@ -176,7 +176,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		super.onNewIntent(intent);
 
 		Log.d(LOG_TAG, "onNewIntent Is first or is call??");
-		
+
 		SoftPhoneService.setUpdateListener(this);
 
 		connectionType = null;
@@ -354,8 +354,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	}
 
 	private void openContacts() {
-		 Intent intentContacts = new Intent(Intent.ACTION_PICK,
-		 ContactsContract.Contacts.CONTENT_URI);
+		Intent intentContacts = new Intent(Intent.ACTION_PICK,
+				ContactsContract.Contacts.CONTENT_URI);
 		startActivityForResult(intentContacts, PICK_CONTACT_REQUEST);
 	}
 
@@ -392,38 +392,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 							"stopService " + e.getMessage() + "; "
 									+ e.toString());
 				}
-
-				// // Save DB
-				SQLiteDatabase db = (SQLiteDatabase) ApplicationContext.contextTable
-						.get("db");
-
-				// Si hemos abierto correctamente la base de datos
-
-				if (db.isOpen()) {
-					// Insertamos 5 usuarios de ejemplo
-
-					// Creamos el registro a insertar como objeto ContentValues
-
-					@SuppressWarnings("unchecked")
-					ArrayList<ListViewHistoryItem> items = (ArrayList<ListViewHistoryItem>) ApplicationContext.contextTable
-							.get("itemsHistory");
-					db.delete("DBHistoryCall", null, null);
-
-					for (int i = 0; i < items.size(); i++) {
-						ContentValues nValue = new ContentValues();
-						nValue.put("id", items.get(i).getId());
-						nValue.put("date", items.get(i).getDate());
-						nValue.put("uri", items.get(i).getUri());
-						nValue.put("name", items.get(i).getName());
-						nValue.put("type", items.get(i).getType());
-						db.insert("DBHistoryCall", null, nValue);
-						Log.d(LOG_TAG, "************insert data");
-					}
-
-					// Cerramos la base de datos
-					db.close();
-				} else
-					Log.d(LOG_TAG, "************data base closed");
 
 				ApplicationContext.contextTable.clear();
 				Log.d(LOG_TAG, " FinishUA");

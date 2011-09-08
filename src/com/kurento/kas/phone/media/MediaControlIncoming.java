@@ -8,8 +8,10 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Message;
@@ -141,10 +143,19 @@ public class MediaControlIncoming extends Activity implements
 		String dateS = date.get(Calendar.HOUR_OF_DAY) + ":" + tMinute + " "
 				+ tDay + "/" + tMonth + "/" + date.get(Calendar.YEAR);
 
-		items.add(new ListViewHistoryItem(idContact, sipUri, name, true, dateS));
+		SQLiteDatabase db = (SQLiteDatabase) ApplicationContext.contextTable
+				.get("db");
 
-		Log.d(LOG_TAG, "items size = " + items.size());
-		ApplicationContext.contextTable.put("itemsHistory", items);
+		if (db.isOpen()) {
+			ContentValues nValue = new ContentValues();
+			nValue.put("id", idContact);
+			nValue.put("date", dateS);
+			nValue.put("uri", sipUri);
+			nValue.put("name", name);
+			nValue.put("type", true);
+			db.insert("DBHistoryCall", null, nValue);
+			ApplicationContext.contextTable.put("db", db);
+		}
 	}
 
 	@Override

@@ -8,8 +8,10 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
@@ -63,12 +65,12 @@ public class MediaControlOutgoing extends Activity {
 		mNotificationMgr.cancel(NOTIF_SOFTPHONE);
 
 		Bundle extras = getIntent().getExtras();
-		
+
 		if (extras == null)
 			extras = (Bundle) ApplicationContext.contextTable.get("extrasOut");
 		else
 			ApplicationContext.contextTable.put("extrasOut", extras);
-		
+
 		String uri = (String) extras.getSerializable("Uri");
 		Integer id = (Integer) extras.getSerializable("Id");
 
@@ -120,11 +122,21 @@ public class MediaControlOutgoing extends Activity {
 		String dateS = date.get(Calendar.HOUR_OF_DAY) + ":" + tMinute + " "
 				+ tDay + "/" + tMonth + "/" + date.get(Calendar.YEAR);
 
-		items.add(new ListViewHistoryItem(id, onlyUri[1], name, false, dateS));
+		SQLiteDatabase db = (SQLiteDatabase) ApplicationContext.contextTable
+				.get("db");
 
-		Log.d(LOG_TAG, "items size = " + items.size());
-		ApplicationContext.contextTable.put("itemsHistory", items);
+		if (db.isOpen()) {
 
+			ContentValues nValue = new ContentValues();
+			nValue.put("id", id);
+			nValue.put("date", dateS);
+			nValue.put("uri", onlyUri[1]);
+			nValue.put("name", name);
+			nValue.put("type", false);
+			db.insert("DBHistoryCall", null, nValue);
+
+			ApplicationContext.contextTable.put("db", db);
+		}
 	}
 
 	@Override
@@ -178,8 +190,7 @@ public class MediaControlOutgoing extends Activity {
 
 	@Override
 	protected void onDestroy() {
-		
-		
+
 		mNotificationMgr.cancel(NOTIF_CALLING_OUT);
 		mNotif = new Notification(R.drawable.icon, notificationTitleSoft,
 				System.currentTimeMillis());
