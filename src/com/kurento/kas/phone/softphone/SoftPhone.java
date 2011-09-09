@@ -35,6 +35,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kurento.commons.mscontrol.join.Joinable.Direction;
 import com.kurento.kas.media.AudioCodecType;
 import com.kurento.kas.media.VideoCodecType;
 import com.kurento.kas.mscontrol.networkconnection.ConnectionType;
@@ -71,11 +72,13 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private String proxyIP;
 	private int proxyPort;
 	private String info_connect;
+	private Direction callDirection;
 	private String info_wifi = "Not connected";
 	private String info_3g = "Not connected";
 	private String info_video;
 	private String info_audio_aux;
 	private String info_video_aux;
+	private String info_call_type;
 
 	private ProgressDialog dialog;
 	private Intent intentService;
@@ -209,8 +212,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			Toast.makeText(SoftPhone.this,
 					"SoftPhone: Please enable any network interface.",
 					Toast.LENGTH_SHORT).show();
-			// TODO: revisar el tema de los iconos
-			// finish();
 		}
 
 	}
@@ -280,8 +281,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			public void onClick(View v) {
 				final Dialog dialog = new Dialog(v.getContext());
 				dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-				info_video = "Codecs: \n " + info_video_aux + "\n "
-						+ info_audio_aux;
+				info_video = "Codecs: \n\n" + info_video_aux + "\n\n"
+						+ info_audio_aux + " \n\n" + info_call_type;
 				dialog.setContentView(R.layout.info_video);
 				((TextView) dialog.findViewById(R.id.info_video))
 						.setText(info_video);
@@ -503,7 +504,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				initControllerUAFromSettings();
 
 			try {
-				controller.call(remoteURI);
+				controller.call(remoteURI, callDirection);
 				Intent mediaIntent = new Intent(SoftPhone.this,
 						MediaControlOutgoing.class);
 				mediaIntent.putExtra("Id", id);
@@ -640,15 +641,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		ArrayList<VideoCodecType> selectedVideoCodecs = new ArrayList<VideoCodecType>();
 		if (settings.getBoolean("H263_CODEC", false)) {
 			selectedVideoCodecs.add(VideoCodecType.H263);
-			info_video_aux = "Codec de Video:\n H263";
+			info_video_aux = "Video Codec:\n H263";
 		}
 		if (settings.getBoolean("MPEG4_CODEC", false)) {
 			selectedVideoCodecs.add(VideoCodecType.MPEG4);
-			info_video_aux = "Codec de Video:\n MPEG4";
+			info_video_aux = "Video Codec:\n MPEG4";
 		}
 		if (settings.getBoolean("H264_CODEC", false)) {
 			selectedVideoCodecs.add(VideoCodecType.H264);
-			info_video_aux = "Codec de Video:\n H264";
+			info_video_aux = "Video Codec:\n H264";
 		}
 
 		return selectedVideoCodecs;
@@ -661,15 +662,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		ArrayList<AudioCodecType> selectedAudioCodecs = new ArrayList<AudioCodecType>();
 		if (settings.getBoolean("AMR_AUDIO_CODEC", false)) {
 			selectedAudioCodecs.add(AudioCodecType.AMR);
-			info_audio_aux = "Codec de Audio:\n AMR";
+			info_audio_aux = "Audio Codec:\n AMR";
 		}
 		if (settings.getBoolean("MP2_AUDIO_CODEC", false)) {
 			selectedAudioCodecs.add(AudioCodecType.MP2);
-			info_audio_aux = "Codec de Audio:\n MP2";
+			info_audio_aux = "Audio Codec:\n MP2";
 		}
 		if (settings.getBoolean("AAC_AUDIO_CODEC", false)) {
 			selectedAudioCodecs.add(AudioCodecType.AAC);
-			info_audio_aux = "Codec de Audio:\n AAC";
+			info_audio_aux = "Audio Codec:\n AAC";
 		}
 
 		return selectedAudioCodecs;
@@ -687,6 +688,29 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			info_connect = "Connecting ... \n\n User: \n " + localUser + "@"
 					+ localRealm + "\n\n Server:\n " + proxyIP + ":"
 					+ proxyPort;
+
+			Direction callDirectionRemote = Direction.DUPLEX;
+			String direction = settings.getString("CALL_DIRECTION",
+					"SEND/RECEIVE");
+			if (direction.equals("SEND ONLY")) {
+				callDirection = Direction.SEND;
+				callDirectionRemote = Direction.RECV;
+				info_call_type = "Call Direction:\n SEND ONLY";
+			}
+			if (direction.equals("RECEIVE ONLY")) {
+				callDirection = Direction.RECV;
+				callDirectionRemote = Direction.SEND;
+				info_call_type = "Call Direction:\n RECEIVE ONLY";
+			}
+			if (direction.equals("SEND/RECEIVE")) {
+				callDirection = Direction.DUPLEX;
+				callDirectionRemote = Direction.DUPLEX;
+				info_call_type = "Call Direction:\n SEND/RECEIVE";
+			}
+			// TODO: ESTE APLICATION CONTEXT SE DEBE ELIMINAR, SÓLO SIRVE PARA
+			// EMULAR EL GETDIRECTION DEL SIPCALL
+			ApplicationContext.contextTable.put("callDirectionRemote",
+					callDirection);
 
 			this.audioCodecs = getAudioCodecsFromSettings();
 			this.videoCodecs = getVideoCodecsFromSettings();
@@ -722,7 +746,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			Toast.makeText(SoftPhone.this,
 					"SoftPhone: Please enable any network interface.",
 					Toast.LENGTH_SHORT).show();
-			// TODO: CAMBIAR ICONOS DE RED
 			return false;
 		}
 

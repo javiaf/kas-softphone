@@ -20,6 +20,7 @@ import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.media.MediaControlIncoming;
 import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.videocall.VideoCallService;
+import com.kurento.commons.mscontrol.join.Joinable.Direction;
 
 public class SoftPhoneService extends Service implements CallListener {
 	private static final String LOG_TAG = "SoftPhoneService";
@@ -136,7 +137,7 @@ public class SoftPhoneService extends Service implements CallListener {
 	}
 
 	@Override
-	public void callSetup(NetworkConnection networkConnection) {
+	public void callSetup(NetworkConnection networkConnection, Direction direction) {
 		ApplicationContext.contextTable.put("networkConnection",
 				networkConnection);
 
@@ -147,6 +148,7 @@ public class SoftPhoneService extends Service implements CallListener {
 		handler.sendMessage(msg);
 
 		videoCallIntent = new Intent(this, VideoCallService.class);
+		ApplicationContext.contextTable.put("callDirectionRemote", direction);
 		videoCallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		Log.d(LOG_TAG, "Start Service " + videoCallIntent);
 		startService(videoCallIntent);

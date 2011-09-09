@@ -39,6 +39,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private static final int SHOW_PREFERENCES = 1;
 	private PowerManager.WakeLock wl;
 	private boolean hang = false;
+	private Direction direction;
 
 	MediaComponent videoPlayerComponent = null;
 	MediaComponent videoRecorderComponent = null;
@@ -46,7 +47,22 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.videocall);
+		// TODO: Control de XML según tipo de llamada
+
+		direction = (Direction) ApplicationContext.contextTable
+				.get("callDirectionRemote");
+
+		if (direction == null)
+			direction = Direction.DUPLEX;
+		
+		Log.d(LOG_TAG, "Direction = " + direction);
+		
+		if (direction.equals(Direction.SEND))
+			setContentView(R.layout.videocall_send);
+		else if (direction.equals(Direction.RECV))
+			setContentView(R.layout.videocall_receive);
+		else if (direction.equals(Direction.DUPLEX))
+			setContentView(R.layout.videocall);
 
 		VideoCallService.setUpdateListener(this);
 		hang = false;
@@ -57,7 +73,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 		Controller controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
-		// FIXME controller != null
+
 		if (controller != null) {
 			MediaSession mediaSession = controller.getMediaSession();
 			try {
@@ -65,29 +81,35 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				getWindowManager().getDefaultDisplay().getMetrics(dm);
 				int Orientation = getWindowManager().getDefaultDisplay()
 						.getOrientation();
-
 				Log.d(LOG_TAG, "W: " + dm.widthPixels + " H:" + dm.heightPixels
 						+ " Orientation = " + Orientation);
 
-				Parameters params = new ParametersImpl();
-				params.put(MediaComponentAndroid.PREVIEW_SURFACE,
-						(View) findViewById(R.id.video_capture_surface));
-				params.put(MediaComponentAndroid.DISPLAY_ORIENTATION,
-						Orientation);
+				if (direction.equals(Direction.SEND)
+						|| direction.equals(Direction.DUPLEX)) {
 
-				videoPlayerComponent = mediaSession.createMediaComponent(
-						MediaComponentAndroid.VIDEO_PLAYER, params);
+					Parameters params = new ParametersImpl();
+					params.put(MediaComponentAndroid.PREVIEW_SURFACE,
+							(View) findViewById(R.id.video_capture_surface));
+					params.put(MediaComponentAndroid.DISPLAY_ORIENTATION,
+							Orientation);
+					videoPlayerComponent = mediaSession.createMediaComponent(
+							MediaComponentAndroid.VIDEO_PLAYER, params);
+				}
+				if (direction.equals(Direction.RECV)
+						|| direction.equals(Direction.DUPLEX)) {
 
-				params = new ParametersImpl();
-				params.put(MediaComponentAndroid.VIEW_SURFACE,
-						(View) findViewById(R.id.video_receive_surface));
-				params.put(MediaComponentAndroid.DISPLAY_WIDTH, dm.widthPixels);
-				params.put(MediaComponentAndroid.DISPLAY_HEIGHT,
-						dm.heightPixels);
-				videoRecorderComponent = mediaSession.createMediaComponent(
-						MediaComponentAndroid.VIDEO_RECORDER, params);
+					Parameters params = new ParametersImpl();
+					params = new ParametersImpl();
+					params.put(MediaComponentAndroid.VIEW_SURFACE,
+							(View) findViewById(R.id.video_receive_surface));
+					params.put(MediaComponentAndroid.DISPLAY_WIDTH,
+							dm.widthPixels);
+					params.put(MediaComponentAndroid.DISPLAY_HEIGHT,
+							dm.heightPixels);
+					videoRecorderComponent = mediaSession.createMediaComponent(
+							MediaComponentAndroid.VIDEO_RECORDER, params);
+				}
 			} catch (MsControlException e) {
-				// TODO Auto-generated catch block
 				Log.e(LOG_TAG, e.getMessage());
 				e.printStackTrace();
 			} catch (Exception e) {
@@ -99,7 +121,6 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 	@Override
 	protected void onNewIntent(Intent intent) {
-		// TODO Auto-generated method stub
 		super.onNewIntent(intent);
 		Log.d(LOG_TAG, "OnNewIntent");
 	}

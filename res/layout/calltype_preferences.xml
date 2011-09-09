@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory android:title="Call Preferences">
+		<ListPreference android:key="CALL_DIRECTION" android:title="Call direction"
+			android:summary="Select call direction" android:entries="@array/call_direction"
+			android:entryValues="@array/call_direction" android:defaultValue="SEND/RECEIVE"
+			android:dialogTitle="Select call direction" />
+	</PreferenceCategory>
+</PreferenceScreen>
+	

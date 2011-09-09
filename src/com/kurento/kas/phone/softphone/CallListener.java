@@ -1,7 +1,7 @@
 package com.kurento.kas.phone.softphone;
 
 import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
-
+import com.kurento.commons.mscontrol.join.Joinable.Direction;
 /**
  * 
  * @author Miguel París Díaz
@@ -15,7 +15,7 @@ public interface CallListener {
 
 	public void registerUserFailed();
 
-	public void callSetup(NetworkConnection networkConnection);
+	public void callSetup(NetworkConnection networkConnection, Direction direction);
 
 	public void callTerminate();
 

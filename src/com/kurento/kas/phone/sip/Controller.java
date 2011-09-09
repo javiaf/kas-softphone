@@ -24,6 +24,7 @@ import com.kurento.kas.mscontrol.MediaSessionAndroid;
 import com.kurento.kas.mscontrol.ParametersImpl;
 import com.kurento.kas.mscontrol.networkconnection.ConnectionType;
 import com.kurento.commons.mscontrol.join.Joinable.Direction;
+import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.softphone.CallListener;
 import com.kurento.kas.phone.softphone.CallNotifier;
 import com.kurento.kas.phone.softphone.IPhone;
@@ -107,8 +108,31 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			this.pendingEndPointEvent = event;
 			incomingCall = pendingEndPointEvent.getCallSource();
 			incomingCall.addListener(this);
-			try {
 
+			try {
+				// TODO: SOLO SIRVE PARA SIMULAR
+
+				Direction d = (Direction) ApplicationContext.contextTable
+						.get("callDirectionRemote");
+				if (d == null)
+					d = Direction.DUPLEX;
+
+				if (d.equals(Direction.SEND)){
+					ApplicationContext.contextTable.put("callDirectionRemote",
+							Direction.RECV);
+				}
+				if (d.equals(Direction.RECV)){
+					ApplicationContext.contextTable.put("callDirectionRemote",
+							Direction.SEND);
+				}
+				if (d.equals(Direction.DUPLEX)){
+					ApplicationContext.contextTable.put("callDirectionRemote",
+							Direction.DUPLEX);
+				}
+
+				Log.d(LOG_TAG, "Direction Invite " + (Direction) ApplicationContext.contextTable
+						.get("callDirectionRemote"));
+				
 				Log.d(LOG_TAG, "Call Source: "
 						+ event.getCallSource().toString());
 				Log.d(LOG_TAG, "Me llama Uri: "
@@ -149,12 +173,25 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		Log.d(LOG_TAG, "onEvent  SipCallEvent: " + eventType.toString());
 
 		if (SipCallEvent.CALL_SETUP.equals(eventType)) {
+
+			// TODO: SIMULAR DESDE CURRENTCALL.GETDIRECTION ( ME DARÁ LA
+			// DIRECCIÓN QUE TENGO QUE USAR)
+
+			Direction d = (Direction) ApplicationContext.contextTable
+					.get("callDirectionRemote");
+			if (d == null)
+				d = Direction.DUPLEX;
+			
+			Log.d(LOG_TAG, "DIRECTION SETUP  " + d);
+
 			currentCall = event.getSource();
 			Log.d(LOG_TAG, "Setting currentCall");
 			if (callListener != null) {
 				Log.d(LOG_TAG, "currentCall.getNetworkConnection(null): "
 						+ currentCall.getNetworkConnection(null));
-				callListener.callSetup(currentCall.getNetworkConnection(null));
+
+				callListener.callSetup(currentCall.getNetworkConnection(null),
+						d);
 			}
 		} else if (SipCallEvent.CALL_TERMINATE.equals(eventType)) {
 			Log.d(LOG_TAG, "Call Terminate");
@@ -189,9 +226,9 @@ public class Controller implements SipEndPointListener, SipCallListener,
 	}
 
 	@Override
-	public void call(String remoteURI) throws Exception {
+	public void call(String remoteURI, Direction direction) throws Exception {
 		Log.d(LOG_TAG, "calling..." + remoteURI);
-		currentCall = endPoint.dial(remoteURI, Direction.DUPLEX, this);
+		currentCall = endPoint.dial(remoteURI, direction, this);
 	}
 
 	@Override

@@ -145,16 +145,17 @@ public class MediaControlIncoming extends Activity implements
 
 		SQLiteDatabase db = (SQLiteDatabase) ApplicationContext.contextTable
 				.get("db");
-
-		if (db.isOpen()) {
-			ContentValues nValue = new ContentValues();
-			nValue.put("id", idContact);
-			nValue.put("date", dateS);
-			nValue.put("uri", sipUri);
-			nValue.put("name", name);
-			nValue.put("type", true);
-			db.insert("DBHistoryCall", null, nValue);
-			ApplicationContext.contextTable.put("db", db);
+		if (db != null) {
+			if (db.isOpen()) {
+				ContentValues nValue = new ContentValues();
+				nValue.put("id", idContact);
+				nValue.put("date", dateS);
+				nValue.put("uri", sipUri);
+				nValue.put("name", name);
+				nValue.put("type", true);
+				db.insert("DBHistoryCall", null, nValue);
+				ApplicationContext.contextTable.put("db", db);
+			}
 		}
 	}
 

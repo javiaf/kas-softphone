@@ -1,6 +1,5 @@
 package com.kurento.kas.phone.videocall;
 
-
 import com.kurento.kas.phone.softphone.R;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -33,18 +32,18 @@ public class VideoCallService extends Service {
 
 	MediaComponentAndroid audioPlayerComponent = null;
 	MediaComponentAndroid audioRecorderComponent = null;
-	
 
 	private NotificationManager mNotificationMgr;
 	private final static int NOTIF_VIDEOCALL = 2;
 	private final static int NOTIF_SOFTPHONE = 1;
-	
+
 	private Notification mNotif;
 	private PendingIntent mNotifContentIntent;
 	private Intent notifIntent;
 	private String notificationTitle = "VideoCall";
 	private String notificationTitleSoft = "KurentoPhone";
-	
+
+	private Direction direction;
 	private Intent videoCallIntent;
 
 	@Override
@@ -56,11 +55,12 @@ public class VideoCallService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		Log.d(LOG_TAG, "VideoCallService Create");
+
 		mNotificationMgr = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		mNotif = new Notification(R.drawable.ic_jog_dial_answer, notificationTitle,
-				System.currentTimeMillis());
+		mNotif = new Notification(R.drawable.ic_jog_dial_answer,
+				notificationTitle, System.currentTimeMillis());
 		mNotif.flags |= Notification.FLAG_ONGOING_EVENT;
 
 		notifIntent = new Intent(this, VideoCall.class);
@@ -71,9 +71,15 @@ public class VideoCallService extends Service {
 
 		mNotificationMgr.notify(NOTIF_VIDEOCALL, mNotif);
 		mNotificationMgr.cancel(NOTIF_SOFTPHONE);
-		
+
+		direction = (Direction) ApplicationContext.contextTable
+				.get("callDirectionRemote");
 		Controller controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
+		if (direction == null) {
+			Log.e(LOG_TAG, "direccion is NULL");
+			direction = Direction.DUPLEX;
+		}
 		if (controller == null) {
 			Log.e(LOG_TAG, "controller is NULL");
 			return;
@@ -81,42 +87,60 @@ public class VideoCallService extends Service {
 		MediaSessionAndroid mediaSession = controller.getMediaSession();
 
 		try {
-			audioPlayerComponent = mediaSession.createMediaComponent(MediaComponentAndroid.AUDIO_PLAYER, Parameters.NO_PARAMETER);
-			
-			Parameters params = new ParametersImpl();
-			params.put(MediaComponentAndroid.STREAM_TYPE, AudioManager.STREAM_MUSIC);
-			audioRecorderComponent = mediaSession.createMediaComponent(MediaComponentAndroid.AUDIO_RECORDER, params);
+			if (direction.equals(Direction.SEND)
+					|| direction.equals(Direction.DUPLEX)) {
+				audioPlayerComponent = mediaSession.createMediaComponent(
+						MediaComponentAndroid.AUDIO_PLAYER,
+						Parameters.NO_PARAMETER);
+				ApplicationContext.contextTable.put("audioPlayerComponent",
+						audioPlayerComponent);
+			}
+
+			if (direction.equals(Direction.RECV)
+					|| direction.equals(Direction.DUPLEX)) {
+				Parameters params = new ParametersImpl();
+				params.put(MediaComponentAndroid.STREAM_TYPE,
+						AudioManager.STREAM_MUSIC);
+				audioRecorderComponent = mediaSession.createMediaComponent(
+						MediaComponentAndroid.AUDIO_RECORDER, params);
+				ApplicationContext.contextTable.put("audioRecorderComponent",
+						audioRecorderComponent);
+			}
 		} catch (MsControlException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		ApplicationContext.contextTable.put("audioPlayerComponent", audioPlayerComponent);
-		ApplicationContext.contextTable.put("audioRecorderComponent", audioRecorderComponent);
+
 	}
 
 	@Override
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
-		
+
 		NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
-		.get("networkConnection");
+				.get("networkConnection");
 		if (nc == null) {
 			Log.e(LOG_TAG, "networkConnection is NULL");
 			return;
 		}
-		
+
 		try {
-			if (audioPlayerComponent != null) {
-				audioPlayerComponent.join(Direction.SEND,
-						nc.getJoinableStream(StreamType.audio));
-				audioPlayerComponent.start();
+			if (direction.equals(Direction.SEND)
+					|| direction.equals(Direction.DUPLEX)) {
+				if (audioPlayerComponent != null) {
+					audioPlayerComponent.join(Direction.SEND,
+							nc.getJoinableStream(StreamType.audio));
+					audioPlayerComponent.start();
+				}
 			}
-			if (audioRecorderComponent != null) {
-				audioRecorderComponent.join(Direction.RECV,
-						nc.getJoinableStream(StreamType.audio));
-				audioRecorderComponent.start();
+
+			if (direction.equals(Direction.RECV)
+					|| direction.equals(Direction.DUPLEX)) {
+				if (audioRecorderComponent != null) {
+					audioRecorderComponent.join(Direction.RECV,
+							nc.getJoinableStream(StreamType.audio));
+					audioRecorderComponent.start();
+				}
 			}
-			
 		} catch (MsControlException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -130,11 +154,11 @@ public class VideoCallService extends Service {
 	@Override
 	public void onDestroy() {
 		Log.d(LOG_TAG, "On Destroy");
-		
+
 		mNotificationMgr.cancel(NOTIF_VIDEOCALL);
 		mNotif = new Notification(R.drawable.icon, notificationTitleSoft,
 				System.currentTimeMillis());
-		
+
 		notifIntent = new Intent(this, SoftPhone.class);
 		mNotifContentIntent = PendingIntent
 				.getActivity(this, 0, notifIntent, 0);
@@ -142,26 +166,24 @@ public class VideoCallService extends Service {
 				mNotifContentIntent);
 
 		mNotificationMgr.notify(NOTIF_SOFTPHONE, mNotif);
-		
-			
+
 		if (audioPlayerComponent != null)
 			audioPlayerComponent.stop();
 
 		if (audioRecorderComponent != null)
 			audioRecorderComponent.stop();
-		
-		
+
 		Message msg = new Message();
 		Bundle b = new Bundle();
 		b.putString("Call", "Terminate");
 		msg.setData(b);
 		handler.sendMessage(msg);
-		
+
 		super.onDestroy();
 	}
-	
+
 	public static ServiceUpdateUIListener UI_UPDATE_LISTENER_VIDEOCALL;
-	
+
 	public static void setUpdateListener(ServiceUpdateUIListener l) {
 		UI_UPDATE_LISTENER_VIDEOCALL = l;
 	}
