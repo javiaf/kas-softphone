@@ -96,7 +96,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 
 	private void register(String localUser, String localRealm) throws Exception {
 		Log.d(LOG_TAG, "localUser: " + localUser + "; localReal: " + localRealm);
-		endPoint = ua.registerEndPoint(localUser, localRealm, null, 20, this);
+		endPoint = ua.registerEndPoint(localUser, localRealm, null, 3600, this);
 	}
 
 	@Override
