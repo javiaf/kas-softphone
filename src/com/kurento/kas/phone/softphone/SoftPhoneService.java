@@ -137,7 +137,8 @@ public class SoftPhoneService extends Service implements CallListener {
 	}
 
 	@Override
-	public void callSetup(NetworkConnection networkConnection, Direction direction) {
+	public void callSetup(NetworkConnection networkConnection,
+			Direction direction) {
 		ApplicationContext.contextTable.put("networkConnection",
 				networkConnection);
 
@@ -169,6 +170,11 @@ public class SoftPhoneService extends Service implements CallListener {
 		b.putString("finishActivity", "MEDIA_CONTROL_OUTGOING");
 		msg.setData(b);
 		handler.sendMessage(msg);
+		msg = new Message();
+		b = new Bundle();
+		b.putString("Call", "Reject");
+		msg.setData(b);
+		handler.sendMessage(msg);
 	}
 
 	@Override
@@ -184,7 +190,8 @@ public class SoftPhoneService extends Service implements CallListener {
 	public static ArrayList<ServiceUpdateUIListener> UI_UPDATE_LISTENERS = new ArrayList<ServiceUpdateUIListener>();
 
 	public static void setUpdateListener(ServiceUpdateUIListener l) {
-		UI_UPDATE_LISTENERS.add(l);
+		if (!UI_UPDATE_LISTENERS.contains(l))
+			UI_UPDATE_LISTENERS.add(l);
 	}
 
 	private Handler handler = new Handler() {

@@ -117,29 +117,41 @@ public class Controller implements SipEndPointListener, SipCallListener,
 				if (d == null)
 					d = Direction.DUPLEX;
 
-				if (d.equals(Direction.SEND)){
+				if (d.equals(Direction.SEND)) {
 					ApplicationContext.contextTable.put("callDirectionRemote",
 							Direction.RECV);
 				}
-				if (d.equals(Direction.RECV)){
+				if (d.equals(Direction.RECV)) {
 					ApplicationContext.contextTable.put("callDirectionRemote",
 							Direction.SEND);
 				}
-				if (d.equals(Direction.DUPLEX)){
+				if (d.equals(Direction.DUPLEX)) {
 					ApplicationContext.contextTable.put("callDirectionRemote",
 							Direction.DUPLEX);
 				}
 
-				Log.d(LOG_TAG, "Direction Invite " + (Direction) ApplicationContext.contextTable
-						.get("callDirectionRemote"));
-				
+				Log.d(LOG_TAG,
+						"Direction Invite "
+								+ (Direction) ApplicationContext.contextTable
+										.get("callDirectionRemote"));
+
 				Log.d(LOG_TAG, "Call Source: "
 						+ event.getCallSource().toString());
-				Log.d(LOG_TAG, "Me llama Uri: "
-						+ event.getCallSource().getRemoteUri());
-				if (callListener != null)
-					callListener.incomingCall(event.getCallSource()
-							.getRemoteUri());
+
+				String getCallSource = (String) ApplicationContext.contextTable
+						.get("getCallSource");
+
+				if (getCallSource == null) {
+					ApplicationContext.contextTable.put("getCallSource", event
+							.getCallSource().toString());
+					Log.d(LOG_TAG, "Me llama Uri: "
+							+ event.getCallSource().getRemoteUri());
+					if (callListener != null)
+						callListener.incomingCall(event.getCallSource()
+								.getRemoteUri());
+				} else {
+					reject();
+				}
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.toString());
 				e.printStackTrace();
@@ -181,7 +193,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 					.get("callDirectionRemote");
 			if (d == null)
 				d = Direction.DUPLEX;
-			
+
 			Log.d(LOG_TAG, "DIRECTION SETUP  " + d);
 
 			currentCall = event.getSource();
@@ -222,6 +234,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 
 	@Override
 	public void reject() throws Exception {
+		ApplicationContext.contextTable.remove("getCallSource");
 		pendingEndPointEvent.getCallSource().reject();
 	}
 
@@ -236,6 +249,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		Log.d(LOG_TAG, "hanging...");
 		if (currentCall != null)
 			try {
+				ApplicationContext.contextTable.remove("getCallSource");
 				currentCall.hangup();
 			} catch (ServerInternalErrorException e) {
 				e.printStackTrace();
@@ -247,6 +261,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		Log.d(LOG_TAG, "canceling...");
 		if (currentCall != null)
 			try {
+				ApplicationContext.contextTable.remove("getCallSource");
 				currentCall.cancel();
 			} catch (ServerInternalErrorException e) {
 				e.printStackTrace();

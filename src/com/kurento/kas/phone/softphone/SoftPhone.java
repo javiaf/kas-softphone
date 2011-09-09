@@ -689,22 +689,19 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					+ localRealm + "\n\n Server:\n " + proxyIP + ":"
 					+ proxyPort;
 
-			Direction callDirectionRemote = Direction.DUPLEX;
+			
 			String direction = settings.getString("CALL_DIRECTION",
 					"SEND/RECEIVE");
 			if (direction.equals("SEND ONLY")) {
 				callDirection = Direction.SEND;
-				callDirectionRemote = Direction.RECV;
 				info_call_type = "Call Direction:\n SEND ONLY";
 			}
 			if (direction.equals("RECEIVE ONLY")) {
 				callDirection = Direction.RECV;
-				callDirectionRemote = Direction.SEND;
 				info_call_type = "Call Direction:\n RECEIVE ONLY";
 			}
 			if (direction.equals("SEND/RECEIVE")) {
 				callDirection = Direction.DUPLEX;
-				callDirectionRemote = Direction.DUPLEX;
 				info_call_type = "Call Direction:\n SEND/RECEIVE";
 			}
 			// TODO: ESTE APLICATION CONTEXT SE DEBE ELIMINAR, SÓLO SIRVE PARA
@@ -787,6 +784,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					.equals("MEDIA_CONTROL_OUTGOING")) {
 				Log.d(LOG_TAG, "Finish Activity MEDIA_CONTROL_OUTGOING");
 				finishActivity(MEDIA_CONTROL_OUTGOING);
+			}
+		}else if (message.getData().containsKey("Call")) {
+			if (message.getData().getString("Call")
+					.equals("Reject")) {
+				Log.d(LOG_TAG, "cALL rEJECT");
+				Toast.makeText(SoftPhone.this, "The call was rejected", Toast.LENGTH_LONG).show();
 			}
 		}
 
