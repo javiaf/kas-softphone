@@ -1,3 +1,6 @@
 .classpath
 .settings/
 target/
+bin/
+kas-mscontrol_src/
+kas-media_src/
