@@ -12,6 +12,12 @@
 		<item>SEND ONLY</item>
 		<item>RECEIVE ONLY</item>
 	</string-array>
+	
+	<string-array name="call_audio_direction">
+		<item>SEND/RECEIVE</item>
+		<item>SEND ONLY</item>
+		<item>RECEIVE ONLY</item>
+	</string-array>
 
 	<string-array name="video_sizes">
 		<item>176 x 144 (QCIF)</item>
