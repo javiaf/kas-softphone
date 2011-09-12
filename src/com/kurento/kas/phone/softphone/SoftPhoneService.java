@@ -96,6 +96,8 @@ public class SoftPhoneService extends Service implements CallListener {
 		Log.d(LOG_TAG, "onDestroy");
 		mNotificationMgr.cancel(NOTIF_SOFTPHONE);
 		mNotificationMgr.cancel(NOTIF_VIDEOCALL);
+		if (UI_UPDATE_LISTENERS != null)
+			UI_UPDATE_LISTENERS.clear();
 		try {
 			stopService(videoCallIntent);
 		} catch (Exception e) {
