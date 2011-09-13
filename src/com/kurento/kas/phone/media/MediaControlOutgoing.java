@@ -27,7 +27,6 @@ import com.kurento.kas.phone.historycall.ListViewHistoryItem;
 import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.softphone.R;
 import com.kurento.kas.phone.softphone.SoftPhone;
-import com.kurento.kas.phone.videocall.VideoCall;
 
 public class MediaControlOutgoing extends Activity {
 	private static final String LOG_TAG = "MediaControlOutgoing";
@@ -124,18 +123,19 @@ public class MediaControlOutgoing extends Activity {
 
 		SQLiteDatabase db = (SQLiteDatabase) ApplicationContext.contextTable
 				.get("db");
+		if (db != null) {
+			if (db.isOpen()) {
 
-		if (db.isOpen()) {
+				ContentValues nValue = new ContentValues();
+				nValue.put("id", id);
+				nValue.put("date", dateS);
+				nValue.put("uri", onlyUri[1]);
+				nValue.put("name", name);
+				nValue.put("type", false);
+				db.insert("DBHistoryCall", null, nValue);
 
-			ContentValues nValue = new ContentValues();
-			nValue.put("id", id);
-			nValue.put("date", dateS);
-			nValue.put("uri", onlyUri[1]);
-			nValue.put("name", name);
-			nValue.put("type", false);
-			db.insert("DBHistoryCall", null, nValue);
-
-			ApplicationContext.contextTable.put("db", db);
+				ApplicationContext.contextTable.put("db", db);
+			}
 		}
 	}
 

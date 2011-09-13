@@ -2,26 +2,24 @@ package com.kurento.kas.phone.softphone;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.PhoneLookup;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -35,7 +33,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kurento.commons.mscontrol.join.Joinable.Direction;
+import com.kurento.commons.sdp.enums.MediaType;
+import com.kurento.commons.sdp.enums.Mode;
 import com.kurento.kas.media.AudioCodecType;
 import com.kurento.kas.media.VideoCodecType;
 import com.kurento.kas.mscontrol.networkconnection.ConnectionType;
@@ -61,6 +60,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	private ArrayList<AudioCodecType> audioCodecs;
 	private ArrayList<VideoCodecType> videoCodecs;
+	private Map<MediaType, Mode> callDirectionMap;
 	private InetAddress localAddress;
 	private ConnectionType connectionType;
 	// ConnectivityManager ConnectManager;
@@ -72,7 +72,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private String proxyIP;
 	private int proxyPort;
 	private String info_connect;
-	private Direction callDirection;
+	
 	private String info_wifi = "Not connected";
 	private String info_3g = "Not connected";
 	private String info_video;
@@ -504,7 +504,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				initControllerUAFromSettings();
 
 			try {
-				controller.call(remoteURI, callDirection);
+				controller.call(remoteURI);
 				Intent mediaIntent = new Intent(SoftPhone.this,
 						MediaControlOutgoing.class);
 				mediaIntent.putExtra("Id", id);
@@ -676,6 +676,44 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		return selectedAudioCodecs;
 	}
 
+	private Map<MediaType, Mode> getCallDirectionMapFromSettings() {
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(getBaseContext());
+		Map<MediaType, Mode> callDirection = new HashMap<MediaType, Mode>();
+
+		String videoDirection = settings.getString("CALL_VIDEO_DIRECTION",
+				"SEND/RECEIVE");
+		if (videoDirection.equals("SEND ONLY")) {
+			callDirection.put(MediaType.VIDEO, Mode.SENDONLY);
+			info_call_type = "Call Video Direction:\n SEND ONLY\n";
+		}
+		if (videoDirection.equals("RECEIVE ONLY")) {
+			callDirection.put(MediaType.VIDEO, Mode.RECVONLY);
+			info_call_type = "Call Video Direction:\n RECEIVE ONLY\n";
+		}
+		if (videoDirection.equals("SEND/RECEIVE")) {
+			callDirection.put(MediaType.VIDEO, Mode.SENDRECV);
+			info_call_type = "Call Video Direction:\n SEND/RECEIVE\n";
+		}
+
+		String audioDirection = settings.getString("CALL_AUDIO_DIRECTION",
+				"SEND/RECEIVE");
+		if (audioDirection.equals("SEND ONLY")) {
+			callDirection.put(MediaType.AUDIO, Mode.SENDONLY);
+			info_call_type += "Call Audio Direction:\n SEND ONLY";
+		}
+		if (audioDirection.equals("RECEIVE ONLY")) {
+			callDirection.put(MediaType.AUDIO, Mode.RECVONLY);
+			info_call_type += "Call Audio Direction:\n RECEIVE ONLY";
+		}
+		if (audioDirection.equals("SEND/RECEIVE")) {
+			callDirection.put(MediaType.AUDIO, Mode.SENDRECV);
+			info_call_type += "Call Audio Direction:\n SEND/RECEIVE";
+		}
+
+		return callDirection;
+	}
+
 	private boolean getPreferences() {
 		try {
 			SharedPreferences settings = PreferenceManager
@@ -689,25 +727,10 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					+ localRealm + "\n\n Server:\n " + proxyIP + ":"
 					+ proxyPort;
 
-			
-			String direction = settings.getString("CALL_DIRECTION",
-					"SEND/RECEIVE");
-			if (direction.equals("SEND ONLY")) {
-				callDirection = Direction.SEND;
-				info_call_type = "Call Direction:\n SEND ONLY";
-			}
-			if (direction.equals("RECEIVE ONLY")) {
-				callDirection = Direction.RECV;
-				info_call_type = "Call Direction:\n RECEIVE ONLY";
-			}
-			if (direction.equals("SEND/RECEIVE")) {
-				callDirection = Direction.DUPLEX;
-				info_call_type = "Call Direction:\n SEND/RECEIVE";
-			}
-			// TODO: ESTE APLICATION CONTEXT SE DEBE ELIMINAR, SÓLO SIRVE PARA
-			// EMULAR EL GETDIRECTION DEL SIPCALL
-			ApplicationContext.contextTable.put("callDirectionRemote",
-					callDirection);
+			callDirectionMap = getCallDirectionMapFromSettings();
+
+			ApplicationContext.contextTable.put("callDirection",
+					callDirectionMap);
 
 			this.audioCodecs = getAudioCodecsFromSettings();
 			this.videoCodecs = getVideoCodecsFromSettings();
@@ -760,7 +783,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					+ proxyPort + " ConnectionType = " + connectionType);
 
 			controller.initUA(audioCodecs, videoCodecs, localAddress,
-					connectionType, proxyIP, proxyPort, localUser, localRealm);
+					connectionType, callDirectionMap, proxyIP, proxyPort, localUser, localRealm);
 			ApplicationContext.contextTable.put("controller", controller);
 			Log.e(LOG_TAG, "put controller in context");
 		} catch (Exception e) {
@@ -785,11 +808,11 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				Log.d(LOG_TAG, "Finish Activity MEDIA_CONTROL_OUTGOING");
 				finishActivity(MEDIA_CONTROL_OUTGOING);
 			}
-		}else if (message.getData().containsKey("Call")) {
-			if (message.getData().getString("Call")
-					.equals("Reject")) {
+		} else if (message.getData().containsKey("Call")) {
+			if (message.getData().getString("Call").equals("Reject")) {
 				Log.d(LOG_TAG, "cALL rEJECT");
-				Toast.makeText(SoftPhone.this, "The call was rejected", Toast.LENGTH_LONG).show();
+				Toast.makeText(SoftPhone.this, "The call was rejected",
+						Toast.LENGTH_LONG).show();
 			}
 		}
 
@@ -831,7 +854,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					info_wifi = "Wifi enable. \n IP: \n " + lAddressNew;
 					info_3g = "Not connected";
 					if (lAddress != null)
-						if (lAddressNew.equals(lAddress))
+						if (lAddress.equals(lAddressNew))
 							isAddressEqual = true;
 						else
 							isAddressEqual = false;
@@ -850,7 +873,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					info_wifi = "Not connected";
 					info_3g = "3G enable. \n IP: \n " + lAddressNew;
 					if (lAddress != null)
-						if (lAddressNew.equals(lAddress))
+						if (lAddress.equals(lAddressNew))
 							isAddressEqual = true;
 						else
 							isAddressEqual = false;

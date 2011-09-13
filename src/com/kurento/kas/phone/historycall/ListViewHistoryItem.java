@@ -1,6 +1,5 @@
 package com.kurento.kas.phone.historycall;
 
-import java.util.Calendar;
 
 public class ListViewHistoryItem {
 	

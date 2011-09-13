@@ -1,6 +1,7 @@
 package com.kurento.kas.phone.videocall;
 
-import com.kurento.kas.phone.softphone.R;
+import java.util.Map;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -19,11 +20,14 @@ import com.kurento.commons.mscontrol.Parameters;
 import com.kurento.commons.mscontrol.join.Joinable.Direction;
 import com.kurento.commons.mscontrol.join.JoinableStream.StreamType;
 import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
+import com.kurento.commons.sdp.enums.MediaType;
+import com.kurento.commons.sdp.enums.Mode;
 import com.kurento.kas.mscontrol.MediaSessionAndroid;
 import com.kurento.kas.mscontrol.ParametersImpl;
 import com.kurento.kas.mscontrol.mediacomponent.MediaComponentAndroid;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.sip.Controller;
+import com.kurento.kas.phone.softphone.R;
 import com.kurento.kas.phone.softphone.ServiceUpdateUIListener;
 import com.kurento.kas.phone.softphone.SoftPhone;
 
@@ -43,7 +47,7 @@ public class VideoCallService extends Service {
 	private String notificationTitle = "VideoCall";
 	private String notificationTitleSoft = "KurentoPhone";
 
-	private Direction direction;
+	private Map<MediaType, Mode> callDirectionMap;
 	private Intent videoCallIntent;
 
 	@Override
@@ -51,6 +55,7 @@ public class VideoCallService extends Service {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -72,23 +77,27 @@ public class VideoCallService extends Service {
 		mNotificationMgr.notify(NOTIF_VIDEOCALL, mNotif);
 		mNotificationMgr.cancel(NOTIF_SOFTPHONE);
 
-		direction = (Direction) ApplicationContext.contextTable
-				.get("callDirectionRemote");
+		callDirectionMap = (Map<MediaType, Mode>) ApplicationContext.contextTable
+				.get("callDirection");
 		Controller controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
-		if (direction == null) {
+		if (callDirectionMap == null) {
 			Log.e(LOG_TAG, "direccion is NULL");
-			direction = Direction.DUPLEX;
+			return;
 		}
 		if (controller == null) {
 			Log.e(LOG_TAG, "controller is NULL");
 			return;
 		}
+
 		MediaSessionAndroid mediaSession = controller.getMediaSession();
 
 		try {
-			if (direction.equals(Direction.SEND)
-					|| direction.equals(Direction.DUPLEX)) {
+			Mode audioMode = callDirectionMap.get(MediaType.AUDIO);
+
+			if ((audioMode != null)
+					&& (Mode.SENDONLY.equals(audioMode) || Mode.SENDRECV
+							.equals(audioMode))) {
 				audioPlayerComponent = mediaSession.createMediaComponent(
 						MediaComponentAndroid.AUDIO_PLAYER,
 						Parameters.NO_PARAMETER);
@@ -96,8 +105,9 @@ public class VideoCallService extends Service {
 						audioPlayerComponent);
 			}
 
-			if (direction.equals(Direction.RECV)
-					|| direction.equals(Direction.DUPLEX)) {
+			if ((audioMode != null)
+					&& (Mode.RECVONLY.equals(audioMode) || Mode.SENDRECV
+							.equals(audioMode))) {
 				Parameters params = new ParametersImpl();
 				params.put(MediaComponentAndroid.STREAM_TYPE,
 						AudioManager.STREAM_MUSIC);
@@ -124,25 +134,20 @@ public class VideoCallService extends Service {
 		}
 
 		try {
-			if (direction.equals(Direction.SEND)
-					|| direction.equals(Direction.DUPLEX)) {
-				if (audioPlayerComponent != null) {
-					audioPlayerComponent.join(Direction.SEND,
-							nc.getJoinableStream(StreamType.audio));
-					audioPlayerComponent.start();
-				}
+
+			if (audioPlayerComponent != null) {
+				audioPlayerComponent.join(Direction.SEND,
+						nc.getJoinableStream(StreamType.audio));
+				audioPlayerComponent.start();
 			}
 
-			if (direction.equals(Direction.RECV)
-					|| direction.equals(Direction.DUPLEX)) {
-				if (audioRecorderComponent != null) {
-					audioRecorderComponent.join(Direction.RECV,
-							nc.getJoinableStream(StreamType.audio));
-					audioRecorderComponent.start();
-				}
+			if (audioRecorderComponent != null) {
+				audioRecorderComponent.join(Direction.RECV,
+						nc.getJoinableStream(StreamType.audio));
+				audioRecorderComponent.start();
 			}
+
 		} catch (MsControlException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

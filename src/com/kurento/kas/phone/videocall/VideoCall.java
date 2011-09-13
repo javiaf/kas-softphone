@@ -1,6 +1,7 @@
 package com.kurento.kas.phone.videocall;
 
-import com.kurento.kas.phone.softphone.R;
+import java.util.Map;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -26,12 +27,15 @@ import com.kurento.commons.mscontrol.join.Joinable.Direction;
 import com.kurento.commons.mscontrol.join.JoinableStream.StreamType;
 import com.kurento.commons.mscontrol.mediacomponent.MediaComponent;
 import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
+import com.kurento.commons.sdp.enums.MediaType;
+import com.kurento.commons.sdp.enums.Mode;
 import com.kurento.kas.mscontrol.MediaSessionAndroid;
 import com.kurento.kas.mscontrol.ParametersImpl;
 import com.kurento.kas.mscontrol.mediacomponent.MediaComponentAndroid;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.preferences.VideoCall_Preferences;
 import com.kurento.kas.phone.sip.Controller;
+import com.kurento.kas.phone.softphone.R;
 import com.kurento.kas.phone.softphone.ServiceUpdateUIListener;
 
 public class VideoCall extends Activity implements ServiceUpdateUIListener {
@@ -39,7 +43,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private static final int SHOW_PREFERENCES = 1;
 	private PowerManager.WakeLock wl;
 	private boolean hang = false;
-	private Direction direction;
+	private Map<MediaType, Mode> callDirectionMap;
 
 	MediaComponent videoPlayerComponent = null;
 	MediaComponent videoRecorderComponent = null;
@@ -49,19 +53,16 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		super.onCreate(savedInstanceState);
 		// TODO: Control de XML según tipo de llamada
 
-		direction = (Direction) ApplicationContext.contextTable
-				.get("callDirectionRemote");
+		callDirectionMap = (Map<MediaType, Mode>) ApplicationContext.contextTable
+				.get("callDirection");
 
-		if (direction == null)
-			direction = Direction.DUPLEX;
-		
-		Log.d(LOG_TAG, "Direction = " + direction);
-		
-		if (direction.equals(Direction.SEND))
-			setContentView(R.layout.videocall_send);
-		else if (direction.equals(Direction.RECV))
+		Mode videoMode = callDirectionMap.get(MediaType.VIDEO);
+
+		if ((videoMode != null) && (Mode.RECVONLY.equals(videoMode)))
 			setContentView(R.layout.videocall_receive);
-		else if (direction.equals(Direction.DUPLEX))
+		else if ((videoMode != null) && (Mode.SENDONLY.equals(videoMode)))
+			setContentView(R.layout.videocall_send);
+		else if ((videoMode != null) && (Mode.SENDRECV.equals(videoMode)))
 			setContentView(R.layout.videocall);
 
 		VideoCallService.setUpdateListener(this);
@@ -84,9 +85,9 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				Log.d(LOG_TAG, "W: " + dm.widthPixels + " H:" + dm.heightPixels
 						+ " Orientation = " + Orientation);
 
-				if (direction.equals(Direction.SEND)
-						|| direction.equals(Direction.DUPLEX)) {
-
+				if ((videoMode != null)
+						&& (Mode.SENDONLY.equals(videoMode) || Mode.SENDRECV
+								.equals(videoMode))) {
 					Parameters params = new ParametersImpl();
 					params.put(MediaComponentAndroid.PREVIEW_SURFACE,
 							(View) findViewById(R.id.video_capture_surface));
@@ -95,8 +96,10 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 					videoPlayerComponent = mediaSession.createMediaComponent(
 							MediaComponentAndroid.VIDEO_PLAYER, params);
 				}
-				if (direction.equals(Direction.RECV)
-						|| direction.equals(Direction.DUPLEX)) {
+				
+				if ((videoMode != null)
+						&& (Mode.RECVONLY.equals(videoMode) || Mode.SENDRECV
+								.equals(videoMode))) {
 
 					Parameters params = new ParametersImpl();
 					params = new ParametersImpl();

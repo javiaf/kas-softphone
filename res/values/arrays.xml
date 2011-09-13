@@ -7,7 +7,7 @@
 		<item>MPEG4</item>
 	</string-array>
 
-	<string-array name="call_direction">
+	<string-array name="call_video_direction">
 		<item>SEND/RECEIVE</item>
 		<item>SEND ONLY</item>
 		<item>RECEIVE ONLY</item>
