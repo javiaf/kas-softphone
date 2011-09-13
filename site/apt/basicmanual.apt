@@ -1,48 +1,56 @@
 
 Basic user manual:
 
-* The application is divided into 4 parts
+* Register data
 
-[image/init210x350.png] Init
+[image/new/init_register210x350.png] Register
 
-	* A message will inform us if wh registered correctly or not.
-       
-	* A text box to enter the SIP address of the contact you want to call.
-	
-	* Data connection.
-	   
+	The first screen is to record our data. 
+
+* The application is divided into 3 parts
+
+[image/new/connected_wifi210x350.png] Init
+
+[image/new/all_info210x350.png] Info
+
+	* A status bar:
+		
+		* Status connection.
+		 
+		* Status WIFI.
+		
+		* Status 3G.
+		
+		* Configuration of media (Video and Audio)
+		
+			       
 	* Two buttons:
 	   
-		* Direct access to contacs.
+		* Button for to access contacts.
 	      
-		* If text box not empty, it make a call to that contact. If text box is empty, opens the phonebook for to select one contact.
+		* Button for to access history calls.
 		
 * Menu
 
-[image/pushmenu210x350.png] Menu
+[image/new/push_button_menu210x350.png] Menu
 
-     When we push the menu button, we can: register manually, to access preferences or exit the application.
+     When we push the menu button, we can: To access preferences, exit the application or you get information.
      
-     * '''Register''': Application to register with the data that there are on preferences.
+[image/new/all_preferences210x350.png] Info
      
      *  '''Preferences''': Show the application preferences.
  
- 
-[image/menupreferences210x350.png] Menu Preferences
-     
         * Connection Preferences.
         	
         	In connection preferences, you can configure connection parameters SIP how the username, domain, server proxy and port.
 
-[image/connetionpreferences210x350.png] Connection Preferences
-
         * Video Preferences.
         	
         	In video  preferences, you can configure codecs video and audio, also the size  of the video.
- 
-[image/videopreferences210x350.png] Video Preferences
         
      * '''Exit''': Exit the application.
+     
+     * '''About''': Get information of application.
      
 * Make a call: You can make a call in various ways.
 
