@@ -811,8 +811,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		} else if (message.getData().containsKey("Call")) {
 			if (message.getData().getString("Call").equals("Reject")) {
 				Log.d(LOG_TAG, "cALL rEJECT");
-				Toast.makeText(SoftPhone.this, "The call was rejected",
-						Toast.LENGTH_LONG).show();
+//				Toast.makeText(SoftPhone.this, "The call was rejected",
+//						Toast.LENGTH_LONG).show();
 			}
 		}
 
@@ -944,8 +944,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 							ApplicationContext.contextTable.clear();
 							Log.d(LOG_TAG, "All Destroy");
 						}
+						registerFailed();
 					} catch (Exception e) {
-
+						
 					}
 				}
 			}

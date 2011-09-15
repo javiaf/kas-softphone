@@ -122,7 +122,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 					cad += mediaType + "\t" + event.getCallSource()
 					.getMediaTypesModes().get(mediaType) + "\n";
 				}
-				Log.d(LOG_TAG, cad);
+				Log.d(LOG_TAG, "cad: " + cad);
 
 				ApplicationContext.contextTable.put("callDirection", event
 						.getCallSource().getMediaTypesModes());

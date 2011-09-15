@@ -32,9 +32,9 @@
 		<PreferenceScreen android:key="AUDIO_CODECS"
 			android:title="Audio codecs" android:summary="Select audio codecs">
 			<CheckBoxPreference android:title="AMR"
-				android:defaultValue="false" android:key="AMR_AUDIO_CODEC" />
+				android:defaultValue="true" android:key="AMR_AUDIO_CODEC" />
 			<CheckBoxPreference android:title="MP2"
-				android:defaultValue="true" android:key="MP2_AUDIO_CODEC" />
+				android:defaultValue="false" android:key="MP2_AUDIO_CODEC" />
 			<CheckBoxPreference android:title="AAC"
 				android:defaultValue="false" android:key="AAC_AUDIO_CODEC" />
 		</PreferenceScreen>

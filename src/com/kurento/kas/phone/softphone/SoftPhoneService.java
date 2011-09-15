@@ -188,7 +188,7 @@ public class SoftPhoneService extends Service implements CallListener {
 	public static ArrayList<ServiceUpdateUIListener> UI_UPDATE_LISTENERS = new ArrayList<ServiceUpdateUIListener>();
 
 	public static void setUpdateListener(ServiceUpdateUIListener l) {
-		if (!UI_UPDATE_LISTENERS.contains(l))
+//		if (!UI_UPDATE_LISTENERS.contains(l))
 			UI_UPDATE_LISTENERS.add(l);
 	}
 
