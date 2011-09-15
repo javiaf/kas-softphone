@@ -72,7 +72,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private String proxyIP;
 	private int proxyPort;
 	private String info_connect;
-	
+
 	private String info_wifi = "Not connected";
 	private String info_3g = "Not connected";
 	private String info_video;
@@ -783,7 +783,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					+ proxyPort + " ConnectionType = " + connectionType);
 
 			controller.initUA(audioCodecs, videoCodecs, localAddress,
-					connectionType, callDirectionMap, proxyIP, proxyPort, localUser, localRealm);
+					connectionType, callDirectionMap, proxyIP, proxyPort,
+					localUser, localRealm);
 			ApplicationContext.contextTable.put("controller", controller);
 			Log.e(LOG_TAG, "put controller in context");
 		} catch (Exception e) {
@@ -811,8 +812,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		} else if (message.getData().containsKey("Call")) {
 			if (message.getData().getString("Call").equals("Reject")) {
 				Log.d(LOG_TAG, "cALL rEJECT");
-//				Toast.makeText(SoftPhone.this, "The call was rejected",
-//						Toast.LENGTH_LONG).show();
+				// Toast.makeText(SoftPhone.this, "The call was rejected",
+				// Toast.LENGTH_LONG).show();
 			}
 		}
 
@@ -896,7 +897,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					Log.d(LOG_TAG, "****IsNetwoking ; IsAdressEqual = "
 							+ isAddressEqual);
 					if (!isAddressEqual) {
-						controller = null;
+						try {
+							if (controller != null) {
+								controller.finishUA();
+								controller = null;
+							}
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+
 						isRegister = false;
 						ApplicationContext.contextTable.put("isRegister",
 								isRegister);
@@ -946,7 +955,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 						}
 						registerFailed();
 					} catch (Exception e) {
-						
+
 					}
 				}
 			}
