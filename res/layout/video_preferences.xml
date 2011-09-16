@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory android:title="General Preferences">
+		<EditTextPreference android:key="MAX_BW"
+			android:title="@string/max_bw" android:summary="@string/max_bw_summary" android:inputType="number"/>
+	</PreferenceCategory>
 	<PreferenceCategory android:title="Video Preferences">
-		<!-- <ListPreference android:key="CODEC_NAME" android:title="Video codec" 
-			android:summary="Select a video codec" android:entries="@array/codec_names" 
-			android:entryValues="@array/codec_names" android:defaultValue="H263" android:dialogTitle="Select 
-			a video codec" /> -->
-
 		<PreferenceScreen android:key="VIDEO_CODECS"
 			android:title="Video codecs" android:summary="Select video codecs">
 			<CheckBoxPreference android:title="H263"
@@ -15,17 +14,25 @@
 			<CheckBoxPreference android:title="H264"
 				android:defaultValue="false" android:key="H264_CODEC" />
 		</PreferenceScreen>
-
-
+		
 		<ListPreference android:key="VIDEO_SIZE" android:title="Video size"
 			android:summary="Select a video size" android:entries="@array/video_sizes"
 			android:entryValues="@array/video_sizes" android:defaultValue="352 x 288 (CIF)"
 			android:dialogTitle="Select a video size" />
-		<!-- <ListPreference android:key="FRAME_RATE" android:title="Frame rate" 
-			android:summary="Select a frame rate" android:entries="@array/frame_rates" 
-			android:entryValues="@array/frame_rates" android:defaultValue="15" android:dialogTitle="Select 
-			a frame rate" /> <EditTextPreference android:key="VIDEO_OUT" android:title="Video 
-			out" android:summary="Video out" android:defaultValue="video_grabado" /> -->
+			
+		<ListPreference android:key="CALL_VIDEO_DIRECTION"
+			android:title="Call video direction" android:summary="Select call video direction"
+			android:entries="@array/call_video_direction" android:entryValues="@array/call_video_direction"
+			android:defaultValue="SEND/RECEIVE" android:dialogTitle="Select call video direction" />
+
+		<EditTextPreference android:key="MAX_FR"
+			android:title="@string/max_fr" android:summary="@string/max_fr_summary" android:inputType="number"/>
+
+		<EditTextPreference android:key="GOP_SIZE"
+			android:title="@string/max_gop" android:summary="@string/max_gop_summary" android:inputType="number"/>
+
+		<EditTextPreference android:key="QUEUE_SIZE"
+			android:title="@string/max_queue" android:summary="@string/max_queue_summary" android:inputType="number"/>
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="Audio Preferences">
@@ -38,6 +45,10 @@
 			<CheckBoxPreference android:title="AAC"
 				android:defaultValue="false" android:key="AAC_AUDIO_CODEC" />
 		</PreferenceScreen>
+		<ListPreference android:key="CALL_AUDIO_DIRECTION"
+			android:title="Call audio direction" android:summary="Select call audio direction"
+			android:entries="@array/call_audio_direction" android:entryValues="@array/call_audio_direction"
+			android:defaultValue="SEND/RECEIVE" android:dialogTitle="Select call audio direction" />
 	</PreferenceCategory>
 
 </PreferenceScreen>

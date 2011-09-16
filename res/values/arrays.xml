@@ -2,7 +2,6 @@
 <resources>
 
 	<string-array name="codec_names">
-		<item>H264</item>
 		<item>H263</item>
 		<item>MPEG4</item>
 	</string-array>

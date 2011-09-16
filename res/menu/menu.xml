@@ -8,11 +8,6 @@
 				android:title="@string/txt_conection_preferences" android:id="@+id/menu_conection_preferences"></item>
 			<item android:icon="@drawable/ic_menu_preferences"
 				android:title="@string/txt_video_preferences" android:id="@+id/menu_video_preferences"></item>
-			<item android:icon="@drawable/ic_menu_preferences" 
-				android:title="@string/txt_call_type_preferences" android:id="@+id/menu_call_type_preferences"></item>
-			<!-- <group android:checkableBehavior="single"> <item android:id="@+id/menu_send_rtp" 
-				android:title="@string/txt_send_RTP" android:checked="true" /> <item android:id="@+id/menu_record" 
-				android:title="@string/txt_record" /> </group> -->
 		</menu>
 	</item>
 

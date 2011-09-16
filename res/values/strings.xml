@@ -56,5 +56,14 @@
 	<string name="infoRemoteUri">Format SIP Uri</string>
 	<string name="textInfoRemoteUri">Add text \n that has to explain \n how is the format</string>
 	
+	<string name="max_bw">Max bandwidth</string>
+	<string name="max_bw_summary">Select max bandwidth</string>
+	<string name="max_fr">Max frame rate</string>
+	<string name="max_fr_summary">Select max frame rate</string>
+	<string name="max_gop">Gop size</string>
+	<string name="max_gop_summary">Select size between two I-frames</string>
+	<string name="max_queue">Max Frame queue size</string>
+	<string name="max_queue_summary">Select max frame queue size</string>
+	
 
 </resources>
