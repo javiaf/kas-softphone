@@ -56,7 +56,8 @@ public class Controller implements SipEndPointListener, SipCallListener,
 	public void initUA(ArrayList<AudioCodecType> audioCodecs,
 			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress,
 			ConnectionType connectionType,
-			Map<MediaType, Mode> callDirectionMap, String proxyIP,
+			Map<MediaType, Mode> callDirectionMap, String max_BW,
+			String max_FR, String gop_size, String max_queue, String proxyIP,
 			int proxyPort, String localUser, String localRealm)
 			throws Exception {
 
@@ -119,8 +120,10 @@ public class Controller implements SipEndPointListener, SipCallListener,
 				String cad = "";
 				for (MediaType mediaType : event.getCallSource()
 						.getMediaTypesModes().keySet()) {
-					cad += mediaType + "\t" + event.getCallSource()
-					.getMediaTypesModes().get(mediaType) + "\n";
+					cad += mediaType
+							+ "\t"
+							+ event.getCallSource().getMediaTypesModes()
+									.get(mediaType) + "\n";
 				}
 				Log.d(LOG_TAG, "cad: " + cad);
 
@@ -157,8 +160,8 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			}
 		}
 		if (SipEndPointEvent.REGISTER_USER_FAIL.equals(eventType)
-                || SipEndPointEvent.REGISTER_USER_NOT_FOUND.equals(eventType)
-                || SipEndPointEvent.SERVER_INTERNAL_ERROR.equals(eventType)) {
+				|| SipEndPointEvent.REGISTER_USER_NOT_FOUND.equals(eventType)
+				|| SipEndPointEvent.SERVER_INTERNAL_ERROR.equals(eventType)) {
 			this.pendingEndPointEvent = event;
 			try {
 				if (callListener != null)

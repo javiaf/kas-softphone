@@ -44,7 +44,6 @@ import com.kurento.kas.phone.historycall.HistoryCall;
 import com.kurento.kas.phone.historycall.ListViewHistoryItem;
 import com.kurento.kas.phone.media.MediaControlOutgoing;
 import com.kurento.kas.phone.network.NetworkIP;
-import com.kurento.kas.phone.preferences.Call_Preferences;
 import com.kurento.kas.phone.preferences.Connection_Preferences;
 import com.kurento.kas.phone.preferences.Video_Preferences;
 import com.kurento.kas.phone.sip.Controller;
@@ -79,6 +78,11 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private String info_audio_aux;
 	private String info_video_aux;
 	private String info_call_type;
+
+	private String max_BW;
+	private String max_FR;
+	private String gop_size;
+	private String max_queue;
 
 	private ProgressDialog dialog;
 	private Intent intentService;
@@ -723,7 +727,16 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					+ localRealm + "\n\n Server:\n " + proxyIP + ":"
 					+ proxyPort;
 
+			max_BW = settings.getString("MAX_BW", "");
+			max_FR = settings.getString("MAX_FR", "");
+			gop_size = settings.getString("GOP_SIZE", "");
+			max_queue = settings.getString("QUEUE_SIZE", "");
+
 			callDirectionMap = getCallDirectionMapFromSettings();
+
+			info_call_type += "\n\nMax BW:\n" + max_BW + "\n\nMax FR:\n"
+					+ max_FR + "\n\nGOP Size:\n" + gop_size
+					+ "\n\nMax Queue:\n" + max_queue;
 
 			ApplicationContext.contextTable.put("callDirection",
 					callDirectionMap);
@@ -779,8 +792,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					+ proxyPort + " ConnectionType = " + connectionType);
 
 			controller.initUA(audioCodecs, videoCodecs, localAddress,
-					connectionType, callDirectionMap, proxyIP, proxyPort,
-					localUser, localRealm);
+					connectionType, callDirectionMap, max_BW, max_FR, gop_size,
+					max_queue, proxyIP, proxyPort, localUser, localRealm);
 			ApplicationContext.contextTable.put("controller", controller);
 			Log.e(LOG_TAG, "put controller in context");
 		} catch (Exception e) {

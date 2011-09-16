@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 	<PreferenceCategory android:title="General Preferences">
 		<EditTextPreference android:key="MAX_BW"
-			android:title="@string/max_bw" android:summary="@string/max_bw_summary" />
+			android:title="@string/max_bw" android:summary="@string/max_bw_summary" android:inputType="number"/>
 	</PreferenceCategory>
 	<PreferenceCategory android:title="Video Preferences">
 		<PreferenceScreen android:key="VIDEO_CODECS"
@@ -14,25 +14,25 @@
 			<CheckBoxPreference android:title="H264"
 				android:defaultValue="false" android:key="H264_CODEC" />
 		</PreferenceScreen>
-
+		
 		<ListPreference android:key="VIDEO_SIZE" android:title="Video size"
 			android:summary="Select a video size" android:entries="@array/video_sizes"
 			android:entryValues="@array/video_sizes" android:defaultValue="352 x 288 (CIF)"
 			android:dialogTitle="Select a video size" />
-
+			
 		<ListPreference android:key="CALL_VIDEO_DIRECTION"
 			android:title="Call video direction" android:summary="Select call video direction"
 			android:entries="@array/call_video_direction" android:entryValues="@array/call_video_direction"
 			android:defaultValue="SEND/RECEIVE" android:dialogTitle="Select call video direction" />
 
 		<EditTextPreference android:key="MAX_FR"
-			android:title="@string/max_fr" android:summary="@string/max_fr_summary" />
+			android:title="@string/max_fr" android:summary="@string/max_fr_summary" android:inputType="number"/>
 
 		<EditTextPreference android:key="GOP_SIZE"
-			android:title="@string/max_gop" android:summary="@string/max_gop_summary" />
+			android:title="@string/max_gop" android:summary="@string/max_gop_summary" android:inputType="number"/>
 
 		<EditTextPreference android:key="QUEUE_SIZE"
-			android:title="@string/max_queue" android:summary="@string/max_queue_summary" />
+			android:title="@string/max_queue" android:summary="@string/max_queue_summary" android:inputType="number"/>
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="Audio Preferences">
