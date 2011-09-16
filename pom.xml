@@ -33,7 +33,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.kurento.commons</groupId>
-			<artifactId>kc-sipua-impl</artifactId>
+			<artifactId>kas-sipua-impl</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
