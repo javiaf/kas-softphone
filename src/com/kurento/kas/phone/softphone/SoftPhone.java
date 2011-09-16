@@ -562,10 +562,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			Intent remotePreferences = new Intent(this, Video_Preferences.class);
 			startActivityForResult(remotePreferences, SHOW_PREFERENCES);
 			return true;
-		case (R.id.menu_call_type_preferences):
-			Intent callPreferences = new Intent(this, Call_Preferences.class);
-			startActivityForResult(callPreferences, SHOW_PREFERENCES);
-			return true;
 		case (R.id.menu_about):
 			final Dialog dialog = new Dialog(this);
 			dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
