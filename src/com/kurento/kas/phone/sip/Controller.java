@@ -58,7 +58,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress,
 			NetIF netIF, Map<MediaType, Mode> callDirectionMap, Integer maxBW,
 			Integer maxFR, Integer gopSize, Integer maxQueueSize,
-			String proxyIP, int proxyPort, String localUser, String localRealm)
+			String proxyIP, int proxyPort, String localUser, String localPassword, String localRealm)
 			throws Exception {
 
 		Parameters params = new ParametersImpl();
@@ -95,7 +95,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 
 		ua = UaFactory.getInstance(sipConfig);
 
-		register(localUser, localRealm);
+		register(localUser, localPassword, localRealm);
 	}
 
 	public boolean isRegister() {
@@ -108,9 +108,9 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		Log.d(LOG_TAG, "FinishUA");
 	}
 
-	private void register(String localUser, String localRealm) throws Exception {
+	private void register(String localUser, String localPassword, String localRealm) throws Exception {
 		Log.d(LOG_TAG, "localUser: " + localUser + "; localReal: " + localRealm);
-		endPoint = ua.registerEndPoint(localUser, localRealm, null, 3600, this);
+		endPoint = ua.registerEndPoint(localUser, localRealm, localPassword, 3600, this);
 	}
 
 	@Override

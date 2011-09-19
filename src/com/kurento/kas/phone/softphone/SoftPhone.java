@@ -68,6 +68,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	private String localUser;
 	private String localRealm;
+	private String localPassword;
 	private String proxyIP;
 	private int proxyPort;
 
@@ -194,7 +195,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		if (ni != null) {
 			if (intent.getData() == null)
 				return;
-				checkCallIntent(intent);
+			checkCallIntent(intent);
 		} else {
 			Log.e(LOG_TAG, "Network interface unable.");
 			Toast.makeText(SoftPhone.this,
@@ -703,9 +704,14 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			SharedPreferences settings = PreferenceManager
 					.getDefaultSharedPreferences(getBaseContext());
 			localUser = settings.getString("LOCAL_USERNAME", "");
+			localPassword = settings.getString("LOCAL_PASSWORD", "");
 			localRealm = settings.getString("LOCAL_DOMAIN", "");
 			proxyIP = settings.getString("PROXY_IP", "");
 			proxyPort = Integer.parseInt(settings.getString("PROXY_PORT", "0"));
+
+			if (localUser.equals("") || localRealm.equals("")
+					|| proxyIP.equals("") || proxyPort == 0)
+				return false;
 
 			info_connect = "Connecting ... \n\n User: \n " + localUser + "@"
 					+ localRealm + "\n\n Server:\n " + proxyIP + ":"
@@ -801,7 +807,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 			controller.initUA(audioCodecs, videoCodecs, localAddress, netIF,
 					callDirectionMap, max_BW, max_FR, gop_size, max_queue,
-					proxyIP, proxyPort, localUser, localRealm);
+					proxyIP, proxyPort, localUser, localPassword, localRealm);
 			ApplicationContext.contextTable.put("controller", controller);
 			Log.e(LOG_TAG, "put controller in context");
 		} catch (Exception e) {

@@ -30,6 +30,7 @@ public class Register extends Activity {
 			@Override
 			public void onClick(View v) {
 				EditText textlocalusername = (EditText) findViewById(R.id.Textpreference_local_username);
+				EditText textlocalpassword = (EditText) findViewById(R.id.Textpreference_local_password);
 				EditText textlocaldomain = (EditText) findViewById(R.id.Textpreference_local_domain);
 				EditText textproxyip = (EditText) findViewById(R.id.Textpreference_proxy_ip);
 				EditText textproxyport = (EditText) findViewById(R.id.Textpreference_proxy_port);
@@ -51,6 +52,8 @@ public class Register extends Activity {
 							.getDefaultSharedPreferences(getBaseContext());
 					SharedPreferences.Editor editor = settings.edit();
 					editor.putString("LOCAL_USERNAME", textlocalusername
+							.getText().toString());
+					editor.putString("LOCAL_PASSWORD", textlocalpassword
 							.getText().toString());
 					editor.putString("LOCAL_DOMAIN", textlocaldomain.getText()
 							.toString());

@@ -14,6 +14,8 @@
 	<string name="txt_local_preferences">Local</string>
 	<string name="preference_local_username">Local SIP URL username</string>
 	<string name="preference_local_username_summary">Local SIP URL username</string>
+	<string name="preference_local_password">Local SIP URL password</string>
+	<string name="preference_local_password_summary">Local SIP URL password</string>
 	<string name="preference_local_domain">Local SIP URL domain</string>
 	<string name="preference_local_domain_summary">Local SIP URL domain</string>
 
