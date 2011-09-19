@@ -1,5 +1,6 @@
 package com.kurento.kas.phone.sip;
 
+import java.awt.Dimension;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Map;
@@ -25,7 +26,7 @@ import com.kurento.kas.media.VideoCodecType;
 import com.kurento.kas.mscontrol.MSControlFactory;
 import com.kurento.kas.mscontrol.MediaSessionAndroid;
 import com.kurento.kas.mscontrol.ParametersImpl;
-import com.kurento.kas.mscontrol.networkconnection.ConnectionType;
+import com.kurento.kas.mscontrol.networkconnection.NetIF;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.softphone.CallListener;
 import com.kurento.kas.phone.softphone.CallNotifier;
@@ -55,19 +56,26 @@ public class Controller implements SipEndPointListener, SipCallListener,
 
 	public void initUA(ArrayList<AudioCodecType> audioCodecs,
 			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress,
-			ConnectionType connectionType,
-			Map<MediaType, Mode> callDirectionMap, String max_BW,
-			String max_FR, String gop_size, String max_queue, String proxyIP,
-			int proxyPort, String localUser, String localRealm)
+			NetIF netIF, Map<MediaType, Mode> callDirectionMap, Integer maxBW,
+			Integer maxFR, Integer gopSize, Integer maxQueueSize,
+			String proxyIP, int proxyPort, String localUser, String localRealm)
 			throws Exception {
 
 		Parameters params = new ParametersImpl();
+		params.put(MediaSessionAndroid.NET_IF, netIF);
+		params.put(MediaSessionAndroid.LOCAL_ADDRESS, localAddress);
+		params.put(MediaSessionAndroid.MAX_BANDWIDTH, maxBW);
+
+		params.put(MediaSessionAndroid.STREAMS_MODES, callDirectionMap);
 		params.put(MediaSessionAndroid.AUDIO_CODECS, audioCodecs);
 		params.put(MediaSessionAndroid.VIDEO_CODECS, videoCodecs);
-		params.put(MediaSessionAndroid.LOCAL_ADDRESS, localAddress);
-		params.put(MediaSessionAndroid.CONNECTION_TYPE, connectionType);
-		params.put(MediaSessionAndroid.STREAMS_DIRECTIONS, callDirectionMap);
 
+		params.put(MediaSessionAndroid.FRAME_SIZE, null);
+		params.put(MediaSessionAndroid.MAX_FRAME_RATE, maxFR);
+		params.put(MediaSessionAndroid.GOP_SIZE, gopSize);
+		params.put(MediaSessionAndroid.FRAMES_QUEUE_SIZE, maxQueueSize);
+
+		Log.d(LOG_TAG, "createMediaSession...");
 		mediaSession = MSControlFactory.createMediaSession(params);
 		Log.d(LOG_TAG, "mediaSession: " + this.mediaSession);
 		UaFactory.setMediaSession(mediaSession);
@@ -201,7 +209,6 @@ public class Controller implements SipEndPointListener, SipCallListener,
 				callListener.callCancel();
 		} else if (SipCallEvent.CALL_ERROR.equals(eventType)) {
 			Log.d(LOG_TAG, "Call Error");
-
 		}
 	}
 

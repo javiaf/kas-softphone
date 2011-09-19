@@ -37,7 +37,7 @@ import com.kurento.commons.sdp.enums.MediaType;
 import com.kurento.commons.sdp.enums.Mode;
 import com.kurento.kas.media.AudioCodecType;
 import com.kurento.kas.media.VideoCodecType;
-import com.kurento.kas.mscontrol.networkconnection.ConnectionType;
+import com.kurento.kas.mscontrol.networkconnection.NetIF;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.controlcontacts.ControlContacts;
 import com.kurento.kas.phone.historycall.HistoryCall;
@@ -61,7 +61,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private ArrayList<VideoCodecType> videoCodecs;
 	private Map<MediaType, Mode> callDirectionMap;
 	private InetAddress localAddress;
-	private ConnectionType connectionType;
+	private NetIF netIF;
 	// ConnectivityManager ConnectManager;
 	ConnectivityManager connManager;
 	NetworkInfo ni;
@@ -70,6 +70,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private String localRealm;
 	private String proxyIP;
 	private int proxyPort;
+
+	private Integer max_BW;
+	private Integer max_FR;
+	private Integer gop_size;
+	private Integer max_queue;
+
 	private String info_connect;
 
 	private String info_wifi = "Not connected";
@@ -78,11 +84,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private String info_audio_aux;
 	private String info_video_aux;
 	private String info_call_type;
-
-	private String max_BW;
-	private String max_FR;
-	private String gop_size;
-	private String max_queue;
 
 	private ProgressDialog dialog;
 	private Intent intentService;
@@ -137,7 +138,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
 
-		connectionType = null;
+		netIF = null;
 		connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 		ni = connManager.getActiveNetworkInfo();
 
@@ -187,7 +188,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 		SoftPhoneService.setUpdateListener(this);
 
-		connectionType = null;
+		netIF = null;
 		connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 		ni = connManager.getActiveNetworkInfo();
 		if (ni != null) {
@@ -721,16 +722,36 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			localUser = settings.getString("LOCAL_USERNAME", "");
 			localRealm = settings.getString("LOCAL_DOMAIN", "");
 			proxyIP = settings.getString("PROXY_IP", "");
-			proxyPort = Integer.parseInt(settings.getString("PROXY_PORT", ""));
+			proxyPort = Integer.parseInt(settings.getString("PROXY_PORT", "0"));
 
 			info_connect = "Connecting ... \n\n User: \n " + localUser + "@"
 					+ localRealm + "\n\n Server:\n " + proxyIP + ":"
 					+ proxyPort;
 
-			max_BW = settings.getString("MAX_BW", "");
-			max_FR = settings.getString("MAX_FR", "");
-			gop_size = settings.getString("GOP_SIZE", "");
-			max_queue = settings.getString("QUEUE_SIZE", "");
+			try {
+				max_BW = Integer.parseInt(settings.getString("MAX_BW", ""));
+			} catch (NumberFormatException e) {
+				max_BW = null;
+			}
+
+			try {
+				max_FR = Integer.parseInt(settings.getString("MAX_FR", ""));
+			} catch (NumberFormatException e) {
+				max_FR = null;
+			}
+
+			try {
+				gop_size = Integer.parseInt(settings.getString("GOP_SIZE", ""));
+			} catch (NumberFormatException e) {
+				gop_size = null;
+			}
+
+			try {
+				max_queue = Integer.parseInt(settings.getString("QUEUE_SIZE",
+						""));
+			} catch (NumberFormatException e) {
+				max_queue = null;
+			}
 
 			callDirectionMap = getCallDirectionMapFromSettings();
 
@@ -746,6 +767,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 			return true;
 		} catch (Exception e) {
+			Log.e(LOG_TAG, "Error in parse preferences.");
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -759,9 +782,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				String conType = ni.getTypeName();
 
 				if ("WIFI".equalsIgnoreCase(conType))
-					connectionType = ConnectionType.WIFI;
+					netIF = NetIF.WIFI;
 				else if ("MOBILE".equalsIgnoreCase(conType))
-					connectionType = ConnectionType.MOBILE;
+					netIF = NetIF.MOBILE;
 
 				this.localAddress = NetworkIP.getLocalAddress();
 				ApplicationContext.contextTable.put("localAddress",
@@ -789,11 +812,13 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		try {
 			Log.d(LOG_TAG, "LocalUser : " + localUser + "; localReal : "
 					+ localRealm + " proxyIP: " + proxyIP + "; localPort : "
-					+ proxyPort + " ConnectionType = " + connectionType);
+					+ proxyPort + " ConnectionType = " + netIF);
+			Log.d(LOG_TAG, "Otros: " + max_BW + "\t" + max_FR + "\t" + gop_size
+					+ "\t" + max_queue);
 
-			controller.initUA(audioCodecs, videoCodecs, localAddress,
-					connectionType, callDirectionMap, max_BW, max_FR, gop_size,
-					max_queue, proxyIP, proxyPort, localUser, localRealm);
+			controller.initUA(audioCodecs, videoCodecs, localAddress, netIF,
+					callDirectionMap, max_BW, max_FR, gop_size, max_queue,
+					proxyIP, proxyPort, localUser, localRealm);
 			ApplicationContext.contextTable.put("controller", controller);
 			Log.e(LOG_TAG, "put controller in context");
 		} catch (Exception e) {
