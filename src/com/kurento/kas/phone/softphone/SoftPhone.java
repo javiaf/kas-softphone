@@ -194,24 +194,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		if (ni != null) {
 			if (intent.getData() == null)
 				return;
-			// Log.d(LOG_TAG, "onNewIntent Tlf: " +
-			// intent.getData().getSchemeSpecificPart() + "; Action: " +
-			// intent.getData().getScheme());
-			// if (intent.getData().getScheme().equalsIgnoreCase("tel")){
-			// try {
-			// Intent callIntent = new Intent(Intent.ACTION_DIAL);
-			// callIntent.setData(Uri.parse("tel:" +
-			// intent.getData().getSchemeSpecificPart()));
-			// startActivity(callIntent);
-			// } catch (ActivityNotFoundException activityException) {
-			// Log.e("dialing-example", "Call failed", activityException);
-			// }
-			//
-			//
-			//
-			// }
-
-			checkCallIntent(intent);
+				checkCallIntent(intent);
 		} else {
 			Log.e(LOG_TAG, "Network interface unable.");
 			Toast.makeText(SoftPhone.this,

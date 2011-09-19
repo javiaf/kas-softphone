@@ -6,12 +6,9 @@
 
 	<SurfaceView android:id="@+id/video_receive_surface"
 		android:layout_width="match_parent" android:layout_height="match_parent"></SurfaceView>
-<!-- 	<SurfaceView android:layout_height="120dip" -->
-<!-- 		android:layout_width="120dip" android:id="@+id/video_capture_surface" -->
-<!-- 		android:layout_gravity="bottom|right"></SurfaceView> -->
 	<TableLayout android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:id="@+id/tableLayout1"
-		android:layout_gravity="center|bottom">
+		android:layout_gravity="top|right">
 		<TableRow android:id="@+id/TableRow01"
 			android:layout_gravity="center">
 			<Button android:id="@+id/button_terminate_call"
@@ -19,21 +16,30 @@
 				android:layout_height="wrap_content"
 				android:layout_alignParentBottom="true"
 				android:layout_alignParentRight="true" android:layout_gravity="left|bottom" />
+		</TableRow>
+		<TableRow android:id="@+id/TableRow01"
+			android:layout_gravity="center">
 			<TextView android:id="@+id/TextView02" android:text=""
 				android:width="30px" />
+		</TableRow>
+		<TableRow android:id="@+id/TableRow01"
+			android:layout_gravity="center">
 			<ToggleButton android:id="@+id/button_headset"
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
 				android:textOn="" android:textOff="" android:padding="10dp"
 				android:background="@drawable/headset_button" />
-
-			<TextView android:id="@+id/TextView01" android:text=""
+		</TableRow>
+		<TableRow android:id="@+id/TableRow01"
+			android:layout_gravity="center">
+			<TextView android:id="@+id/TextView02" android:text=""
 				android:width="30px" />
+		</TableRow>
+		<TableRow android:id="@+id/TableRow01"
+			android:layout_gravity="center">
 			<ToggleButton android:id="@+id/button_mute"
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
 				android:textOn="" android:textOff="" android:padding="10dp"
 				android:background="@drawable/mute_button" />
-
-
 		</TableRow>
 	</TableLayout>
 </FrameLayout>
