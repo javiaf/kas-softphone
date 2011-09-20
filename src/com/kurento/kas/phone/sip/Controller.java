@@ -209,6 +209,8 @@ public class Controller implements SipEndPointListener, SipCallListener,
 				callListener.callCancel();
 		} else if (SipCallEvent.CALL_ERROR.equals(eventType)) {
 			Log.d(LOG_TAG, "Call Error");
+			if (callListener != null)
+				callListener.callReject();
 		}
 	}
 
