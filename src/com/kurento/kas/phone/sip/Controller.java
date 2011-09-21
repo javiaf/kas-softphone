@@ -1,6 +1,5 @@
 package com.kurento.kas.phone.sip;
 
-import java.awt.Dimension;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Map;
