@@ -362,11 +362,18 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		super.onStop();
 	}
 
+	private synchronized void setIsExit(boolean type){
+		isExit = type;
+	}
+	private synchronized boolean getIsExit(){
+		return isExit;
+	}
+	
 	@Override
 	protected void onDestroy() {
 		Log.d(LOG_TAG, "On Destroy");
 		try {
-			if (isExit) {
+			if (getIsExit()) {
 				signalManager.listen(signalListener,
 						PhoneStateListener.LISTEN_NONE);
 				if (controller != null)
@@ -528,7 +535,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
-									isExit = true;
+									setIsExit(true);
+									
 									finish();
 								}
 							})
@@ -845,7 +853,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private final PhoneStateListener signalListener = new PhoneStateListener() {
 
 		public void onDataConnectionStateChanged(int state) {
-			if (!isExit) {
+			if (!getIsExit()) {
 				ConnectivityManager ConnectManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
 				String sNetworkType = "No Activate";
