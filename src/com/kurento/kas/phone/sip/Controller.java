@@ -57,8 +57,8 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress,
 			NetIF netIF, Map<MediaType, Mode> callDirectionMap, Integer maxBW,
 			Integer maxFR, Integer gopSize, Integer maxQueueSize,
-			String proxyIP, int proxyPort, String localUser, String localPassword, String localRealm)
-			throws Exception {
+			String proxyIP, int proxyPort, String localUser,
+			String localPassword, String localRealm) throws Exception {
 
 		Parameters params = new ParametersImpl();
 		params.put(MediaSessionAndroid.NET_IF, netIF);
@@ -107,9 +107,11 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		Log.d(LOG_TAG, "FinishUA");
 	}
 
-	private void register(String localUser, String localPassword, String localRealm) throws Exception {
+	private void register(String localUser, String localPassword,
+			String localRealm) throws Exception {
 		Log.d(LOG_TAG, "localUser: " + localUser + "; localReal: " + localRealm);
-		endPoint = ua.registerEndPoint(localUser, localRealm, localPassword, 3600, this);
+		endPoint = ua.registerEndPoint(localUser, localRealm, localPassword,
+				3600, this);
 	}
 
 	@Override
@@ -134,8 +136,8 @@ public class Controller implements SipEndPointListener, SipCallListener,
 				}
 				Log.d(LOG_TAG, "cad: " + cad);
 
-				ApplicationContext.contextTable.put("callDirection", event
-						.getCallSource().getMediaTypesModes());
+				// ApplicationContext.contextTable.put("callDirection", event
+				// .getCallSource().getMediaTypesModes());
 
 				String getCallSource = (String) ApplicationContext.contextTable
 						.get("getCallSource");
@@ -189,9 +191,8 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			currentCall = event.getSource();
 			Log.d(LOG_TAG, "Setting currentCall");
 			if (callListener != null) {
-				Log.d(LOG_TAG, "currentCall.getNetworkConnection(null): "
-						+ currentCall.getNetworkConnection(null));
-
+				ApplicationContext.contextTable.put("callDirection",
+						currentCall.getMediaTypesModes());
 				callListener.callSetup(currentCall.getNetworkConnection(null));
 			}
 		} else if (SipCallEvent.CALL_TERMINATE.equals(eventType)) {
