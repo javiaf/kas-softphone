@@ -176,16 +176,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			Toast.makeText(SoftPhone.this,
 					"SoftPhone: Please enable any network interface.",
 					Toast.LENGTH_SHORT).show();
-
-			// finish();
 		}
 	}
 
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
-
-		Log.d(LOG_TAG, "onNewIntent Is first or is call??");
 
 		SoftPhoneService.setUpdateListener(this);
 
@@ -362,13 +358,14 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		super.onStop();
 	}
 
-	private synchronized void setIsExit(boolean type){
+	private synchronized void setIsExit(boolean type) {
 		isExit = type;
 	}
-	private synchronized boolean getIsExit(){
+
+	private synchronized boolean getIsExit() {
 		return isExit;
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		Log.d(LOG_TAG, "On Destroy");
@@ -450,8 +447,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					+ proxyPort;
 			isRegister = false;
 			ApplicationContext.contextTable.put("isRegister", isRegister);
-			// dialog = ProgressDialog.show(SoftPhone.this, "",
-			// "Connecting ...");
 
 			Log.d(LOG_TAG, "Reconfigure Preferences");
 			if (initControllerUAFromSettings())
@@ -467,10 +462,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				id = controlcontacts.getId(data);
 				sip = controlcontacts.getSip(data);
 				name = controlcontacts.getName(data);
-
-				Log.d(LOG_TAG, "Id: " + id);
-				Log.d(LOG_TAG, "Sip: " + sip);
-				Log.d(LOG_TAG, "Name: " + name);
 
 				if (sip != null) {
 					Toast.makeText(SoftPhone.this, name + ", SIP:" + sip,
@@ -490,7 +481,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		Integer idContact;
 		idContact = controlcontacts.getId(textRemoteUri);
 
-		Log.d(LOG_TAG, "remoteURI: " + remoteURI + " IdContact = " + idContact);
 		call(remoteURI, idContact);
 	}
 
@@ -536,7 +526,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 								public void onClick(DialogInterface dialog,
 										int id) {
 									setIsExit(true);
-									
+
 									finish();
 								}
 							})
@@ -595,12 +585,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 		info_connect = "The connection is ok. \n\n User: \n " + localUser + "@"
 				+ localRealm + "\n\n Server:\n " + proxyIP + ":" + proxyPort;
-		// if (connection != null)
-		// SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
-		// SoftPhone.this.text.setTextSize(20);
-		// SoftPhone.this.text.setTextColor(Color.GREEN);
-		// SoftPhone.this.text.setText("Register Sucessful");
-
 		isRegister = true;
 		ApplicationContext.contextTable.put("isRegister", isRegister);
 
@@ -614,10 +598,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				+ proxyPort;
 		SoftPhone.this.connection = (Button) findViewById(R.id.connection_button);
 		connection.setBackgroundResource(R.drawable.disconnect_icon);
-		// SoftPhone.this.text = (TextView) findViewById(R.id.textRegister);
-		// SoftPhone.this.text.setTextSize(20);
-		// SoftPhone.this.text.setTextColor(Color.RED);
-		// SoftPhone.this.text.setText("Register Failed");
 
 		isRegister = false;
 		ApplicationContext.contextTable.put("isRegister", isRegister);
@@ -800,18 +780,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	}
 
-	// public static Context getContext() {
-	// Context context = SoftPhone.getContext();
-	// return Context;
-	// }
-
 	private void initUA() {
 		try {
-			Log.d(LOG_TAG, "LocalUser : " + localUser + "; localReal : "
-					+ localRealm + " proxyIP: " + proxyIP + "; localPort : "
-					+ proxyPort + " ConnectionType = " + netIF);
-			Log.d(LOG_TAG, "Otros: " + max_BW + "\t" + max_FR + "\t" + gop_size
-					+ "\t" + max_queue);
 
 			controller.initUA(audioCodecs, videoCodecs, localAddress, netIF,
 					callDirectionMap, max_BW, max_FR, gop_size, max_queue,
@@ -843,8 +813,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		} else if (message.getData().containsKey("Call")) {
 			if (message.getData().getString("Call").equals("Reject")) {
 				Log.d(LOG_TAG, "cALL rEJECT");
-				// Toast.makeText(SoftPhone.this, "The call was rejected",
-				// Toast.LENGTH_LONG).show();
+
 			}
 		}
 

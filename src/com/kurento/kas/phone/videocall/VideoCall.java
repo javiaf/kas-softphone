@@ -48,10 +48,10 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	MediaComponent videoPlayerComponent = null;
 	MediaComponent videoRecorderComponent = null;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// TODO: Control de XML según tipo de llamada
 
 		callDirectionMap = (Map<MediaType, Mode>) ApplicationContext.contextTable
 				.get("callDirection");
@@ -77,14 +77,12 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 		if (controller != null) {
 			MediaSession mediaSession = controller.getMediaSession();
-			try {
-				DisplayMetrics dm = new DisplayMetrics();
-				getWindowManager().getDefaultDisplay().getMetrics(dm);
-				int Orientation = getWindowManager().getDefaultDisplay()
-						.getOrientation();
-				Log.d(LOG_TAG, "W: " + dm.widthPixels + " H:" + dm.heightPixels
-						+ " Orientation = " + Orientation);
 
+			DisplayMetrics dm = new DisplayMetrics();
+			getWindowManager().getDefaultDisplay().getMetrics(dm);
+			int Orientation = getWindowManager().getDefaultDisplay()
+					.getOrientation();
+			try {
 				if ((videoMode != null)
 						&& (Mode.SENDONLY.equals(videoMode) || Mode.SENDRECV
 								.equals(videoMode))) {
@@ -96,11 +94,17 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 					videoPlayerComponent = mediaSession.createMediaComponent(
 							MediaComponentAndroid.VIDEO_PLAYER, params);
 				}
-				
+			} catch (MsControlException e) {
+				Log.e(LOG_TAG, e.getMessage());
+				e.printStackTrace();
+			} catch (Exception e) {
+				Log.e(LOG_TAG, e.getMessage());
+			}
+
+			try {
 				if ((videoMode != null)
 						&& (Mode.RECVONLY.equals(videoMode) || Mode.SENDRECV
 								.equals(videoMode))) {
-
 					Parameters params = new ParametersImpl();
 					params = new ParametersImpl();
 					params.put(MediaComponentAndroid.VIEW_SURFACE,
@@ -326,9 +330,6 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			Log.d(LOG_TAG, "Show preferences");
 			SharedPreferences settings = PreferenceManager
 					.getDefaultSharedPreferences(getBaseContext());
-			Boolean headset = settings.getBoolean("HEADSET", true);
-			Boolean mute = settings.getBoolean("MUTE", false);
-
 		}
 	}
 

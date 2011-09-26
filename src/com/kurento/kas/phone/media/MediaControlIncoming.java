@@ -186,7 +186,6 @@ public class MediaControlIncoming extends Activity implements
 					try {
 						controller.aceptCall();
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -204,7 +203,6 @@ public class MediaControlIncoming extends Activity implements
 					try {
 						controller.reject();
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}

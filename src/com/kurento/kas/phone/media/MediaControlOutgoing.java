@@ -170,7 +170,6 @@ public class MediaControlOutgoing extends Activity {
 					e.printStackTrace();
 				}
 				finish();
-				// setResult(RESULT_OK);
 			}
 		});
 

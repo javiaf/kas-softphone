@@ -134,11 +134,6 @@ public class Controller implements SipEndPointListener, SipCallListener,
 							+ event.getCallSource().getMediaTypesModes()
 									.get(mediaType) + "\n";
 				}
-				Log.d(LOG_TAG, "cad: " + cad);
-
-				// ApplicationContext.contextTable.put("callDirection", event
-				// .getCallSource().getMediaTypesModes());
-
 				String getCallSource = (String) ApplicationContext.contextTable
 						.get("getCallSource");
 
@@ -216,9 +211,6 @@ public class Controller implements SipEndPointListener, SipCallListener,
 
 	@Override
 	public void aceptCall() throws Exception {
-		// SipCall sipCall = pendingEndPointEvent.getCallSource();
-		// sipCall.addListener(this);
-		// sipCall.accept();
 		if (incomingCall != null)
 			incomingCall.accept();
 	}

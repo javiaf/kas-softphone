@@ -32,10 +32,6 @@ public class SoftPhoneService extends Service implements CallListener {
 	private Intent notifIntent;
 	private String notificationTitle = "KurentoPhone";
 	private static final int IC_LEVEL_ORANGE = 0;
-	/*
-	 * private static final int IC_LEVEL_GREEN=1; private static final int
-	 * IC_LEVEL_RED=2;
-	 */
 
 	private Intent videoCallIntent;
 
@@ -74,20 +70,6 @@ public class SoftPhoneService extends Service implements CallListener {
 
 		Log.e(LOG_TAG, "onCreate OK");
 	}
-
-	// private void sendNotification(int level, String text) {
-	// if (mNotif != null) {
-	// // mNotif.iconLevel = level;
-	// mNotif.when = System.currentTimeMillis();
-	//
-	// mNotif.setLatestEventInfo(this, notificationTitle, text,
-	// mNotifContentIntent);
-	// mNotificationMgr.notify(NOTIF_ID, mNotif);
-	// Log.d(LOG_TAG, "sendNotification = " + text);
-	// } else
-	// Log.d(LOG_TAG, "mNotif == null");
-	//
-	// }
 
 	@Override
 	public void onDestroy() {
@@ -188,7 +170,6 @@ public class SoftPhoneService extends Service implements CallListener {
 	public static ArrayList<ServiceUpdateUIListener> UI_UPDATE_LISTENERS = new ArrayList<ServiceUpdateUIListener>();
 
 	public static void setUpdateListener(ServiceUpdateUIListener l) {
-//		if (!UI_UPDATE_LISTENERS.contains(l))
 			UI_UPDATE_LISTENERS.add(l);
 	}
 
