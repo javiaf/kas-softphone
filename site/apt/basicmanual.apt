@@ -46,7 +46,26 @@ Basic user manual:
 
         * Video Preferences.
         	
-        	In video  preferences, you can configure codecs video and audio, also the size  of the video.
+        	In video  preferences, you can configure:
+        	
+        		* Max BandWidth
+        		        	
+        		* Codecs video
+        		
+        		* Video size
+        		
+        		* Video direction
+        		
+        		* Max frame rate
+        		
+        		* Gop size
+        		
+        		* Max frame queue size
+        		 
+        		* Codecs audio
+        		
+        		* Audio direction
+        		
         
      * '''Exit''': Exit the application.
      
