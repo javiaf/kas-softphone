@@ -60,7 +60,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			String proxyIP, int proxyPort, String localUser,
 			String localPassword, String localRealm) throws Exception {
 
-		Parameters params = new ParametersImpl();
+		Parameters params = MSControlFactory.createParameters();
 		params.put(MediaSessionAndroid.NET_IF, netIF);
 		params.put(MediaSessionAndroid.LOCAL_ADDRESS, localAddress);
 		params.put(MediaSessionAndroid.MAX_BANDWIDTH, maxBW);

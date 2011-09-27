@@ -29,6 +29,7 @@ import com.kurento.commons.mscontrol.mediacomponent.MediaComponent;
 import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
 import com.kurento.commons.sdp.enums.MediaType;
 import com.kurento.commons.sdp.enums.Mode;
+import com.kurento.kas.mscontrol.MSControlFactory;
 import com.kurento.kas.mscontrol.MediaSessionAndroid;
 import com.kurento.kas.mscontrol.ParametersImpl;
 import com.kurento.kas.mscontrol.mediacomponent.MediaComponentAndroid;
@@ -86,7 +87,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				if ((videoMode != null)
 						&& (Mode.SENDONLY.equals(videoMode) || Mode.SENDRECV
 								.equals(videoMode))) {
-					Parameters params = new ParametersImpl();
+					Parameters params = MSControlFactory.createParameters();
 					params.put(MediaComponentAndroid.PREVIEW_SURFACE,
 							(View) findViewById(R.id.video_capture_surface));
 					params.put(MediaComponentAndroid.DISPLAY_ORIENTATION,
@@ -105,8 +106,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				if ((videoMode != null)
 						&& (Mode.RECVONLY.equals(videoMode) || Mode.SENDRECV
 								.equals(videoMode))) {
-					Parameters params = new ParametersImpl();
-					params = new ParametersImpl();
+					Parameters params = MSControlFactory.createParameters();
 					params.put(MediaComponentAndroid.VIEW_SURFACE,
 							(View) findViewById(R.id.video_receive_surface));
 					params.put(MediaComponentAndroid.DISPLAY_WIDTH,
@@ -244,7 +244,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 									.getJoinableStream(StreamType.audio));
 						}
 
-						Parameters params = new ParametersImpl();
+						Parameters params = MSControlFactory.createParameters();
 						params.put(MediaComponentAndroid.STREAM_TYPE,
 								AudioManager.STREAM_VOICE_CALL);
 						audioRecorderComponent = mediaSession

@@ -22,6 +22,7 @@ import com.kurento.commons.mscontrol.join.JoinableStream.StreamType;
 import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
 import com.kurento.commons.sdp.enums.MediaType;
 import com.kurento.commons.sdp.enums.Mode;
+import com.kurento.kas.mscontrol.MSControlFactory;
 import com.kurento.kas.mscontrol.MediaSessionAndroid;
 import com.kurento.kas.mscontrol.ParametersImpl;
 import com.kurento.kas.mscontrol.mediacomponent.MediaComponentAndroid;
@@ -108,7 +109,7 @@ public class VideoCallService extends Service {
 			if ((audioMode != null)
 					&& (Mode.RECVONLY.equals(audioMode) || Mode.SENDRECV
 							.equals(audioMode))) {
-				Parameters params = new ParametersImpl();
+				Parameters params = MSControlFactory.createParameters();
 				params.put(MediaComponentAndroid.STREAM_TYPE,
 						AudioManager.STREAM_MUSIC);
 				audioRecorderComponent = mediaSession.createMediaComponent(
