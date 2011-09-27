@@ -193,14 +193,13 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 					MediaComponentAndroid audioPlayerComponent = (MediaComponentAndroid) ApplicationContext.contextTable
 							.get("audioPlayerComponent");
 
-					Log.d(LOG_TAG, "Button Mute push");
-					Log.d(LOG_TAG,
-							"isStarted(): " + audioPlayerComponent.isStarted());
 					try {
-						if (audioPlayerComponent.isStarted())
-							audioPlayerComponent.stop();
-						else
-							audioPlayerComponent.start();
+						if (audioPlayerComponent != null) {
+							if (audioPlayerComponent.isStarted())
+								audioPlayerComponent.stop();
+							else
+								audioPlayerComponent.start();
+						}
 					} catch (MsControlException e) {
 						e.printStackTrace();
 					}
