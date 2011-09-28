@@ -35,8 +35,8 @@ import android.widget.Toast;
 
 import com.kurento.commons.sdp.enums.MediaType;
 import com.kurento.commons.sdp.enums.Mode;
-import com.kurento.kas.media.AudioCodecType;
-import com.kurento.kas.media.VideoCodecType;
+import com.kurento.kas.media.codecs.AudioCodecType;
+import com.kurento.kas.media.codecs.VideoCodecType;
 import com.kurento.kas.mscontrol.networkconnection.NetIF;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.controlcontacts.ControlContacts;
