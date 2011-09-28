@@ -64,6 +64,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			setContentView(R.layout.videocall_send);
 		else if ((videoMode != null) && (Mode.SENDRECV.equals(videoMode)))
 			setContentView(R.layout.videocall);
+		else setContentView(R.layout.onlycall);
 
 		VideoCallService.setUpdateListener(this);
 		hang = false;
@@ -167,7 +168,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.getMessage());
 			}
-
+			
 			final Button buttonTerminateCall = (Button) findViewById(R.id.button_terminate_call);
 			buttonTerminateCall.setOnClickListener(new OnClickListener() {
 
