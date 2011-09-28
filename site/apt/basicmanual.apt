@@ -73,18 +73,23 @@ Basic user manual:
      
 * Make a call: You can make a call in various ways.
 
-[image/outgoingcall210x350.png] Outgoing Call  
+ 
 
      * From the phonebook, choose the contact and opens the application to make the call.
      
-     * From the application:
+     * From button of call:
+
+		* Enter the contact's address in the text box and press the call button.
+       
+		* Access phonebook from the contacts button.
+       
+		* Use the list of history call.
+		
+		[]
+
+[image/new/history210x350.png] History
      
-       * Enter the contact's address in the text box and press the call button.
-       
-       * Access phonebook from the contacts button.
-       
-       * Press the call button, if the text box is empty then opens phonebook.
-       
+[image/outgoingcall210x350.png] Outgoing Call 
    
 * Accepting a call
 
