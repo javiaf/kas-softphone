@@ -10,18 +10,21 @@
 	<description>Softphone application for Android. It can make video calls using SIP with different video formats and audio formats.</description>
 	<url>http://repository.kurento.com/site/kas-softphone</url>
 
+	<organization>
+		<name>Kurento</name>
+		<url>http://www.kurento.com</url>
+	</organization>
+
 	<developers>
 		<developer>
 			<id>rbenitez</id>
 			<name>Raúl Benítez Mejías</name>
 		</developer>
-	</developers>
-
-	<contributors>
-		<contributor>
+		<developer>
+			<id>mparis</id>
 			<name>Miguel París Díaz</name>
-		</contributor>
-	</contributors>
+		</developer>
+	</developers>
 
 	<mailingLists>
 		<mailingList>
