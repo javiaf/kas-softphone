@@ -10,31 +10,54 @@
 	<description>Softphone application for Android. It can make video calls using SIP with different video formats and audio formats.</description>
 	<url>http://repository.kurento.com/site/kas-softphone</url>
 
+	<developers>
+		<developer>
+			<id>rbenitez</id>
+			<name>Raúl Benítez Mejías</name>
+		</developer>
+	</developers>
+
+	<contributors>
+		<contributor>
+			<name>Miguel París Díaz</name>
+		</contributor>
+	</contributors>
+
+	<mailingLists>
+		<mailingList>
+			<name>Kurento</name>
+			<subscribe>http://groups.google.com/group/kurento/subscribe</subscribe>
+			<post>http://groups.google.com/group/kurento/post</post>
+			<archive>http://groups.google.com/group/kurento/about</archive>
+		</mailingList>
+	</mailingLists>
+
+
 	<dependencies>
 		<dependency>
 			<groupId>com.kurento.commons</groupId>
 			<artifactId>kc-mediaspec</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-RC-1</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.kurento.kas</groupId>
 			<artifactId>kas-media</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>1.0.0-RC-1</version>
 			<type>apklib</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.kurento.kas</groupId>
 			<artifactId>kas-mscontrol</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>1.0.0-RC-1</version>
 			<type>apklib</type>
 		</dependency>
 		<dependency>
 			<groupId>com.kurento.commons</groupId>
 			<artifactId>kas-sipua-impl</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0-RC-1</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
