@@ -169,4 +169,10 @@
 			<url>scp://repository.kurento.com/opt/tomcat/current/data/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
+	
+	<scm>
+		<connection>scm:git:ssh://repository.kurento.com/git/kas-softphone</connection>
+		<developerConnection>scm:git:ssh://repository.kurento.com/git/kas-softphone</developerConnection>
+		<url>https://repository.kurento.com/git/kurento-android-sdk/?p=kas-softphone</url>
+	</scm>
 </project>
