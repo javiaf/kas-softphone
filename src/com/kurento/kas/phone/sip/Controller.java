@@ -209,6 +209,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			Log.d(LOG_TAG, "Call Terminate");
 			if (callListener != null)
 				callListener.callTerminate();
+			ApplicationContext.contextTable.remove("getCallSource");
 		} else if (SipCallEvent.CALL_REJECT.equals(eventType)) {
 			Log.d(LOG_TAG, "Call Reject");
 			if (callListener != null)
@@ -217,6 +218,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			Log.d(LOG_TAG, "Call Cancel");
 			if (callListener != null)
 				callListener.callCancel();
+			ApplicationContext.contextTable.remove("getCallSource");
 		} else if (SipCallEvent.CALL_ERROR.equals(eventType)) {
 			Log.d(LOG_TAG, "Call Error");
 			if (callListener != null)
@@ -259,7 +261,6 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		Log.d(LOG_TAG, "canceling...");
 		if (currentCall != null)
 			try {
-				ApplicationContext.contextTable.remove("getCallSource");
 				currentCall.cancel();
 			} catch (ServerInternalErrorException e) {
 				e.printStackTrace();
