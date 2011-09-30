@@ -53,7 +53,7 @@
 		<dependency>
 			<groupId>com.kurento.kas</groupId>
 			<artifactId>kas-mscontrol</artifactId>
-			<version>1.0.0-RC-1</version>
+			<version>1.0.0-RC-2</version>
 			<type>apklib</type>
 		</dependency>
 		<dependency>
