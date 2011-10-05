@@ -69,7 +69,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 	}
 
 	public void initUA(ArrayList<AudioCodecType> audioCodecs,
-			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress,
+			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress, int localPort, InetAddress publicAddress, int publicPort,
 			NetIF netIF, Map<MediaType, Mode> callDirectionMap, Integer maxBW,
 			Integer maxFR, Integer gopSize, Integer maxQueueSize,
 			String proxyIP, int proxyPort, String localUser,
@@ -96,10 +96,13 @@ public class Controller implements SipEndPointListener, SipCallListener,
 
 		SipConfig sipConfig = new SipConfig();
 		sipConfig.setLocalAddress(localAddress.getHostAddress());
-		sipConfig.setLocalPort(6060);
+		sipConfig.setLocalPort(localPort);
 		sipConfig.setProxyAddress(proxyIP);
 		sipConfig.setProxyPort(proxyPort);
-
+		sipConfig.setPublicAddress(publicAddress.getHostAddress());
+		sipConfig.setPublicPort(publicPort);
+		
+		
 		Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig);
 
 		if (ua != null) {

@@ -13,10 +13,13 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package com.kurento.kas.phone.softphone;
 
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,6 +67,12 @@ import com.kurento.kas.phone.preferences.Connection_Preferences;
 import com.kurento.kas.phone.preferences.Video_Preferences;
 import com.kurento.kas.phone.sip.Controller;
 
+import de.javawi.jstun.attribute.MessageAttributeException;
+import de.javawi.jstun.attribute.MessageAttributeParsingException;
+import de.javawi.jstun.header.MessageHeaderParsingException;
+import de.javawi.jstun.test.*;
+import de.javawi.jstun.util.UtilityException;
+
 public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private final int MEDIA_CONTROL_OUTGOING = 0;
 	private final int SHOW_PREFERENCES = 1;
@@ -77,6 +86,10 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private ArrayList<VideoCodecType> videoCodecs;
 	private Map<MediaType, Mode> callDirectionMap;
 	private InetAddress localAddress;
+	private InetAddress publicAddress;
+	private InetAddress lAddressNew;
+	private int localPort = 6060;
+	private int publicPort;
 	private NetIF netIF;
 	// ConnectivityManager ConnectManager;
 	ConnectivityManager connManager;
@@ -162,7 +175,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		if (ni != null) {
 
 			if (initControllerUAFromSettings()) {
-
 				if (controller == null) {
 					Log.d(LOG_TAG, "Controller is null");
 					register();
@@ -780,6 +792,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					netIF = NetIF.MOBILE;
 
 				this.localAddress = NetworkIP.getLocalAddress();
+				publicAddress = localAddress;
+				if (isNewIp())
+					update_stun();
 				ApplicationContext.contextTable.put("localAddress",
 						localAddress);
 
@@ -799,7 +814,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private void initUA() {
 		try {
 
-			controller.initUA(audioCodecs, videoCodecs, localAddress, netIF,
+			controller.initUA(audioCodecs, videoCodecs, localAddress,
+					localPort, publicAddress, publicPort, netIF,
 					callDirectionMap, max_BW, max_FR, gop_size, max_queue,
 					proxyIP, proxyPort, localUser, localPassword, localRealm);
 			ApplicationContext.contextTable.put("controller", controller);
@@ -835,6 +851,19 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	}
 
+	private boolean isNewIp() {
+
+		InetAddress lAddress;
+		lAddressNew = NetworkIP.getLocalAddress();
+		lAddress = (InetAddress) ApplicationContext.contextTable
+				.get("localAddress");
+
+		if (lAddress != null)
+			if (lAddress.equals(lAddressNew))
+				return false;
+		return true;
+	}
+
 	private final PhoneStateListener signalListener = new PhoneStateListener() {
 
 		public void onDataConnectionStateChanged(int state) {
@@ -854,46 +883,28 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				if (activeNetwork != null) {
 					networkType = activeNetwork.getType();
 				}
-				boolean isAddressEqual = false;
 				boolean isNetworking = false;
-				InetAddress lAddressNew;
-				InetAddress lAddress;
-
 				switch (networkType) {
 				case ConnectivityManager.TYPE_WIFI: // Disconnected
 					// Register() with new ip.
 					Log.d(LOG_TAG, "Connection OK, Register... WIFI");
-					lAddressNew = NetworkIP.getLocalAddress();
-					lAddress = (InetAddress) ApplicationContext.contextTable
-							.get("localAddress");
+
 					wifi.setBackgroundResource(R.drawable.wifi_on_120);
 					_3g.setBackgroundResource(R.drawable.icon_3g_off_120);
 					info_wifi = "Wifi enable. \n IP: \n " + lAddressNew;
 					info_3g = "Not connected";
-					if (lAddress != null)
-						if (lAddress.equals(lAddressNew))
-							isAddressEqual = true;
-						else
-							isAddressEqual = false;
 					isNetworking = true;
 					break;
 				case ConnectivityManager.TYPE_MOBILE: // Connecting
 					// Register() with new ip.
 					Log.d(LOG_TAG, "Connection OK, Register...MOBILE");
 					ApplicationContext.contextTable.put("isNetworking", true);
-					lAddressNew = NetworkIP.getLocalAddress();
-					lAddress = (InetAddress) ApplicationContext.contextTable
-							.get("localAddress");
 
 					wifi.setBackgroundResource(R.drawable.wifi_off_120);
 					_3g.setBackgroundResource(R.drawable.icon_3g_on_120);
 					info_wifi = "Not connected";
 					info_3g = "3G enable. \n IP: \n " + lAddressNew;
-					if (lAddress != null)
-						if (lAddress.equals(lAddressNew))
-							isAddressEqual = true;
-						else
-							isAddressEqual = false;
+
 					isNetworking = true;
 					break;
 				case -1: // Disconneted
@@ -910,9 +921,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 				if (isNetworking) {
 					// Destruir Service and UA
-					Log.d(LOG_TAG, "****IsNetwoking ; IsAdressEqual = "
-							+ isAddressEqual);
-					if (!isAddressEqual) {
+					Log.d(LOG_TAG, "****IsNetwoking ; isNewIp = " + isNewIp());
+					if (isNewIp()) {
+						update_stun();
 						try {
 							if (controller != null) {
 								controller.finishUA();
@@ -977,5 +988,40 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			}
 		}
 	};
+
+	private void update_stun() {
+		DiscoveryTest test = new DiscoveryTest(localAddress, localPort,
+				"stun.sipgate.net", 10000);
+		try {
+			DiscoveryInfo info = test.test();
+			publicAddress = info.getPublicIP();
+			publicPort = info.getPublicPort();
+
+			Log.d(LOG_TAG, "Private IP:" + localAddress + ":" + localPort
+					+ "\nPublic IP: " + publicAddress + ":" + publicPort);
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MessageAttributeParsingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MessageHeaderParsingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UtilityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MessageAttributeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 
 }
