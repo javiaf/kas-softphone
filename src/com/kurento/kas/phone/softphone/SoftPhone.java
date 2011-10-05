@@ -792,12 +792,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					netIF = NetIF.MOBILE;
 
 				this.localAddress = NetworkIP.getLocalAddress();
-				publicAddress = localAddress;
+				
 				if (isNewIp())
 					update_stun();
 				ApplicationContext.contextTable.put("localAddress",
 						localAddress);
-
+				
 				return true;
 			} else
 				return false;
