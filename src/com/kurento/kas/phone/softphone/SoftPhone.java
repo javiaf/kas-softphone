@@ -792,12 +792,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					netIF = NetIF.MOBILE;
 
 				this.localAddress = NetworkIP.getLocalAddress();
-				
-				if (isNewIp())
+
+				if (isNewIp()) {
+
 					update_stun();
+
+				}
 				ApplicationContext.contextTable.put("localAddress",
 						localAddress);
-				
+
 				return true;
 			} else
 				return false;
@@ -819,9 +822,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					callDirectionMap, max_BW, max_FR, gop_size, max_queue,
 					proxyIP, proxyPort, localUser, localPassword, localRealm);
 			ApplicationContext.contextTable.put("controller", controller);
-			Log.e(LOG_TAG, "put controller in context");
+			Log.d(LOG_TAG, "put controller in context");
 		} catch (Exception e) {
-			Log.e(LOG_TAG, e.toString());
+			Log.e(LOG_TAG, "Init UA : " + e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -990,38 +993,50 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	};
 
 	private void update_stun() {
-		DiscoveryTest test = new DiscoveryTest(localAddress, localPort,
-				"stun.sipgate.net", 10000);
-		try {
-			DiscoveryInfo info = test.test();
-			publicAddress = info.getPublicIP();
-			publicPort = info.getPublicPort();
+		final ProgressDialog dialog = ProgressDialog.show(SoftPhone.this, "",
+				"Loading. Please wait...", false);
+//
+//		new Thread(new Runnable() {
+//			public void run() {
+				Log.d(LOG_TAG, "Update Stun ....");
+				DiscoveryTest test = new DiscoveryTest(localAddress, localPort,
+						"stun.sipgate.net", 10000);
+				try {
 
-			Log.d(LOG_TAG, "Private IP:" + localAddress + ":" + localPort
-					+ "\nPublic IP: " + publicAddress + ":" + publicPort);
-		} catch (SocketException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MessageAttributeParsingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MessageHeaderParsingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UtilityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MessageAttributeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+					DiscoveryInfo info = test.test();
+					Log.d(LOG_TAG, "test ....");
+
+					publicAddress = info.getPublicIP();
+					publicPort = info.getPublicPort();
+
+					Log.d(LOG_TAG, "Private IP:" + localAddress + ":"
+							+ localPort + "\nPublic IP: " + publicAddress + ":"
+							+ publicPort);
+				} catch (SocketException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (UnknownHostException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (MessageAttributeParsingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (MessageHeaderParsingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (UtilityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (MessageAttributeException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				dialog.dismiss();
+//			}
+//		}).start();
 
 	}
-
 }

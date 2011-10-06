@@ -78,6 +78,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		Parameters params = MSControlFactory.createParameters();
 		params.put(MediaSessionAndroid.NET_IF, netIF);
 		params.put(MediaSessionAndroid.LOCAL_ADDRESS, localAddress);
+		params.put(MediaSessionAndroid.PUBLIC_ADDRESS, publicAddress);
 		params.put(MediaSessionAndroid.MAX_BANDWIDTH, maxBW);
 
 		params.put(MediaSessionAndroid.STREAMS_MODES, callDirectionMap);
