@@ -728,7 +728,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 			if (!stunHostAux.equals("-")) {
 				stunHost = stunHostAux;
-				stunPort = Integer.parseInt(settings.getString("STUN_HOST_PORT", "3478"));
+				stunPort = Integer.parseInt(settings.getString(
+						"STUN_HOST_PORT", "3478"));
 			}
 		}
 	}
@@ -843,7 +844,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			controller.initUA(audioCodecs, videoCodecs, localAddress,
 					localPort, publicAddress, publicPort, netIF,
 					callDirectionMap, max_BW, max_FR, gop_size, max_queue,
-					proxyIP, proxyPort, localUser, localPassword, localRealm);
+					proxyIP, proxyPort, localUser, localPassword, localRealm,
+					stunHost, stunPort);
 			ApplicationContext.contextTable.put("controller", controller);
 			Log.d(LOG_TAG, "put controller in context");
 		} catch (Exception e) {
@@ -1017,15 +1019,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	};
 
 	private void update_stun() {
-//		final ProgressDialog dialog = ProgressDialog.show(SoftPhone.this, "",
-//				"Loading. Please wait...", false);
+		// final ProgressDialog dialog = ProgressDialog.show(SoftPhone.this, "",
+		// "Loading. Please wait...", false);
 		//
 		// new Thread(new Runnable() {
 		// public void run() {
 		Log.d(LOG_TAG, "Update Stun .... with :" + stunHost + ":" + stunPort);
 		DiscoveryTest test = new DiscoveryTest(localAddress, localPort,
 				stunHost, stunPort);
-		
+
 		// "stun.sipgate.net", 10000);
 		try {
 
@@ -1037,28 +1039,27 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 			Log.d(LOG_TAG, "Private IP:" + localAddress + ":" + localPort
 					+ "\nPublic IP: " + publicAddress + ":" + publicPort);
-			info_network = "IP Private: \n "
-						+ localAddress.getHostAddress() + ":" + localPort
-						+ "\n IP Public: \n " + publicAddress.getHostAddress()
-						+ ":" + publicPort;
-//			if (type_network == ConnectivityManager.TYPE_WIFI) {
-//				info_wifi = "Wifi enable. \n IP Private: \n "
-//						+ localAddress.getHostAddress() + ":" + localPort
-//						+ "\n IP Public: \n " + publicAddress.getHostAddress()
-//						+ ":" + publicPort;
-//				info_3g = "Not connected";
-//			} else if (type_network == ConnectivityManager.TYPE_MOBILE) {
-//				info_3g = "3G enable. \n IP Private: \n "
-//						+ localAddress.getHostAddress() + ":" + localPort
-//						+ "\n IP Public: \n " + publicAddress.getHostAddress()
-//						+ ":" + publicPort;
-//				info_wifi = "Not connected";
-//			}
+			info_network = "IP Private: \n " + localAddress.getHostAddress()
+					+ ":" + localPort + "\n IP Public: \n "
+					+ publicAddress.getHostAddress() + ":" + publicPort;
+			// if (type_network == ConnectivityManager.TYPE_WIFI) {
+			// info_wifi = "Wifi enable. \n IP Private: \n "
+			// + localAddress.getHostAddress() + ":" + localPort
+			// + "\n IP Public: \n " + publicAddress.getHostAddress()
+			// + ":" + publicPort;
+			// info_3g = "Not connected";
+			// } else if (type_network == ConnectivityManager.TYPE_MOBILE) {
+			// info_3g = "3G enable. \n IP Private: \n "
+			// + localAddress.getHostAddress() + ":" + localPort
+			// + "\n IP Public: \n " + publicAddress.getHostAddress()
+			// + ":" + publicPort;
+			// info_wifi = "Not connected";
+			// }
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Update Stun: " + e.toString());
 			e.printStackTrace();
 		}
-//		dialog.dismiss();
+		// dialog.dismiss();
 		// }
 		// }).start();
 

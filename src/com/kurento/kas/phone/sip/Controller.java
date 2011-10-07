@@ -73,7 +73,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			NetIF netIF, Map<MediaType, Mode> callDirectionMap, Integer maxBW,
 			Integer maxFR, Integer gopSize, Integer maxQueueSize,
 			String proxyIP, int proxyPort, String localUser,
-			String localPassword, String localRealm) throws Exception {
+			String localPassword, String localRealm, String stunHost, Integer stunPort) throws Exception {
 
 		Parameters params = MSControlFactory.createParameters();
 		params.put(MediaSessionAndroid.NET_IF, netIF);
@@ -89,6 +89,9 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		params.put(MediaSessionAndroid.MAX_FRAME_RATE, maxFR);
 		params.put(MediaSessionAndroid.GOP_SIZE, gopSize);
 		params.put(MediaSessionAndroid.FRAMES_QUEUE_SIZE, maxQueueSize);
+		
+		params.put(MediaSessionAndroid.STUN_HOST, stunHost);
+		params.put(MediaSessionAndroid.STUN_PORT, stunPort);
 
 		Log.d(LOG_TAG, "createMediaSession...");
 		mediaSession = MSControlFactory.createMediaSession(params);
