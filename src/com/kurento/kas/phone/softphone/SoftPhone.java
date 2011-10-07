@@ -920,7 +920,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					wifi.setBackgroundResource(R.drawable.wifi_on_120);
 					_3g.setBackgroundResource(R.drawable.icon_3g_off_120);
 					info_3g = "Not connected";
-					info_wifi = info_network;
+					info_wifi = (String) ApplicationContext.contextTable.get("info_network");
 					type_network = ConnectivityManager.TYPE_WIFI;
 					isNetworking = true;
 					break;
@@ -929,7 +929,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					Log.d(LOG_TAG, "Connection OK, Register...MOBILE");
 					ApplicationContext.contextTable.put("isNetworking", true);
 					info_wifi = "Not connected";
-					info_3g = info_network;
+					info_3g  = (String) ApplicationContext.contextTable.get("info_network");
 					wifi.setBackgroundResource(R.drawable.wifi_off_120);
 					_3g.setBackgroundResource(R.drawable.icon_3g_on_120);
 					type_network = ConnectivityManager.TYPE_MOBILE;
@@ -1042,6 +1042,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			info_network = "IP Private: \n " + localAddress.getHostAddress()
 					+ ":" + localPort + "\n IP Public: \n "
 					+ publicAddress.getHostAddress() + ":" + publicPort;
+			
+			ApplicationContext.contextTable.put("info_network", info_network);
 			// if (type_network == ConnectivityManager.TYPE_WIFI) {
 			// info_wifi = "Wifi enable. \n IP Private: \n "
 			// + localAddress.getHostAddress() + ":" + localPort
