@@ -16,10 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.kurento.kas.phone.softphone;
 
-import java.io.IOException;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,11 +64,8 @@ import com.kurento.kas.phone.preferences.Connection_Preferences;
 import com.kurento.kas.phone.preferences.Video_Preferences;
 import com.kurento.kas.phone.sip.Controller;
 
-import de.javawi.jstun.attribute.MessageAttributeException;
-import de.javawi.jstun.attribute.MessageAttributeParsingException;
-import de.javawi.jstun.header.MessageHeaderParsingException;
-import de.javawi.jstun.test.*;
-import de.javawi.jstun.util.UtilityException;
+import de.javawi.jstun.test.DiscoveryInfo;
+import de.javawi.jstun.test.DiscoveryTest;
 
 public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private final int MEDIA_CONTROL_OUTGOING = 0;
@@ -135,14 +129,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private boolean isRegister = false;
 
 	private boolean isExit = false;
-
-	// =(ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-	//
-	// String sNetworkType = "No Activate";
-	// /*Control para sólo transmitir cuando tengamos conexión si es false*/
-	// boolean backgroundEnabled = ConnectManager.getBackgroundDataSetting();
-	//
-	// NetworkInfo activeNetwork = ConnectManager.getActiveNetworkInfo();
 
 	/** Called when the activity is first created. */
 	/* Cycle Life */
