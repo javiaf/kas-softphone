@@ -728,7 +728,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 			if (!stunHostAux.equals("-")) {
 				stunHost = stunHostAux;
-				stunPort = settings.getInt("STUN_HOST", 3478);
+				stunPort = Integer.parseInt(settings.getString("STUN_HOST_PORT", "3478"));
 			}
 		}
 	}
