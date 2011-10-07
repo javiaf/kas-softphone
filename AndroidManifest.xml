@@ -63,6 +63,9 @@
 		<activity android:name="com.kurento.kas.phone.preferences.VideoCall_Preferences"
 			android:label="Video Call Preferences" android:screenOrientation="portrait"></activity>
 
+		<activity android:name="com.kurento.kas.phone.preferences.Stun_Preferences"
+			android:label="Stun Preferences" android:screenOrientation="portrait"></activity>
+
 		<activity android:name="com.kurento.kas.phone.preferences.Call_Preferences"
 			android:label="Call Preferences" android:screenOrientation="portrait"></activity>
 

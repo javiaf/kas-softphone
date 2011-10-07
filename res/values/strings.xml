@@ -36,6 +36,7 @@
 	
 	<string name="txt_call_type_preferences">Call Preferences</string>
 	<string name="txt_video_preferences">Media Preferences</string>
+	<string name="txt_stun_preferences">Stun Preferences</string>
 	<string name="txt_video_codec_preferences">Video Codec</string>
 	
 	<string name="txt_menu_register">Register</string>
@@ -66,6 +67,12 @@
 	<string name="max_gop_summary">Select size between two I-frames</string>
 	<string name="max_queue">Max Frame queue size</string>
 	<string name="max_queue_summary">Select max frame queue size</string>
+	
+	<string name="stun_host">Stun host</string>
+	<string name="summary_stun_host">Write a Stun host</string>
+	
+	<string name="stun_host_port">Stun port</string>
+	<string name="summary_stun_host_port">Write a Stun port</string>
 	
 
 </resources>

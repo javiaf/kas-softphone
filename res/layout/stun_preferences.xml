@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory android:title="Video Preferences">
+		<ListPreference android:key="STUN_LIST" android:title="Stun list"
+			android:summary="Select a Stun host" android:entries="@array/stun_host"
+			android:entryValues="@array/stun_host" android:defaultValue="stun.xten.com"
+			android:dialogTitle="Select a Stun host" />
+			
+		<EditTextPreference android:key="STUN_HOST"
+			android:title="@string/stun_host" android:summary="@string/summary_stun_host"/>
+
+		<EditTextPreference android:key="STUN_HOST_PORT"
+			android:title="@string/stun_host_port" android:summary="@string/summary_stun_host_port" android:inputType="number"/>
+	</PreferenceCategory>
+</PreferenceScreen>
