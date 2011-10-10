@@ -53,13 +53,13 @@
 		<dependency>
 			<groupId>com.kurento.kas</groupId>
 			<artifactId>kas-mscontrol</artifactId>
-			<version>1.0.0-RC-2</version>
+			<version>1.0.0-RC-3-SNAPSHOT</version>
 			<type>apklib</type>
 		</dependency>
 		<dependency>
 			<groupId>com.kurento.commons</groupId>
 			<artifactId>kas-sipua-impl</artifactId>
-			<version>1.0.0-RC-1</version>
+			<version>1.0.0-RC-2-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
