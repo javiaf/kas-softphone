@@ -85,7 +85,8 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		params.put(MediaSessionAndroid.AUDIO_CODECS, audioCodecs);
 		params.put(MediaSessionAndroid.VIDEO_CODECS, videoCodecs);
 
-		params.put(MediaSessionAndroid.FRAME_SIZE, null);
+		params.put(MediaSessionAndroid.FRAME_HEIGHT, null);
+		params.put(MediaSessionAndroid.FRAME_WIDTH, null);
 		params.put(MediaSessionAndroid.MAX_FRAME_RATE, maxFR);
 		params.put(MediaSessionAndroid.GOP_SIZE, gopSize);
 		params.put(MediaSessionAndroid.FRAMES_QUEUE_SIZE, maxQueueSize);
