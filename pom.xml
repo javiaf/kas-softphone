@@ -46,7 +46,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.kurento.kas</groupId>
-			<artifactId>kas-media-lib</artifactId>
+			<artifactId>kas-media-native</artifactId>
 			<version>1.1.0-SNAPSHOT</version>
 			<type>apklib</type>
 			<scope>compile</scope>
