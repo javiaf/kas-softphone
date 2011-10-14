@@ -20,6 +20,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Map;
 
+import android.hardware.Camera;
 import android.util.Log;
 
 import com.kurento.commons.mscontrol.Parameters;
@@ -85,8 +86,8 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		params.put(MediaSessionAndroid.AUDIO_CODECS, audioCodecs);
 		params.put(MediaSessionAndroid.VIDEO_CODECS, videoCodecs);
 
-		params.put(MediaSessionAndroid.FRAME_HEIGHT, null);
-		params.put(MediaSessionAndroid.FRAME_WIDTH, null);
+//		params.put(MediaSessionAndroid.FRAME_WIDTH, new Integer(176));
+//		params.put(MediaSessionAndroid.FRAME_HEIGHT, new Integer(144));
 		params.put(MediaSessionAndroid.MAX_FRAME_RATE, maxFR);
 		params.put(MediaSessionAndroid.GOP_SIZE, gopSize);
 		params.put(MediaSessionAndroid.FRAMES_QUEUE_SIZE, maxQueueSize);
@@ -104,11 +105,11 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		sipConfig.setLocalPort(localPort);
 		sipConfig.setProxyAddress(proxyIP);
 		sipConfig.setProxyPort(proxyPort);
-		sipConfig.setStunAddress(stunHost);
-		sipConfig.setStunPort(stunPort);
+//		sipConfig.setPublicAddress(publicAddress.getHostAddress());
+//		sipConfig.setPublicPort(publicPort);
 
-		Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig + " Stun :"
-				+ stunHost + ":" + stunPort);
+
+		Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig);
 
 		if (ua != null) {
 			ua.terminate();
