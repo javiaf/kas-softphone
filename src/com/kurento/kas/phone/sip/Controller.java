@@ -13,7 +13,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package com.kurento.kas.phone.sip;
 
 import java.net.InetAddress;
@@ -69,16 +69,16 @@ public class Controller implements SipEndPointListener, SipCallListener,
 	}
 
 	public void initUA(ArrayList<AudioCodecType> audioCodecs,
-			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress, int localPort, InetAddress publicAddress, int publicPort,
-			NetIF netIF, Map<MediaType, Mode> callDirectionMap, Integer maxBW,
-			Integer maxFR, Integer gopSize, Integer maxQueueSize,
-			String proxyIP, int proxyPort, String localUser,
-			String localPassword, String localRealm, String stunHost, Integer stunPort) throws Exception {
+			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress,
+			int localPort, NetIF netIF, Map<MediaType, Mode> callDirectionMap,
+			Integer maxBW, Integer maxFR, Integer gopSize,
+			Integer maxQueueSize, String proxyIP, int proxyPort,
+			String localUser, String localPassword, String localRealm,
+			String stunHost, Integer stunPort) throws Exception {
 
 		Parameters params = MSControlFactory.createParameters();
 		params.put(MediaSessionAndroid.NET_IF, netIF);
 		params.put(MediaSessionAndroid.LOCAL_ADDRESS, localAddress);
-		params.put(MediaSessionAndroid.PUBLIC_ADDRESS, publicAddress);
 		params.put(MediaSessionAndroid.MAX_BANDWIDTH, maxBW);
 
 		params.put(MediaSessionAndroid.STREAMS_MODES, callDirectionMap);
@@ -90,7 +90,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		params.put(MediaSessionAndroid.MAX_FRAME_RATE, maxFR);
 		params.put(MediaSessionAndroid.GOP_SIZE, gopSize);
 		params.put(MediaSessionAndroid.FRAMES_QUEUE_SIZE, maxQueueSize);
-		
+
 		params.put(MediaSessionAndroid.STUN_HOST, stunHost);
 		params.put(MediaSessionAndroid.STUN_PORT, stunPort);
 
@@ -104,11 +104,11 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		sipConfig.setLocalPort(localPort);
 		sipConfig.setProxyAddress(proxyIP);
 		sipConfig.setProxyPort(proxyPort);
-		sipConfig.setPublicAddress(publicAddress.getHostAddress());
-		sipConfig.setPublicPort(publicPort);
-		
-		
-		Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig);
+		sipConfig.setStunAddress(stunHost);
+		sipConfig.setStunPort(stunPort);
+
+		Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig + " Stun :"
+				+ stunHost + ":" + stunPort);
 
 		if (ua != null) {
 			ua.terminate();
