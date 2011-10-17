@@ -13,7 +13,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package com.kurento.kas.phone.softphone;
 
 import java.net.InetAddress;
@@ -61,6 +61,7 @@ import com.kurento.kas.phone.historycall.ListViewHistoryItem;
 import com.kurento.kas.phone.media.MediaControlOutgoing;
 import com.kurento.kas.phone.network.NetworkIP;
 import com.kurento.kas.phone.preferences.Connection_Preferences;
+import com.kurento.kas.phone.preferences.Stun_Preferences;
 import com.kurento.kas.phone.preferences.Video_Preferences;
 import com.kurento.kas.phone.sip.Controller;
 
@@ -77,7 +78,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private ArrayList<VideoCodecType> videoCodecs;
 	private Map<MediaType, Mode> callDirectionMap;
 	private InetAddress localAddress;
+	private InetAddress publicAddress;
+	private InetAddress lAddressNew;
+	private int localPort = 6060;
+	private int publicPort;
 	private NetIF netIF;
+
+	private String stunHost = "";
+	private int stunPort = 0;
+
 	// ConnectivityManager ConnectManager;
 	ConnectivityManager connManager;
 	NetworkInfo ni;
@@ -95,8 +104,10 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	private String info_connect;
 
+	private int type_network;
 	private String info_wifi = "Not connected";
 	private String info_3g = "Not connected";
+	private String info_network = "";
 	private String info_video;
 	private String info_audio_aux;
 	private String info_video_aux;
@@ -121,14 +132,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private boolean isRegister = false;
 
 	private boolean isExit = false;
-
-	// =(ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-	//
-	// String sNetworkType = "No Activate";
-	// /*Control para sólo transmitir cuando tengamos conexión si es false*/
-	// boolean backgroundEnabled = ConnectManager.getBackgroundDataSetting();
-	//
-	// NetworkInfo activeNetwork = ConnectManager.getActiveNetworkInfo();
 
 	/** Called when the activity is first created. */
 	/* Cycle Life */
@@ -162,7 +165,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		if (ni != null) {
 
 			if (initControllerUAFromSettings()) {
-
 				if (controller == null) {
 					Log.d(LOG_TAG, "Controller is null");
 					register();
@@ -565,6 +567,10 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			Intent remotePreferences = new Intent(this, Video_Preferences.class);
 			startActivityForResult(remotePreferences, SHOW_PREFERENCES);
 			return true;
+		case (R.id.menu_stun_preferences):
+			Intent stunPreferences = new Intent(this, Stun_Preferences.class);
+			startActivityForResult(stunPreferences, SHOW_PREFERENCES);
+			return true;
 		case (R.id.menu_about):
 			final Dialog dialog = new Dialog(this);
 			dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
@@ -703,6 +709,29 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		return callDirection;
 	}
 
+	private void getStunFromSettings() {
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(getBaseContext());
+		String stunHostAux = settings.getString("STUN_LIST", "-");
+
+		if (stunHostAux.equals("-")) {
+			stunHostAux = settings.getString("STUN_HOST", "-");
+
+			if (!stunHostAux.equals("-")) {
+				stunHost = stunHostAux;
+				stunPort = Integer.parseInt(settings.getString(
+						"STUN_HOST_PORT", "3478"));
+			} else {
+				stunHost = "";
+				stunPort = 0;
+			}
+		} else {
+			stunHost = stunHostAux;
+			stunPort = Integer.parseInt(settings.getString("STUN_HOST_PORT",
+					"3478"));
+		}
+	}
+
 	private boolean getPreferences() {
 		try {
 			SharedPreferences settings = PreferenceManager
@@ -712,6 +741,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			localRealm = settings.getString("LOCAL_DOMAIN", "");
 			proxyIP = settings.getString("PROXY_IP", "");
 			proxyPort = Integer.parseInt(settings.getString("PROXY_PORT", "0"));
+
+			getStunFromSettings();
 
 			if (localUser.equals("") || localRealm.equals("")
 					|| proxyIP.equals("") || proxyPort == 0)
@@ -774,12 +805,23 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				ni = connManager.getActiveNetworkInfo();
 				String conType = ni.getTypeName();
 
-				if ("WIFI".equalsIgnoreCase(conType))
+				if ("WIFI".equalsIgnoreCase(conType)) {
 					netIF = NetIF.WIFI;
-				else if ("MOBILE".equalsIgnoreCase(conType))
+					type_network = ConnectivityManager.TYPE_WIFI;
+				} else if ("MOBILE".equalsIgnoreCase(conType)) {
 					netIF = NetIF.MOBILE;
+					type_network = ConnectivityManager.TYPE_MOBILE;
+				}
 
 				this.localAddress = NetworkIP.getLocalAddress();
+				publicAddress = localAddress;
+				publicPort = localPort;
+				info_network = "IP Private: \n "
+						+ localAddress.getHostAddress() + ":" + localPort
+						+ "\n IP Public: \n " + publicAddress.getHostAddress()
+						+ ":" + publicPort;
+				ApplicationContext.contextTable.put("info_network",
+						info_network);
 				ApplicationContext.contextTable.put("localAddress",
 						localAddress);
 
@@ -799,13 +841,14 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private void initUA() {
 		try {
 
-			controller.initUA(audioCodecs, videoCodecs, localAddress, netIF,
-					callDirectionMap, max_BW, max_FR, gop_size, max_queue,
-					proxyIP, proxyPort, localUser, localPassword, localRealm);
+			controller.initUA(audioCodecs, videoCodecs, localAddress,
+					localPort, netIF, callDirectionMap, max_BW, max_FR,
+					gop_size, max_queue, proxyIP, proxyPort, localUser,
+					localPassword, localRealm, stunHost, stunPort);
 			ApplicationContext.contextTable.put("controller", controller);
-			Log.e(LOG_TAG, "put controller in context");
+			Log.d(LOG_TAG, "put controller in context");
 		} catch (Exception e) {
-			Log.e(LOG_TAG, e.toString());
+			Log.e(LOG_TAG, "Init UA : " + e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -835,6 +878,19 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	}
 
+	private boolean isNewIp() {
+
+		InetAddress lAddress;
+		lAddressNew = NetworkIP.getLocalAddress();
+		lAddress = (InetAddress) ApplicationContext.contextTable
+				.get("localAddress");
+
+		if (lAddress != null)
+			if (lAddress.equals(lAddressNew))
+				return false;
+		return true;
+	}
+
 	private final PhoneStateListener signalListener = new PhoneStateListener() {
 
 		public void onDataConnectionStateChanged(int state) {
@@ -854,46 +910,30 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				if (activeNetwork != null) {
 					networkType = activeNetwork.getType();
 				}
-				boolean isAddressEqual = false;
 				boolean isNetworking = false;
-				InetAddress lAddressNew;
-				InetAddress lAddress;
-
 				switch (networkType) {
 				case ConnectivityManager.TYPE_WIFI: // Disconnected
 					// Register() with new ip.
 					Log.d(LOG_TAG, "Connection OK, Register... WIFI");
-					lAddressNew = NetworkIP.getLocalAddress();
-					lAddress = (InetAddress) ApplicationContext.contextTable
-							.get("localAddress");
+
 					wifi.setBackgroundResource(R.drawable.wifi_on_120);
 					_3g.setBackgroundResource(R.drawable.icon_3g_off_120);
-					info_wifi = "Wifi enable. \n IP: \n " + lAddressNew;
 					info_3g = "Not connected";
-					if (lAddress != null)
-						if (lAddress.equals(lAddressNew))
-							isAddressEqual = true;
-						else
-							isAddressEqual = false;
+					info_wifi = (String) ApplicationContext.contextTable
+							.get("info_network");
+					type_network = ConnectivityManager.TYPE_WIFI;
 					isNetworking = true;
 					break;
 				case ConnectivityManager.TYPE_MOBILE: // Connecting
 					// Register() with new ip.
 					Log.d(LOG_TAG, "Connection OK, Register...MOBILE");
 					ApplicationContext.contextTable.put("isNetworking", true);
-					lAddressNew = NetworkIP.getLocalAddress();
-					lAddress = (InetAddress) ApplicationContext.contextTable
-							.get("localAddress");
-
+					info_wifi = "Not connected";
+					info_3g = (String) ApplicationContext.contextTable
+							.get("info_network");
 					wifi.setBackgroundResource(R.drawable.wifi_off_120);
 					_3g.setBackgroundResource(R.drawable.icon_3g_on_120);
-					info_wifi = "Not connected";
-					info_3g = "3G enable. \n IP: \n " + lAddressNew;
-					if (lAddress != null)
-						if (lAddress.equals(lAddressNew))
-							isAddressEqual = true;
-						else
-							isAddressEqual = false;
+					type_network = ConnectivityManager.TYPE_MOBILE;
 					isNetworking = true;
 					break;
 				case -1: // Disconneted
@@ -902,6 +942,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					_3g.setBackgroundResource(R.drawable.icon_3g_off_120);
 					info_wifi = "Not connected";
 					info_3g = "Not connected";
+					type_network = -1;
 					isNetworking = false;
 					break;
 				default:
@@ -910,9 +951,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 				if (isNetworking) {
 					// Destruir Service and UA
-					Log.d(LOG_TAG, "****IsNetwoking ; IsAdressEqual = "
-							+ isAddressEqual);
-					if (!isAddressEqual) {
+					Log.d(LOG_TAG, "****IsNetwoking ; isNewIp = " + isNewIp());
+					if (isNewIp()) {
+
 						try {
 							if (controller != null) {
 								controller.finishUA();
@@ -940,6 +981,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 						if (initControllerUAFromSettings()) {
 							Log.d(LOG_TAG, "****Register on new networking");
 							register();
+						}
+						if (localAddress != null) {
+							info_network = "IP Private: \n "
+									+ localAddress.getHostAddress() + ":"
+									+ localPort + "\n IP Public: \n "
+									+ publicAddress.getHostAddress() + ":"
+									+ publicPort;
+							ApplicationContext.contextTable.put("info_network",
+									info_network);
 						}
 					}
 				} else {

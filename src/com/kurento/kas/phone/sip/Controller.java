@@ -13,13 +13,14 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package com.kurento.kas.phone.sip;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Map;
 
+import android.hardware.Camera;
 import android.util.Log;
 
 import com.kurento.commons.mscontrol.Parameters;
@@ -70,10 +71,11 @@ public class Controller implements SipEndPointListener, SipCallListener,
 
 	public void initUA(ArrayList<AudioCodecType> audioCodecs,
 			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress,
-			NetIF netIF, Map<MediaType, Mode> callDirectionMap, Integer maxBW,
-			Integer maxFR, Integer gopSize, Integer maxQueueSize,
-			String proxyIP, int proxyPort, String localUser,
-			String localPassword, String localRealm) throws Exception {
+			int localPort, NetIF netIF, Map<MediaType, Mode> callDirectionMap,
+			Integer maxBW, Integer maxFR, Integer gopSize,
+			Integer maxQueueSize, String proxyIP, int proxyPort,
+			String localUser, String localPassword, String localRealm,
+			String stunHost, Integer stunPort) throws Exception {
 
 		Parameters params = MSControlFactory.createParameters();
 		params.put(MediaSessionAndroid.NET_IF, netIF);
@@ -84,10 +86,14 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		params.put(MediaSessionAndroid.AUDIO_CODECS, audioCodecs);
 		params.put(MediaSessionAndroid.VIDEO_CODECS, videoCodecs);
 
-		params.put(MediaSessionAndroid.FRAME_SIZE, null);
+//		params.put(MediaSessionAndroid.FRAME_WIDTH, new Integer(176));
+//		params.put(MediaSessionAndroid.FRAME_HEIGHT, new Integer(144));
 		params.put(MediaSessionAndroid.MAX_FRAME_RATE, maxFR);
 		params.put(MediaSessionAndroid.GOP_SIZE, gopSize);
 		params.put(MediaSessionAndroid.FRAMES_QUEUE_SIZE, maxQueueSize);
+
+		params.put(MediaSessionAndroid.STUN_HOST, stunHost);
+		params.put(MediaSessionAndroid.STUN_PORT, stunPort);
 
 		Log.d(LOG_TAG, "createMediaSession...");
 		mediaSession = MSControlFactory.createMediaSession(params);
@@ -96,9 +102,12 @@ public class Controller implements SipEndPointListener, SipCallListener,
 
 		SipConfig sipConfig = new SipConfig();
 		sipConfig.setLocalAddress(localAddress.getHostAddress());
-		sipConfig.setLocalPort(6060);
+		sipConfig.setLocalPort(localPort);
 		sipConfig.setProxyAddress(proxyIP);
 		sipConfig.setProxyPort(proxyPort);
+//		sipConfig.setPublicAddress(publicAddress.getHostAddress());
+//		sipConfig.setPublicPort(publicPort);
+
 
 		Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig);
 

@@ -8,6 +8,8 @@
 				android:title="@string/txt_conection_preferences" android:id="@+id/menu_conection_preferences"></item>
 			<item android:icon="@drawable/ic_menu_preferences"
 				android:title="@string/txt_video_preferences" android:id="@+id/menu_video_preferences"></item>
+			<item android:icon="@drawable/ic_menu_preferences"
+				android:title="@string/txt_stun_preferences" android:id="@+id/menu_stun_preferences"></item>
 		</menu>
 	</item>
 
