@@ -178,8 +178,8 @@
 	</distributionManagement>
 
 	<scm>
-		<connection>scm:git:ssh://repository.kurento.com/git/kas-softphone</connection>
-		<developerConnection>scm:git:ssh://repository.kurento.com/git/kas-softphone</developerConnection>
-		<url>https://repository.kurento.com/git/kurento-android-sdk/?p=kas-softphone</url>
+		<connection>scm:http://kurento.googlecode.com</connection>
+		<developerConnection>scm:git:ssh://git@repository.kurento.com/kas/kas-softphone.git</developerConnection>
+		<url>https://repository.kurento.com/git/kurento-android-sdk/?p=kas-softphone.git</url>
 	</scm>
 </project>
