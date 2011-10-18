@@ -101,6 +101,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private Integer max_FR;
 	private Integer gop_size;
 	private Integer max_queue;
+	private Integer width;
+	private Integer height;
 
 	private String info_connect;
 
@@ -753,6 +755,16 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					+ proxyPort;
 
 			try {
+				String size = settings.getString("VIDEO_SIZE", "352x288");
+				String sizes[] = size.split("x");
+				width = Integer.parseInt(sizes[0]);
+				height = Integer.parseInt(sizes[1]);
+			} catch (NumberFormatException e) {
+				width = 352;
+				height = 288;
+			}
+			
+			try {
 				max_BW = Integer.parseInt(settings.getString("MAX_BW", ""));
 			} catch (NumberFormatException e) {
 				max_BW = null;
@@ -840,10 +852,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	private void initUA() {
 		try {
-
 			controller.initUA(audioCodecs, videoCodecs, localAddress,
 					localPort, netIF, callDirectionMap, max_BW, max_FR,
-					gop_size, max_queue, proxyIP, proxyPort, localUser,
+					gop_size, max_queue, width, height, proxyIP, proxyPort, localUser,
 					localPassword, localRealm, stunHost, stunPort);
 			ApplicationContext.contextTable.put("controller", controller);
 			Log.d(LOG_TAG, "put controller in context");
@@ -1029,3 +1040,4 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	};
 
 }
+

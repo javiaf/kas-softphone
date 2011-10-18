@@ -73,7 +73,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress,
 			int localPort, NetIF netIF, Map<MediaType, Mode> callDirectionMap,
 			Integer maxBW, Integer maxFR, Integer gopSize,
-			Integer maxQueueSize, String proxyIP, int proxyPort,
+			Integer maxQueueSize, Integer width, Integer height, String proxyIP, int proxyPort,
 			String localUser, String localPassword, String localRealm,
 			String stunHost, Integer stunPort) throws Exception {
 
@@ -86,8 +86,8 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		params.put(MediaSessionAndroid.AUDIO_CODECS, audioCodecs);
 		params.put(MediaSessionAndroid.VIDEO_CODECS, videoCodecs);
 
-//		params.put(MediaSessionAndroid.FRAME_WIDTH, new Integer(176));
-//		params.put(MediaSessionAndroid.FRAME_HEIGHT, new Integer(144));
+		params.put(MediaSessionAndroid.FRAME_WIDTH, width);
+		params.put(MediaSessionAndroid.FRAME_HEIGHT, height);
 		params.put(MediaSessionAndroid.MAX_FRAME_RATE, maxFR);
 		params.put(MediaSessionAndroid.GOP_SIZE, gopSize);
 		params.put(MediaSessionAndroid.FRAMES_QUEUE_SIZE, maxQueueSize);
