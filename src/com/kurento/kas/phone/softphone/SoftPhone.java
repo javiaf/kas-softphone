@@ -113,6 +113,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private String info_video;
 	private String info_audio_aux;
 	private String info_video_aux;
+	private String info_size_video;
 	private String info_call_type;
 
 	private ProgressDialog dialog;
@@ -286,7 +287,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			public void onClick(View v) {
 				final Dialog dialog = new Dialog(v.getContext());
 				dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-				info_video = "Codecs: \n\n" + info_video_aux + "\n\n"
+				info_video = "Codecs: \n\n" + info_size_video + "\n\n" + info_video_aux + "\n\n"
 						+ info_audio_aux + " \n\n" + info_call_type;
 				dialog.setContentView(R.layout.info_video);
 				((TextView) dialog.findViewById(R.id.info_video))
@@ -763,7 +764,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				width = 352;
 				height = 288;
 			}
-			
+			info_size_video = "Size:\n" + width +"x" + height;
 			try {
 				max_BW = Integer.parseInt(settings.getString("MAX_BW", ""));
 			} catch (NumberFormatException e) {
