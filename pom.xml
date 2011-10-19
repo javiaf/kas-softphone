@@ -6,9 +6,15 @@
 	<version>1.1.0-SNAPSHOT</version>
 	<packaging>apk</packaging>
 
-	<name>SoftPhone</name>
+	<properties>
+		<project.build.sourceEncoding>UTF-8 </project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<sign.develop>true</sign.develop>
+	</properties>
+	
+	<name>K-Phone</name>
 	<description>Softphone application for Android. It can make video calls using SIP with different video formats and audio formats.</description>
-	<url>http://repository.kurento.com/site/kas-softphone</url>
+	<url>http://www.kurento.com/docs/kas-softphone/${project.version}</url>
 
 	<organization>
 		<name>Kurento</name>
@@ -67,6 +73,39 @@
 				<finalName>${project.artifactId}-android2.2-${version}</finalName>
 			</build>
 		</profile>
+
+		<profile>
+			<id>release</id>
+			<properties>
+				<sign.develop>false</sign.develop>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jarsigner-plugin</artifactId>
+						<version>1.2</version>
+						<executions>
+							<execution>
+								<id>signing</id>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+								<phase>package</phase>
+								<inherited>true</inherited>
+								<configuration>
+<!-- 									<storetype>${keystore.type}</storetype> -->
+									<keystore>${keystore.path}</keystore>
+									<alias>${keystore.alias}</alias>
+									<storepass>${keystore.store.password}</storepass>
+									<keypass>${keystore.key.password}</keypass>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 
 	<build>
@@ -82,6 +121,10 @@
 						<platform>10</platform>
 					</sdk>
 					<undeployBeforeDeploy>true</undeployBeforeDeploy>
+					<deleteConflictingFiles>true</deleteConflictingFiles>
+					<sign>
+						<debug>${sign.develop}</debug>
+					</sign>
 				</configuration>
 				<extensions>true</extensions>
 			</plugin>
@@ -146,7 +189,7 @@
 
 	<scm>
 		<connection>scm:http://kurento.googlecode.com</connection>
-		<developerConnection>scm:git:ssh://git@repository.kurento.com/kas/kas-softphone.git</developerConnection>
-		<url>https://repository.kurento.com/git/kurento-android-sdk/?p=kas-softphone.git</url>
+                <developerConnection>scm:git:ssh://git@repository.kurento.com/kas/kas-softphone.git</developerConnection>
+                <url>https://repository.kurento.com/git/kurento-android-sdk/?p=kas-softphone.git</url>
 	</scm>
 </project>

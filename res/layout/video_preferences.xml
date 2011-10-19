@@ -11,8 +11,8 @@
 				android:defaultValue="true" android:key="H263_CODEC" />
 			<CheckBoxPreference android:title="MPEG4"
 				android:defaultValue="false" android:key="MPEG4_CODEC" />
-			<CheckBoxPreference android:title="H264"
-				android:defaultValue="false" android:key="H264_CODEC" />
+<!-- 			<CheckBoxPreference android:title="H264" -->
+<!-- 				android:defaultValue="false" android:key="H264_CODEC" /> -->
 		</PreferenceScreen>
 		
 		<ListPreference android:key="VIDEO_SIZE" android:title="Video size"
@@ -42,8 +42,8 @@
 				android:defaultValue="true" android:key="AMR_AUDIO_CODEC" />
 			<CheckBoxPreference android:title="MP2"
 				android:defaultValue="false" android:key="MP2_AUDIO_CODEC" />
-			<CheckBoxPreference android:title="AAC"
-				android:defaultValue="false" android:key="AAC_AUDIO_CODEC" />
+<!-- 			<CheckBoxPreference android:title="AAC" -->
+<!-- 				android:defaultValue="false" android:key="AAC_AUDIO_CODEC" /> -->
 		</PreferenceScreen>
 		<ListPreference android:key="CALL_AUDIO_DIRECTION"
 			android:title="Call audio direction" android:summary="Select call audio direction"
