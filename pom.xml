@@ -120,7 +120,7 @@
 					<sdk>
 						<platform>10</platform>
 					</sdk>
-					<undeployBeforeDeploy>true</undeployBeforeDeploy>
+					<!-- <undeployBeforeDeploy>true</undeployBeforeDeploy> -->
 					<deleteConflictingFiles>true</deleteConflictingFiles>
 					<sign>
 						<debug>${sign.develop}</debug>
