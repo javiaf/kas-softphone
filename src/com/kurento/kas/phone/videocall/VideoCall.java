@@ -64,6 +64,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	MediaComponent videoPlayerComponent = null;
 	MediaComponent videoRecorderComponent = null;
 
+	Boolean isStarted = true;
+
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -212,12 +214,31 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 					try {
 						if (audioPlayerComponent != null) {
-							if (audioPlayerComponent.isStarted())
-								audioPlayerComponent.stop();
-							else
-								audioPlayerComponent.start();
+							NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
+									.get("networkConnection");
+							if (nc == null) {
+								Log.e(LOG_TAG, "networkConnection is NULL");
+								return;
+							}
+
+							Boolean mute = (Boolean) ApplicationContext.contextTable
+									.get("mute");
+							if (mute != null) {
+								if (mute)
+									audioPlayerComponent.join(
+											Direction.SEND,
+											nc.getJoinableStream(StreamType.audio));
+								else
+									audioPlayerComponent.unjoin(nc
+											.getJoinableStream(StreamType.audio));
+
+								mute = !mute;
+								ApplicationContext.contextTable.put("mute",
+										mute);
+							}
 						}
 					} catch (MsControlException e) {
+						Log.e(LOG_TAG, "Exception Mute. " + e.toString());
 						e.printStackTrace();
 					}
 				}

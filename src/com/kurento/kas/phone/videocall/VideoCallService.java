@@ -114,6 +114,7 @@ public class VideoCallService extends Service {
 			if ((audioMode != null)
 					&& (Mode.SENDONLY.equals(audioMode) || Mode.SENDRECV
 							.equals(audioMode))) {
+				ApplicationContext.contextTable.put("mute", false);
 				audioPlayerComponent = mediaSession.createMediaComponent(
 						MediaComponentAndroid.AUDIO_PLAYER,
 						Parameters.NO_PARAMETER);
