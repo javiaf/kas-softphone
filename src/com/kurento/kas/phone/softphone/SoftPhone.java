@@ -392,13 +392,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		Log.d(LOG_TAG, "On Destroy");
 		try {
 			if (getIsExit()) {
-				signalManager.listen(signalListener,
-						PhoneStateListener.LISTEN_NONE);
-				if (controller != null)
-					controller.finishUA();
-				isRegister = false;
-				ApplicationContext.contextTable.put("isRegister", isRegister);
-
+				
 				intentService = (Intent) ApplicationContext.contextTable
 						.get("intentService");
 				try {
@@ -408,6 +402,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 							"stopService " + e.getMessage() + "; "
 									+ e.toString());
 				}
+				
+				signalManager.listen(signalListener,
+						PhoneStateListener.LISTEN_NONE);
+				if (controller != null)
+					controller.finishUA();
+				isRegister = false;
+				ApplicationContext.contextTable.put("isRegister", isRegister);
+
+				
 
 				ApplicationContext.contextTable.clear();
 				Log.d(LOG_TAG, " FinishUA");
@@ -596,9 +599,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			startService(intentService);
 
 			Log.d(LOG_TAG, "StartService");
-			SoftPhoneService.setUpdateListener(this);
+			
 		}
-
+		SoftPhoneService.setUpdateListener(this);
 		if (initControllerUAFromSettings())
 			initUA();
 	}
@@ -871,6 +874,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 		if (message.getData().containsKey("Register")) {
 			if (message.getData().getString("Register").equals("Sucessful")) {
+				Log.d(LOG_TAG, "Register Sucessfull");
 				registerSucessful();
 			} else if (message.getData().getString("Register").equals("Failed")) {
 				registerFailed();
