@@ -287,8 +287,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			public void onClick(View v) {
 				final Dialog dialog = new Dialog(v.getContext());
 				dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-				info_video = "Codecs: \n\n" + info_size_video + "\n\n" + info_video_aux + "\n\n"
-						+ info_audio_aux + " \n\n" + info_call_type;
+				info_video = "Codecs: \n\n" + info_size_video + "\n\n"
+						+ info_video_aux + "\n\n" + info_audio_aux + " \n\n"
+						+ info_call_type;
 				dialog.setContentView(R.layout.info_video);
 				((TextView) dialog.findViewById(R.id.info_video))
 						.setText(info_video);
@@ -392,7 +393,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		Log.d(LOG_TAG, "On Destroy");
 		try {
 			if (getIsExit()) {
-				
+
 				intentService = (Intent) ApplicationContext.contextTable
 						.get("intentService");
 				try {
@@ -402,15 +403,13 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 							"stopService " + e.getMessage() + "; "
 									+ e.toString());
 				}
-				
+
 				signalManager.listen(signalListener,
 						PhoneStateListener.LISTEN_NONE);
 				if (controller != null)
 					controller.finishUA();
 				isRegister = false;
 				ApplicationContext.contextTable.put("isRegister", isRegister);
-
-				
 
 				ApplicationContext.contextTable.clear();
 				Log.d(LOG_TAG, " FinishUA");
@@ -514,12 +513,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				initControllerUAFromSettings();
 
 			try {
-				controller.call(remoteURI);
 				Intent mediaIntent = new Intent(SoftPhone.this,
 						MediaControlOutgoing.class);
 				mediaIntent.putExtra("Id", id);
 				mediaIntent.putExtra("Uri", remoteURI);
 				startActivityForResult(mediaIntent, MEDIA_CONTROL_OUTGOING);
+				controller.call(remoteURI);
 
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.toString());
@@ -599,7 +598,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			startService(intentService);
 
 			Log.d(LOG_TAG, "StartService");
-			
+
 		}
 		SoftPhoneService.setUpdateListener(this);
 		if (initControllerUAFromSettings())
@@ -736,6 +735,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			stunPort = Integer.parseInt(settings.getString("STUN_HOST_PORT",
 					"3478"));
 		}
+		Log.d(LOG_TAG, "StunHost " + stunHost + ":" + stunPort);
 	}
 
 	private boolean getPreferences() {
@@ -767,7 +767,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				width = 352;
 				height = 288;
 			}
-			info_size_video = "Size:\n" + width +"x" + height;
+			info_size_video = "Size:\n" + width + "x" + height;
 			try {
 				max_BW = Integer.parseInt(settings.getString("MAX_BW", ""));
 			} catch (NumberFormatException e) {
@@ -858,8 +858,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		try {
 			controller.initUA(audioCodecs, videoCodecs, localAddress,
 					localPort, netIF, callDirectionMap, max_BW, max_FR,
-					gop_size, max_queue, width, height, proxyIP, proxyPort, localUser,
-					localPassword, localRealm, stunHost, stunPort);
+					gop_size, max_queue, width, height, proxyIP, proxyPort,
+					localUser, localPassword, localRealm, stunHost, stunPort);
 			ApplicationContext.contextTable.put("controller", controller);
 			Log.d(LOG_TAG, "put controller in context");
 		} catch (Exception e) {
@@ -1045,4 +1045,3 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	};
 
 }
-
