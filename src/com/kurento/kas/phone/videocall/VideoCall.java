@@ -13,7 +13,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package com.kurento.kas.phone.videocall;
 
 import java.util.Map;
@@ -80,7 +80,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			setContentView(R.layout.videocall_send);
 		else if ((videoMode != null) && (Mode.SENDRECV.equals(videoMode)))
 			setContentView(R.layout.videocall);
-		else setContentView(R.layout.onlycall);
+		else
+			setContentView(R.layout.onlycall);
 
 		VideoCallService.setUpdateListener(this);
 		hang = false;
@@ -184,7 +185,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.getMessage());
 			}
-			
+
 			final Button buttonTerminateCall = (Button) findViewById(R.id.button_terminate_call);
 			buttonTerminateCall.setOnClickListener(new OnClickListener() {
 
@@ -247,12 +248,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 							.getMediaSession();
 					MediaComponentAndroid audioRecorderComponent = (MediaComponentAndroid) ApplicationContext.contextTable
 							.get("audioRecorderComponent");
-
 					try {
-						// TODO: solo cambia al altavoz interno. El control de
-						// que
-						// altavoz se está usando habrá que hacerlo a nivel de
-						// aplicación. El API no ofrece tanto detalle
 						if (audioRecorderComponent != null) {
 							audioRecorderComponent.stop();
 							audioRecorderComponent.unjoin(nc
@@ -260,19 +256,40 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 						}
 
 						Parameters params = MSControlFactory.createParameters();
-						params.put(MediaComponentAndroid.STREAM_TYPE,
-								AudioManager.STREAM_VOICE_CALL);
-						audioRecorderComponent = mediaSession
-								.createMediaComponent(
-										MediaComponentAndroid.AUDIO_RECORDER,
-										params);
 
-						if (audioRecorderComponent != null) {
-							audioRecorderComponent.join(Direction.RECV,
-									nc.getJoinableStream(StreamType.audio));
-							audioRecorderComponent.start();
+						Boolean speaker = (Boolean) ApplicationContext.contextTable
+								.get("speaker");
+						if (speaker != null) {
+
+							if (speaker)
+								params.put(MediaComponentAndroid.STREAM_TYPE,
+										AudioManager.STREAM_MUSIC);
+							else
+								params.put(MediaComponentAndroid.STREAM_TYPE,
+										AudioManager.STREAM_VOICE_CALL);
+
+							speaker = !speaker;
+							ApplicationContext.contextTable.put("speaker",
+									speaker);
+
+							audioRecorderComponent = mediaSession
+									.createMediaComponent(
+											MediaComponentAndroid.AUDIO_RECORDER,
+											params);
+							ApplicationContext.contextTable.put(
+									"audioRecorderComponent",
+									audioRecorderComponent);
+
+							if (audioRecorderComponent != null) {
+								audioRecorderComponent.join(Direction.RECV,
+										nc.getJoinableStream(StreamType.audio));
+								audioRecorderComponent.start();
+
+							}
 						}
 					} catch (MsControlException e) {
+						Log.e(LOG_TAG,
+								"Exception change speaker." + e.toString());
 						e.printStackTrace();
 					}
 				}

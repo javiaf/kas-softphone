@@ -124,6 +124,9 @@ public class VideoCallService extends Service {
 			if ((audioMode != null)
 					&& (Mode.RECVONLY.equals(audioMode) || Mode.SENDRECV
 							.equals(audioMode))) {
+				// speaker = false, audioRecorderComponent was created as STREAM_MUSIC
+				// speaker = true, audioRecorderComponent was created as STREAM_VOICE_CALL
+				ApplicationContext.contextTable.put("speaker", false);
 				Parameters params = MSControlFactory.createParameters();
 				params.put(MediaComponentAndroid.STREAM_TYPE,
 						AudioManager.STREAM_MUSIC);
