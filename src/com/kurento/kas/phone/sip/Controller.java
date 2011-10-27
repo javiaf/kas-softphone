@@ -105,9 +105,8 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		sipConfig.setLocalPort(localPort);
 		sipConfig.setProxyAddress(proxyIP);
 		sipConfig.setProxyPort(proxyPort);
-//		sipConfig.setPublicAddress(publicAddress.getHostAddress());
-//		sipConfig.setPublicPort(publicPort);
-
+		sipConfig.setStunAddress(stunHost);
+		sipConfig.setStunPort(stunPort);
 
 		Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig);
 
