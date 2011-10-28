@@ -199,28 +199,6 @@ public class ControlContacts {
 		Bitmap bm = null;
 		int contact_id = -1;
 		int photo_id = -1;
-		// Cursor cursor =
-		// getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-		// new String[] { ContactsContract.CommonDataKinds.Phone.CONTACT_ID },
-		// ContactsContract.Data.DATA1 + "=" + "'desi@urjc.es'", null, null);
-		// if (cursor != null) {
-		// if (cursor.moveToFirst()) {
-		// contact_id = cursor.getInt(0);
-		//
-		// }
-		// }
-		// Cursor cursor =
-		// getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-		// new String[] { ContactsContract.CommonDataKinds.Phone.CONTACT_ID },
-		// ContactsContract.CommonDataKinds.Phone.NUMBER + "=" + phone, null,
-		// null);
-		// if (cursor != null) {
-		// if (cursor.moveToFirst()) {
-		// contact_id = cursor.getInt(0);
-		//
-		// }
-		// }
-		//
 		if (id != -1){
 			contact_id = id;
 
@@ -265,10 +243,10 @@ public class ControlContacts {
 
 		String id = null;
 		String name = null;
-		String number = null;
+//		String number = null;
 		String note = null;
 		String sip = null;
-		String imType = "";
+//		String imType = "";
 		if (cursor.moveToFirst()) {
 			int nameIdx = cursor
 					.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME);
@@ -282,7 +260,7 @@ public class ControlContacts {
 
 			// Leer las notas del usuario si tine
 
-			String[] columns = new String[] { ContactsContract.CommonDataKinds.Note.NOTE };
+//			String[] columns = new String[] { ContactsContract.CommonDataKinds.Note.NOTE };
 			String where = ContactsContract.Data.RAW_CONTACT_ID + " = ? AND "
 					+ ContactsContract.Data.MIMETYPE + " = ?";
 			String[] whereParameters = new String[] { id,
@@ -294,7 +272,7 @@ public class ControlContacts {
 
 			Log.e(LOG_TAG, "Valor de contacts:" + contacts.getCount());
 			;
-			String rv = null;
+//			String rv = null;
 			if (contacts.moveToFirst()) {
 				Log.e(LOG_TAG,
 						"Valor de las colunas:" + contacts.getColumnCount());
@@ -309,7 +287,7 @@ public class ControlContacts {
 
 			// Leer las IM del usuario si tine
 
-			String[] columnsIm = new String[] { ContactsContract.CommonDataKinds.Im.PROTOCOL };
+//			String[] columnsIm = new String[] { ContactsContract.CommonDataKinds.Im.PROTOCOL };
 
 			String whereIm = ContactsContract.Data.RAW_CONTACT_ID + " = ? AND "
 					+ ContactsContract.Data.MIMETYPE + " = ?";
