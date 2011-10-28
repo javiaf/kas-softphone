@@ -62,7 +62,7 @@ public class MediaControlOutgoing extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.control_call_outgoingcall);
-
+	
 		mNotificationMgr = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -100,16 +100,15 @@ public class MediaControlOutgoing extends Activity {
 		if (id != -1)
 			name = controlcontacts.getName(id);
 
-		Log.d(LOG_TAG, "Media Control Outgoing Created; uri = " + uri
-				+ " id = " + id + "; Name = " + name);
-
 		Bitmap bm = controlcontacts.getPhoto(id);
 
 		if (bm != null) {
 
 			imageCall.setImageBitmap(bm);
 		}
-
+		Log.d(LOG_TAG, "Media Control Outgoing Created; uri = " + uri
+				+ " id = " + id + "; Name = " + name);
+		
 		@SuppressWarnings("unchecked")
 		ArrayList<ListViewHistoryItem> items = (ArrayList<ListViewHistoryItem>) ApplicationContext.contextTable
 				.get("itemsHistory");

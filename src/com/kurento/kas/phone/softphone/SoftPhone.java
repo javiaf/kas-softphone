@@ -518,8 +518,19 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				mediaIntent.putExtra("Id", id);
 				mediaIntent.putExtra("Uri", remoteURI);
 				startActivityForResult(mediaIntent, MEDIA_CONTROL_OUTGOING);
-				controller.call(remoteURI);
-
+				
+				final String rUri = remoteURI;
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							controller.call(rUri);
+						} catch (Exception e) {
+							Log.e(LOG_TAG, "Controller is null, Faild in thread for call");
+							e.printStackTrace();
+						}
+					}
+				}).start();
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.toString());
 				e.printStackTrace();
