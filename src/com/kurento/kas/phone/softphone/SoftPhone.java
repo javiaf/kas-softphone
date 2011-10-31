@@ -857,9 +857,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				publicAddress = localAddress;
 				publicPort = localPort;
 				info_network = "IP Private: \n "
-						+ localAddress.getHostAddress() + ":" + localPort
-						+ "\n IP Public: \n " + publicAddress.getHostAddress()
-						+ ":" + publicPort;
+						+ localAddress.getHostAddress() + ":" + localPort;
+//						+ "\n IP Public: \n " + publicAddress.getHostAddress()
+//						+ ":" + publicPort;
 				ApplicationContext.contextTable.put("info_network",
 						info_network);
 				ApplicationContext.contextTable.put("localAddress",
@@ -1026,10 +1026,10 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 						}
 						if (localAddress != null) {
 							info_network = "IP Private: \n "
-									+ localAddress.getHostAddress() + ":"
-									+ localPort + "\n IP Public: \n "
-									+ publicAddress.getHostAddress() + ":"
-									+ publicPort;
+									+ localAddress.getHostAddress() + ":" + localPort;
+//									+ localPort + "\n IP Public: \n "
+//									+ publicAddress.getHostAddress() + ":"
+//									+ publicPort;
 							ApplicationContext.contextTable.put("info_network",
 									info_network);
 						}
