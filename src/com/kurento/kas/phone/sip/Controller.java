@@ -73,9 +73,12 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress,
 			int localPort, NetIF netIF, Map<MediaType, Mode> callDirectionMap,
 			Integer maxBW, Integer maxFR, Integer gopSize,
-			Integer maxQueueSize, Integer width, Integer height, String proxyIP, int proxyPort,
-			String localUser, String localPassword, String localRealm,
-			String stunHost, Integer stunPort) throws Exception {
+			Integer maxQueueSize, Integer width, Integer height,
+			String proxyIP, int proxyPort, String localUser,
+			String localPassword, String localRealm, String stunHost,
+			Integer stunPort) throws Exception {
+		
+		Boolean isInitUA = false;
 
 		Parameters params = MSControlFactory.createParameters();
 		params.put(MediaSessionAndroid.NET_IF, netIF);
@@ -108,14 +111,24 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		sipConfig.setStunAddress(stunHost);
 		sipConfig.setStunPort(stunPort);
 
-		Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig);
-
-		if (ua != null) {
-			ua.terminate();
-			Log.d(LOG_TAG, "UA Terminate");
-		}else Log.d(LOG_TAG, "Ua is Null");
-
-		ua = UaFactory.getInstance(sipConfig);
+		while (!isInitUA) {
+			try {
+				if (ua != null) {
+					ua.terminate();
+					Log.d(LOG_TAG, "UA Terminate");
+				} 
+				ua = UaFactory.getInstance(sipConfig);
+				isInitUA = true;
+				Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig);
+			} catch (Exception e) {
+				Log.e(LOG_TAG,  e.toString() + ". Looking for a free port.");
+				localPort = localPort + 1;
+				sipConfig.setLocalPort(localPort);
+				ua = null;
+				if (localPort >= 6070) 
+					break;
+			}
+		}
 
 		register(localUser, localPassword, localRealm);
 	}
