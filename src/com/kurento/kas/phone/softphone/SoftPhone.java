@@ -80,12 +80,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private InetAddress localAddress;
 	private InetAddress publicAddress;
 	private InetAddress lAddressNew;
-	private int localPort = 6060;
+	private int localPort = 6060  ;
 	private int publicPort;
 	private NetIF netIF;
 
-	private String stunHost = "";
-	private int stunPort = 0;
+	private String stunHost = "stun.xten.com";
+	private int stunPort = 3478 ;
 
 	// ConnectivityManager ConnectManager;
 	ConnectivityManager connManager;
@@ -148,6 +148,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		PreferenceManager.setDefaultValues(this, R.layout.video_preferences,
 				true);
 		SoftPhoneService.setUpdateListener(this);
+
+		if ((Boolean) ApplicationContext.contextTable.get("isRegister") == null)
+			ApplicationContext.contextTable.put("isRegister", false);
 
 		// PowerManager pm = (PowerManager)
 		// getSystemService(Context.POWER_SERVICE);
@@ -273,6 +276,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	protected void onResume() {
 		super.onResume();
 		Log.d(LOG_TAG, "On Resume");
+
+		try {
+			if ((Boolean) ApplicationContext.contextTable.get("isRegister"))
+				registerSucessful();
+			else
+				registerFailed();
+		} catch (Exception e) {
+			registerFailed();
+		}
 
 		/* Listener for change of networking */
 
@@ -518,7 +530,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				mediaIntent.putExtra("Id", id);
 				mediaIntent.putExtra("Uri", remoteURI);
 				startActivityForResult(mediaIntent, MEDIA_CONTROL_OUTGOING);
-				
+
 				final String rUri = remoteURI;
 				new Thread(new Runnable() {
 					@Override
@@ -526,7 +538,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 						try {
 							controller.call(rUri);
 						} catch (Exception e) {
-							Log.e(LOG_TAG, "Controller is null, Faild in thread for call");
+							Log.e(LOG_TAG,
+									"Controller is null, Faild in thread for call");
 							e.printStackTrace();
 						}
 					}
@@ -729,10 +742,10 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(getBaseContext());
 		String stunHostAux = settings.getString("STUN_LIST", "-");
-
+		Log.d(LOG_TAG, "stunHostAux : " + stunHostAux);
 		if (stunHostAux.equals("-")) {
 			stunHostAux = settings.getString("STUN_HOST", "-");
-
+			Log.d(LOG_TAG, "Es igual a '-', stunHostAux : " + stunHostAux);
 			if (!stunHostAux.equals("-")) {
 				stunHost = stunHostAux;
 				stunPort = Integer.parseInt(settings.getString(
@@ -867,10 +880,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	private void initUA() {
 		try {
+			Log.d(LOG_TAG, "Init UA ....");
 			controller.initUA(audioCodecs, videoCodecs, localAddress,
 					localPort, netIF, callDirectionMap, max_BW, max_FR,
 					gop_size, max_queue, width, height, proxyIP, proxyPort,
 					localUser, localPassword, localRealm, stunHost, stunPort);
+			Log.d(LOG_TAG, "Finish Init UA ...");
 			ApplicationContext.contextTable.put("controller", controller);
 			Log.d(LOG_TAG, "put controller in context");
 		} catch (Exception e) {
