@@ -113,7 +113,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		if (ua != null) {
 			ua.terminate();
 			Log.d(LOG_TAG, "UA Terminate");
-		}
+		}else Log.d(LOG_TAG, "Ua is Null");
 
 		ua = UaFactory.getInstance(sipConfig);
 
@@ -179,6 +179,8 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		if (SipEndPointEvent.REGISTER_USER_SUCESSFUL.equals(eventType)) {
 			this.pendingEndPointEvent = event;
 			try {
+				ApplicationContext.contextTable.put("isRegister", true);
+
 				if (callListener != null)
 					callListener.registerUserSucessful();
 			} catch (Exception e) {
@@ -191,6 +193,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 				|| SipEndPointEvent.SERVER_INTERNAL_ERROR.equals(eventType)) {
 			this.pendingEndPointEvent = event;
 			try {
+				ApplicationContext.contextTable.put("isRegister", false);
 				if (callListener != null)
 					callListener.registerUserFailed();
 			} catch (Exception e) {
