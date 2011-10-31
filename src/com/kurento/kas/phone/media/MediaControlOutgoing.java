@@ -144,7 +144,7 @@ public class MediaControlOutgoing extends Activity {
 				ContentValues nValue = new ContentValues();
 				nValue.put("id", id);
 				nValue.put("date", dateS);
-				nValue.put("uri", onlyUri[1]);
+				nValue.put("uri", uri.substring(4));
 				nValue.put("name", name);
 				nValue.put("type", false);
 				db.insert("DBHistoryCall", null, nValue);
