@@ -172,10 +172,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 			if (initControllerUAFromSettings()) {
 				if (controller == null) {
-					Log.d(LOG_TAG, "Controller is null");
 					register();
 				} else {
-					Log.d(LOG_TAG, "Controller not is null");
 					try {
 						if ((Boolean) ApplicationContext.contextTable
 								.get("isRegister"))
@@ -217,7 +215,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				return;
 			checkCallIntent(intent);
 		} else {
-			Log.e(LOG_TAG, "Network interface unable.");
 			Toast.makeText(SoftPhone.this,
 					"SoftPhone: Please enable any network interface.",
 					Toast.LENGTH_SHORT).show();
@@ -262,13 +259,11 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	@Override
 	protected void onRestart() {
-		Log.d(LOG_TAG, "On Restart");
 		super.onRestart();
 	}
 
 	@Override
 	protected void onStart() {
-		Log.d(LOG_TAG, "On Start");
 		super.onStart();
 	}
 
@@ -630,7 +625,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	}
 
 	public void registerSucessful() {
-		Log.d(LOG_TAG, "Register Sucessful");
 		SoftPhone.this.connection = (Button) findViewById(R.id.connection_button);
 		connection.setBackgroundResource(R.drawable.connect_icon);
 
@@ -642,8 +636,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	}
 
 	public void registerFailed() {
-		Log.d(LOG_TAG, "Register Failed");
-
 		info_connect = "The connection is failed. \n\n User: \n " + localUser
 				+ "@" + localRealm + "\n\n Server:\n " + proxyIP + ":"
 				+ proxyPort;
@@ -891,7 +883,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 			Log.d(LOG_TAG, "Finish Init UA ...");
 			ApplicationContext.contextTable.put("controller", controller);
-			Log.d(LOG_TAG, "put controller in context");
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Init UA : " + e.toString());
 			info_network = "IP Private: \n " + localAddress.getHostAddress()
@@ -907,11 +898,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	@Override
 	public void update(Message message) {
-		Log.d(LOG_TAG, "Message : " + message.getData());
-
 		if (message.getData().containsKey("Register")) {
 			if (message.getData().getString("Register").equals("Sucessful")) {
-				Log.d(LOG_TAG, "Register Sucessfull");
 				registerSucessful();
 			} else if (message.getData().getString("Register").equals("Failed")) {
 				registerFailed();
@@ -919,13 +907,10 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		} else if (message.getData().containsKey("finishActivity")) {
 			if (message.getData().getString("finishActivity")
 					.equals("MEDIA_CONTROL_OUTGOING")) {
-				Log.d(LOG_TAG, "Finish Activity MEDIA_CONTROL_OUTGOING");
 				finishActivity(MEDIA_CONTROL_OUTGOING);
 			}
 		} else if (message.getData().containsKey("Call")) {
 			if (message.getData().getString("Call").equals("Reject")) {
-				Log.d(LOG_TAG, "cALL rEJECT");
-
 			}
 		}
 
