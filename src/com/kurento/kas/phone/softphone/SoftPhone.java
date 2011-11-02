@@ -756,8 +756,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			}
 		} else {
 			stunHost = stunHostAux;
-			stunPort = Integer.parseInt(settings.getString("STUN_HOST_PORT",
-					"3478"));
+			stunPort = 3478;
 		}
 		Log.d(LOG_TAG, "StunHost " + stunHost + ":" + stunPort);
 	}
@@ -890,6 +889,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			Log.d(LOG_TAG, "put controller in context");
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Init UA : " + e.toString());
+			Toast.makeText(SoftPhone.this,
+					"SoftPhone: The configuration of Stun Server is failing.",
+					Toast.LENGTH_LONG).show();
 			e.printStackTrace();
 		}
 	}

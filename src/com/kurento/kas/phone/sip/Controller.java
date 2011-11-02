@@ -77,8 +77,9 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			String proxyIP, int proxyPort, String localUser,
 			String localPassword, String localRealm, String stunHost,
 			Integer stunPort) throws Exception {
-		
+
 		Boolean isInitUA = false;
+		Boolean isStunOk = true;
 
 		Parameters params = MSControlFactory.createParameters();
 		params.put(MediaSessionAndroid.NET_IF, netIF);
@@ -111,22 +112,26 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		sipConfig.setStunAddress(stunHost);
 		sipConfig.setStunPort(stunPort);
 
+		
+		ApplicationContext.contextTable.put("isStunOk", true);
 		while (!isInitUA) {
 			try {
 				if (ua != null) {
 					ua.terminate();
 					Log.d(LOG_TAG, "UA Terminate");
-				} 
+				}
 				ua = UaFactory.getInstance(sipConfig);
 				isInitUA = true;
 				Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig);
 			} catch (Exception e) {
-				Log.e(LOG_TAG,  e.toString() + ". Looking for a free port.");
+				Log.e(LOG_TAG, e.toString() + ". Looking for a free port.");
 				localPort = localPort + 1;
 				sipConfig.setLocalPort(localPort);
 				ua = null;
-				if (localPort >= 6070) 
+				if (localPort >= 6070){
+					ApplicationContext.contextTable.put("isStunOk", false);
 					break;
+				}
 			}
 		}
 
