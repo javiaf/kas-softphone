@@ -733,7 +733,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private void getStunFromSettings() {
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(getBaseContext());
-		String stunHostAux = settings.getString("STUN_LIST", "-");
+		String stunHostAux = settings.getString("STUN_LIST", "stun.xten.com");
 		Log.d(LOG_TAG, "stunHostAux : " + stunHostAux);
 		if (stunHostAux.equals("-")) {
 			stunHostAux = settings.getString("STUN_HOST", "-");
