@@ -71,7 +71,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 
 	public void initUA(ArrayList<AudioCodecType> audioCodecs,
 			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress,
-			int localPort, NetIF netIF, Map<MediaType, Mode> callDirectionMap,
+			Integer localPort, NetIF netIF, Map<MediaType, Mode> callDirectionMap,
 			Integer maxBW, Integer maxFR, Integer gopSize,
 			Integer maxQueueSize, Integer width, Integer height,
 			String proxyIP, int proxyPort, String localUser,
@@ -122,6 +122,8 @@ public class Controller implements SipEndPointListener, SipCallListener,
 				}
 				ua = UaFactory.getInstance(sipConfig);
 				isInitUA = true;
+				ApplicationContext.contextTable.put("localPort", localPort);
+				
 				Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig);
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.toString() + ". Looking for a free port.");

@@ -80,12 +80,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private InetAddress localAddress;
 	private InetAddress publicAddress;
 	private InetAddress lAddressNew;
-	private int localPort = 6060  ;
+	private int localPort = 6060;
 	private int publicPort;
 	private NetIF netIF;
 
 	private String stunHost = "stun.xten.com";
-	private int stunPort = 3478 ;
+	private int stunPort = 3478;
 
 	// ConnectivityManager ConnectManager;
 	ConnectivityManager connManager;
@@ -855,12 +855,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				this.localAddress = NetworkIP.getLocalAddress();
 				publicAddress = localAddress;
 				publicPort = localPort;
-				info_network = "IP Private: \n "
-						+ localAddress.getHostAddress() + ":" + localPort;
-//						+ "\n IP Public: \n " + publicAddress.getHostAddress()
-//						+ ":" + publicPort;
-				ApplicationContext.contextTable.put("info_network",
-						info_network);
+
 				ApplicationContext.contextTable.put("localAddress",
 						localAddress);
 
@@ -878,22 +873,36 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	}
 
 	private void initUA() {
+
 		try {
 			Log.d(LOG_TAG, "Init UA ....");
 			controller.initUA(audioCodecs, videoCodecs, localAddress,
 					localPort, netIF, callDirectionMap, max_BW, max_FR,
 					gop_size, max_queue, width, height, proxyIP, proxyPort,
 					localUser, localPassword, localRealm, stunHost, stunPort);
+
+			Integer localPortAux = (Integer) ApplicationContext.contextTable
+					.get("localPort");
+			if (localPortAux != null)
+				info_network = "IP Private: \n "
+						+ localAddress.getHostAddress() + ":" + localPortAux;
+			// + "\n IP Public: \n " + publicAddress.getHostAddress()
+			// + ":" + publicPort;
+
 			Log.d(LOG_TAG, "Finish Init UA ...");
 			ApplicationContext.contextTable.put("controller", controller);
 			Log.d(LOG_TAG, "put controller in context");
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Init UA : " + e.toString());
+			info_network = "IP Private: \n " + localAddress.getHostAddress()
+					+ ":" + localPort;
 			Toast.makeText(SoftPhone.this,
 					"SoftPhone: The configuration of Stun Server is failing.",
 					Toast.LENGTH_LONG).show();
 			e.printStackTrace();
 		}
+
+		ApplicationContext.contextTable.put("info_network", info_network);
 	}
 
 	@Override
@@ -1028,10 +1037,11 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 						}
 						if (localAddress != null) {
 							info_network = "IP Private: \n "
-									+ localAddress.getHostAddress() + ":" + localPort;
-//									+ localPort + "\n IP Public: \n "
-//									+ publicAddress.getHostAddress() + ":"
-//									+ publicPort;
+									+ localAddress.getHostAddress() + ":"
+									+ localPort;
+							// + localPort + "\n IP Public: \n "
+							// + publicAddress.getHostAddress() + ":"
+							// + publicPort;
 							ApplicationContext.contextTable.put("info_network",
 									info_network);
 						}
