@@ -112,8 +112,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		sipConfig.setStunAddress(stunHost);
 		sipConfig.setStunPort(stunPort);
 
-		
-		ApplicationContext.contextTable.put("isStunOk", true);
+		ApplicationContext.contextTable.put("isStunOk", isStunOk);
 		while (!isInitUA) {
 			try {
 				if (ua != null) {
@@ -130,8 +129,10 @@ public class Controller implements SipEndPointListener, SipCallListener,
 				localPort = localPort + 1;
 				sipConfig.setLocalPort(localPort);
 				ua = null;
-				if (localPort >= 6070){
-					ApplicationContext.contextTable.put("isStunOk", false);
+				if ((localPort >= 6065) || (!e.toString().contains("Address already in use"))){
+					Log.e(LOG_TAG, "Break initUA");
+					isStunOk = false;
+					ApplicationContext.contextTable.put("isStunOk", isStunOk);
 					break;
 				}
 			}
