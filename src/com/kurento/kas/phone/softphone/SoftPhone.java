@@ -861,7 +861,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			Toast.makeText(SoftPhone.this,
 					"SoftPhone: Please enable any network interface.",
 					Toast.LENGTH_SHORT).show();
-			return false;
+			return true;
 		}
 
 	}
@@ -877,6 +877,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 			Integer localPortAux = (Integer) ApplicationContext.contextTable
 					.get("localPort");
+			
 			if (localPortAux != null)
 				info_network = "IP Private: \n "
 						+ localAddress.getHostAddress() + ":" + localPortAux;
