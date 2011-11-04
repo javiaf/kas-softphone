@@ -1,5 +1,4 @@
 /*
-Softphone application for Android. It can make video calls using SIP with different video formats and audio formats.
 Copyright (C) 2011 Tikal Technologies
 
 This program is free software: you can redistribute it and/or modify
@@ -847,6 +846,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				this.localAddress = NetworkIP.getLocalAddress();
 				publicAddress = localAddress;
 				publicPort = localPort;
+				
+				info_network = "IP Private: \n " + localAddress.getHostAddress()
+						+ ":" + localPort;
 
 				ApplicationContext.contextTable.put("localAddress",
 						localAddress);
