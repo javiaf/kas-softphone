@@ -868,38 +868,47 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	private void initUA() {
 
-		try {
-			Log.d(LOG_TAG, "Init UA ....");
-			controller.initUA(audioCodecs, videoCodecs, localAddress,
-					localPort, netIF, callDirectionMap, max_BW, max_FR,
-					gop_size, max_queue, width, height, proxyIP, proxyPort,
-					localUser, localPassword, localRealm, stunHost, stunPort);
+		Log.d(LOG_TAG, "Init UA ....");
+		final ProgressDialog dialog = ProgressDialog.show(SoftPhone.this, "",
+				"Please wait for few seconds...", true);
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					controller.initUA(audioCodecs, videoCodecs, localAddress,
+							localPort, netIF, callDirectionMap, max_BW, max_FR,
+							gop_size, max_queue, width, height, proxyIP,
+							proxyPort, localUser, localPassword, localRealm,
+							stunHost, stunPort);
+				} catch (Exception e) {
+					Log.e(LOG_TAG, "Init UA : " + e.toString());
+					if (localAddress != null)
+						info_network = "IP Private: \n "
+								+ localAddress.getHostAddress() + ":"
+								+ localPort;
+					else
+						info_network = "Not connected";
+					Toast.makeText(
+							SoftPhone.this,
+							"SoftPhone: The configuration of Stun Server is failing or the mobile hasn't connection.",
+							Toast.LENGTH_LONG).show();
+					e.printStackTrace();
+				}
+				dialog.dismiss();
+			}
+		}).start();
 
-			Integer localPortAux = (Integer) ApplicationContext.contextTable
-					.get("localPort");
+		dialog.show();
+		
+		Integer localPortAux = (Integer) ApplicationContext.contextTable
+				.get("localPort");
 
-			if (localPortAux != null)
-				info_network = "IP Private: \n "
-						+ localAddress.getHostAddress() + ":" + localPortAux;
-			// + "\n IP Public: \n " + publicAddress.getHostAddress()
-			// + ":" + publicPort;
+		if (localPortAux != null)
+			info_network = "IP Private: \n " + localAddress.getHostAddress()
+					+ ":" + localPortAux;
+		// + "\n IP Public: \n " + publicAddress.getHostAddress()
+		// + ":" + publicPort;
 
-			Log.d(LOG_TAG, "Finish Init UA ...");
-			ApplicationContext.contextTable.put("controller", controller);
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "Init UA : " + e.toString());
-			if (localAddress != null)
-				info_network = "IP Private: \n "
-						+ localAddress.getHostAddress() + ":" + localPort;
-			else
-				info_network = "Not connected";
-			Toast.makeText(
-					SoftPhone.this,
-					"SoftPhone: The configuration of Stun Server is failing or the mobile hasn't connection.",
-					Toast.LENGTH_LONG).show();
-			e.printStackTrace();
-		}
-
+		ApplicationContext.contextTable.put("controller", controller);
 		ApplicationContext.contextTable.put("info_network", info_network);
 	}
 
