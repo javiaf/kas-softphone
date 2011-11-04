@@ -846,9 +846,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				this.localAddress = NetworkIP.getLocalAddress();
 				publicAddress = localAddress;
 				publicPort = localPort;
-				
-				info_network = "IP Private: \n " + localAddress.getHostAddress()
-						+ ":" + localPort;
+
+				info_network = "IP Private: \n "
+						+ localAddress.getHostAddress() + ":" + localPort;
 
 				ApplicationContext.contextTable.put("localAddress",
 						localAddress);
@@ -877,7 +877,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 			Integer localPortAux = (Integer) ApplicationContext.contextTable
 					.get("localPort");
-			
+
 			if (localPortAux != null)
 				info_network = "IP Private: \n "
 						+ localAddress.getHostAddress() + ":" + localPortAux;
@@ -888,10 +888,14 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			ApplicationContext.contextTable.put("controller", controller);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Init UA : " + e.toString());
-			info_network = "IP Private: \n " + localAddress.getHostAddress()
-					+ ":" + localPort;
-			Toast.makeText(SoftPhone.this,
-					"SoftPhone: The configuration of Stun Server is failing.",
+			if (localAddress != null)
+				info_network = "IP Private: \n "
+						+ localAddress.getHostAddress() + ":" + localPort;
+			else
+				info_network = "Not connected";
+			Toast.makeText(
+					SoftPhone.this,
+					"SoftPhone: The configuration of Stun Server is failing or the mobile hasn't connection.",
 					Toast.LENGTH_LONG).show();
 			e.printStackTrace();
 		}
