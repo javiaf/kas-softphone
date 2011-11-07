@@ -116,6 +116,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private String info_call_type;
 
 	private ProgressDialog dialog;
+	
 	private Intent intentService;
 	private TelephonyManager signalManager;
 
@@ -270,15 +271,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	protected void onResume() {
 		super.onResume();
 		Log.d(LOG_TAG, "On Resume");
-
-		try {
-			if ((Boolean) ApplicationContext.contextTable.get("isRegister"))
-				registerSucessful();
-			else
-				registerFailed();
-		} catch (Exception e) {
-			registerFailed();
-		}
 
 		/* Listener for change of networking */
 
@@ -869,7 +861,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private void initUA() {
 
 		Log.d(LOG_TAG, "Init UA ....");
-		final ProgressDialog dialog = ProgressDialog.show(SoftPhone.this, "",
+		final ProgressDialog dialogWait = ProgressDialog.show(SoftPhone.this, "",
 				"Please wait for few seconds...", true);
 		new Thread(new Runnable() {
 			public void run() {
@@ -893,12 +885,13 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 							Toast.LENGTH_LONG).show();
 					e.printStackTrace();
 				}
-				dialog.dismiss();
+				dialogWait.dismiss();
 			}
 		}).start();
 
-		dialog.show();
-		
+		if (!dialogWait.isShowing())
+			dialogWait.show();
+
 		Integer localPortAux = (Integer) ApplicationContext.contextTable
 				.get("localPort");
 
