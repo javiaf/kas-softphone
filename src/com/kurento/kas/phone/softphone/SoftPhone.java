@@ -116,7 +116,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private String info_call_type;
 
 	private ProgressDialog dialog;
-	
+	private ProgressDialog dialogWait;
 	private Intent intentService;
 	private TelephonyManager signalManager;
 
@@ -462,7 +462,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			 * CARGAR LAS PREFERENCIAS
 			 */
 
-			connection.setBackgroundResource(R.drawable.connecting_icon);
+			connection.setBackgroundResource(R.drawable.disconnect_icon);
 			info_connect = "Connection .... \n\n User: \n " + localUser + "@"
 					+ localRealm + "\n\n Server:\n " + proxyIP + ":"
 					+ proxyPort;
@@ -861,11 +861,13 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private void initUA() {
 
 		Log.d(LOG_TAG, "Init UA ....");
-		final ProgressDialog dialogWait = ProgressDialog.show(SoftPhone.this, "",
+
+		dialogWait = ProgressDialog.show(SoftPhone.this, "",
 				"Please wait for few seconds...", true);
 		new Thread(new Runnable() {
 			public void run() {
 				try {
+					
 					controller.initUA(audioCodecs, videoCodecs, localAddress,
 							localPort, netIF, callDirectionMap, max_BW, max_FR,
 							gop_size, max_queue, width, height, proxyIP,
@@ -879,18 +881,13 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 								+ localPort;
 					else
 						info_network = "Not connected";
-					Toast.makeText(
-							SoftPhone.this,
-							"SoftPhone: The configuration of Stun Server is failing or the mobile hasn't connection.",
-							Toast.LENGTH_LONG).show();
+		
 					e.printStackTrace();
 				}
 				dialogWait.dismiss();
 			}
 		}).start();
 
-		if (!dialogWait.isShowing())
-			dialogWait.show();
 
 		Integer localPortAux = (Integer) ApplicationContext.contextTable
 				.get("localPort");
