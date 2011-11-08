@@ -646,18 +646,21 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				.getDefaultSharedPreferences(getBaseContext());
 
 		ArrayList<VideoCodecType> selectedVideoCodecs = new ArrayList<VideoCodecType>();
+		info_video_aux = "Video Codec: ";
+		String codec = "";
 		if (settings.getBoolean("H263_CODEC", false)) {
 			selectedVideoCodecs.add(VideoCodecType.H263);
-			info_video_aux = "Video Codec:\n H263";
+			codec += "\n H263";
 		}
 		if (settings.getBoolean("MPEG4_CODEC", false)) {
 			selectedVideoCodecs.add(VideoCodecType.MPEG4);
-			info_video_aux = "Video Codec:\n MPEG4";
+			codec += "\n MPEG4";
 		}
 		if (settings.getBoolean("H264_CODEC", false)) {
 			selectedVideoCodecs.add(VideoCodecType.H264);
-			info_video_aux = "Video Codec:\n H264";
+			codec += "\n H264";
 		}
+		info_video_aux +=  codec;
 
 		return selectedVideoCodecs;
 	}
@@ -667,19 +670,21 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				.getDefaultSharedPreferences(getBaseContext());
 
 		ArrayList<AudioCodecType> selectedAudioCodecs = new ArrayList<AudioCodecType>();
+		info_audio_aux = "Audio Codec:";
+		String codec = "";
 		if (settings.getBoolean("AMR_AUDIO_CODEC", false)) {
 			selectedAudioCodecs.add(AudioCodecType.AMR);
-			info_audio_aux = "Audio Codec:\n AMR";
+			codec += "\n AMR";
 		}
 		if (settings.getBoolean("MP2_AUDIO_CODEC", false)) {
 			selectedAudioCodecs.add(AudioCodecType.MP2);
-			info_audio_aux = "Audio Codec:\n MP2";
+			codec += "\n MP2";
 		}
 		if (settings.getBoolean("AAC_AUDIO_CODEC", false)) {
 			selectedAudioCodecs.add(AudioCodecType.AAC);
-			info_audio_aux = "Audio Codec:\n AAC";
+			codec += "\n AAC";
 		}
-
+		info_audio_aux += codec;
 		return selectedAudioCodecs;
 	}
 
