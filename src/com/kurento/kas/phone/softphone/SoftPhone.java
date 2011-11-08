@@ -79,7 +79,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private InetAddress localAddress;
 	private InetAddress publicAddress;
 	private InetAddress lAddressNew;
-	private int localPort = 6060;
+	private int localPort = 0; //The stun server will give a random port
 	private int publicPort;
 	private NetIF netIF;
 
@@ -660,7 +660,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			selectedVideoCodecs.add(VideoCodecType.H264);
 			codec += "\n H264";
 		}
-		info_video_aux +=  codec;
+		info_video_aux += codec;
 
 		return selectedVideoCodecs;
 	}
@@ -786,22 +786,23 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			}
 
 			try {
-				max_FR = Integer.parseInt(settings.getString("MAX_FR", ""));
+				max_FR = Integer.parseInt(settings.getString("MAX_FR", "15"));
 			} catch (NumberFormatException e) {
-				max_FR = null;
+				max_FR = 15;
 			}
 
 			try {
-				gop_size = Integer.parseInt(settings.getString("GOP_SIZE", ""));
+				gop_size = Integer
+						.parseInt(settings.getString("GOP_SIZE", "6"));
 			} catch (NumberFormatException e) {
-				gop_size = null;
+				gop_size = 6;
 			}
 
 			try {
 				max_queue = Integer.parseInt(settings.getString("QUEUE_SIZE",
-						""));
+						"2"));
 			} catch (NumberFormatException e) {
-				max_queue = null;
+				max_queue = 2;
 			}
 
 			callDirectionMap = getCallDirectionMapFromSettings();
@@ -835,9 +836,13 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				if ("WIFI".equalsIgnoreCase(conType)) {
 					netIF = NetIF.WIFI;
 					type_network = ConnectivityManager.TYPE_WIFI;
+					if (max_BW == null)
+						max_BW = 3000000;
 				} else if ("MOBILE".equalsIgnoreCase(conType)) {
 					netIF = NetIF.MOBILE;
 					type_network = ConnectivityManager.TYPE_MOBILE;
+					if (max_BW == null)
+						max_BW = 384000;
 				}
 
 				this.localAddress = NetworkIP.getLocalAddress();
@@ -872,7 +877,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		new Thread(new Runnable() {
 			public void run() {
 				try {
-					
+
 					controller.initUA(audioCodecs, videoCodecs, localAddress,
 							localPort, netIF, callDirectionMap, max_BW, max_FR,
 							gop_size, max_queue, width, height, proxyIP,
@@ -886,13 +891,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 								+ localPort;
 					else
 						info_network = "Not connected";
-		
+
 					e.printStackTrace();
 				}
 				dialogWait.dismiss();
 			}
 		}).start();
-
 
 		Integer localPortAux = (Integer) ApplicationContext.contextTable
 				.get("localPort");
