@@ -71,12 +71,12 @@ public class Controller implements SipEndPointListener, SipCallListener,
 
 	public void initUA(ArrayList<AudioCodecType> audioCodecs,
 			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress,
-			Integer localPort, NetIF netIF, Map<MediaType, Mode> callDirectionMap,
-			Integer maxBW, Integer maxFR, Integer gopSize,
-			Integer maxQueueSize, Integer width, Integer height,
-			String proxyIP, int proxyPort, String localUser,
-			String localPassword, String localRealm, String stunHost,
-			Integer stunPort) throws Exception {
+			Integer localPort, NetIF netIF,
+			Map<MediaType, Mode> callDirectionMap, Integer maxBW,
+			Integer maxFR, Integer gopSize, Integer maxQueueSize,
+			Integer width, Integer height, String proxyIP, int proxyPort,
+			String localUser, String localPassword, String localRealm,
+			String stunHost, Integer stunPort) throws Exception {
 
 		Boolean isInitUA = false;
 		Boolean isStunOk = true;
@@ -113,6 +113,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		sipConfig.setStunPort(stunPort);
 
 		ApplicationContext.contextTable.put("isStunOk", isStunOk);
+		Integer trying = 0;
 		while (!isInitUA) {
 			try {
 				if (ua != null) {
@@ -120,16 +121,20 @@ public class Controller implements SipEndPointListener, SipCallListener,
 					Log.d(LOG_TAG, "UA Terminate");
 				}
 				ua = UaFactory.getInstance(sipConfig);
+				localPort = ua.getLocalPort();
 				isInitUA = true;
 				ApplicationContext.contextTable.put("localPort", localPort);
-				
+
 				Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig);
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.toString() + ". Looking for a free port.");
-				localPort = localPort + 1;
+				if (localPort != 0)
+					localPort++;
+				trying++;
 				sipConfig.setLocalPort(localPort);
 				ua = null;
-				if ((localPort >= 6065) || (!e.toString().contains("Address already in use"))){
+				if ((trying > 5)
+						|| (!e.toString().contains("Address already in use"))) {
 					Log.e(LOG_TAG, "Break initUA");
 					isStunOk = false;
 					ApplicationContext.contextTable.put("isStunOk", isStunOk);

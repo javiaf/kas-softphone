@@ -79,7 +79,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private InetAddress localAddress;
 	private InetAddress publicAddress;
 	private InetAddress lAddressNew;
-	private int localPort = 0; //The stun server will give a random port
+	private int localPort = 0; // The stun server will give a random port
 	private int publicPort;
 	private NetIF netIF;
 
@@ -130,11 +130,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private Button wifi;
 	private Button _3g;
 	private Button video;
+	private boolean isUseStun = true;
 
 	private Controller controller;
 	private boolean isRegister = false;
 
 	private boolean isExit = false;
+
+	int portMin = 6060;
+	int portMax = 10000;
 
 	/** Called when the activity is first created. */
 	/* Cycle Life */
@@ -410,6 +414,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				ApplicationContext.contextTable.put("isRegister", isRegister);
 
 				ApplicationContext.contextTable.clear();
+				dialogWait.dismiss();
 				Log.d(LOG_TAG, " FinishUA");
 			}
 
@@ -731,6 +736,11 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				.getDefaultSharedPreferences(getBaseContext());
 		String stunHostAux = settings.getString("STUN_LIST", "stun.xten.com");
 		Log.d(LOG_TAG, "stunHostAux : " + stunHostAux);
+
+		if (localPort == 0)
+			localPort = (int) Math.floor(Math.random()
+					* (portMin - portMax + 1) + portMax);
+		Log.d(LOG_TAG, "Get Stun. LocalPort = " + localPort);
 		if (stunHostAux.equals("-")) {
 			stunHostAux = settings.getString("STUN_HOST", "-");
 			Log.d(LOG_TAG, "Es igual a '-', stunHostAux : " + stunHostAux);
@@ -741,6 +751,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			} else {
 				stunHost = "";
 				stunPort = 0;
+				
 			}
 		} else {
 			stunHost = stunHostAux;
@@ -851,7 +862,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 				info_network = "IP Private: \n "
 						+ localAddress.getHostAddress() + ":" + localPort;
-
+				ApplicationContext.contextTable.put("info_network", info_network);
 				ApplicationContext.contextTable.put("localAddress",
 						localAddress);
 
