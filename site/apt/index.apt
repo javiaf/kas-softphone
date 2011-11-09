@@ -1,0 +1,15 @@
+
+Kurento Android Application K-Phone
+
+	This application is mainly intended for tests. It's a video soft phone application that uses Kurento Android SDK.
+	
+	Here you can find:
+	
+	* How it {{{./installation.html}install}}?
+		
+	* How it {{{./configuration.html}configurate}}?
+	
+	* {{{./basicmanual.html}Basic manual.}}
+	
+	* {{{./testplan.html}Test plan.}}
+	

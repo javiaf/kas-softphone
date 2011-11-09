@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="SoftPhone">
-  <body>
-    <menu name="App Softphone">
-      <item name="Introduction" href="index.html"/>
-      <item name="Installation" href="installation.html"/>
-      <item name="Configuration" href="configuration.html"/>
-      <item name="Basic Manual" href="basicmanual.html"/>
-      <item name="Test Plan" href="testplan.html"/>
-    </menu>
+	<bannerLeft>
+		<name>Kurento</name>
+		<src>http://www.kurento.com/sites/all/themes/bartikplus/logo.png
+		</src>
+		<href>http://www.kurento.com</href>
+	</bannerLeft>
+	<publishDate position="right" />
+	<version position="right" />
+	<body>
+		<menu name="App Softphone">
+			<item name="Introduction" href="index.html" />
+			<item name="Installation" href="installation.html" />
+			<item name="Configuration" href="configuration.html" />
+			<item name="Basic Manual" href="basicmanual.html" />
+			<item name="Test Plan" href="testplan.html" />
+		</menu>
 
-    <menu ref="reports"/>
+		<menu ref="reports" />
 
-  </body>
+	</body>
 </project>
