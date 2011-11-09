@@ -7,9 +7,9 @@ Configuration
 	
 	* <<Domain>>: This is the SIP realm, i.e. <kurento.com>
 	
-	* SIP Proxy Server: External SIP proxy and registrar where all SIP messages will be sent, i.e. <193.147.51.37>
+	* <<SIP Proxy Server>>: External SIP proxy and registrar where all SIP messages will be sent, i.e. <193.147.51.37>
 	
-	* SIP Proxy Port: Remote port where the SIP Proxy will listen form messages, i.e. <5080>
+	* <<SIP Proxy Port>>: Remote port where the SIP Proxy will listen form messages, i.e. <5080>
 	
 	{{{./basicmanual.html}K-Phone basic user manual}} shows how to configure this attributes. 
 	

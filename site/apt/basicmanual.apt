@@ -9,17 +9,20 @@ Basic user manual:
 	the basic user identity information. 
 
 * GUI layout
-The application consist of Two main sections
 
-	* Control buttons:
+	The application consist of Two main sections
+
+	* <<Control buttons>>:
 	   
 		* Agenda: Opens the agenda enabling contact search.
 	      
 		* Call: Allows the user to start a video conference.
 		
+		[]
+		
 [image/new/connected_wifi210x350.png] Init
 
-	* Status bar: Provides relevant information 
+	* <<Status bar>>: Provides relevant information 
 		
 		* Connection: Shows conectivity to the VoIP network. Any of following states are possible: Not connected,
 		Connecting and Connected.
@@ -38,10 +41,6 @@ The application consist of Two main sections
 	Menu button provides access to the preference and allows application exit the application.
  
 [image/new/push_button_menu210x350.png] Menu
-
-    
-     
-[image/new/all_preferences210x350.png] Info
      
      *  <<Preferences>>
  
@@ -88,7 +87,11 @@ The application consist of Two main sections
      * <<Exit>>: Exits the application.
      
      * <<About>>: Shows version information.
-     
+
+[image/new/all_preferences210x350.png] Info
+
+
+    
 * Making a phone call
  
 
@@ -109,7 +112,7 @@ The application consist of Two main sections
    
 * Accepting a call
 
-The K-Phone waits in background for incoming SIP calls. Press green icon to accept an incoming call
+	The K-Phone waits in background for incoming SIP calls. Press green icon to accept an incoming call
 
 [image/incomingcall210x350.png] Incoming Call
 
