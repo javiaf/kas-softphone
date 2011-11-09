@@ -71,11 +71,15 @@ public class Controller implements SipEndPointListener, SipCallListener,
 
 	public void initUA(ArrayList<AudioCodecType> audioCodecs,
 			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress,
-			int localPort, NetIF netIF, Map<MediaType, Mode> callDirectionMap,
-			Integer maxBW, Integer maxFR, Integer gopSize,
-			Integer maxQueueSize, Integer width, Integer height, String proxyIP, int proxyPort,
+			Integer localPort, NetIF netIF,
+			Map<MediaType, Mode> callDirectionMap, Integer maxBW,
+			Integer maxFR, Integer gopSize, Integer maxQueueSize,
+			Integer width, Integer height, String proxyIP, int proxyPort,
 			String localUser, String localPassword, String localRealm,
 			String stunHost, Integer stunPort) throws Exception {
+
+		Boolean isInitUA = false;
+		Boolean isStunOk = true;
 
 		Parameters params = MSControlFactory.createParameters();
 		params.put(MediaSessionAndroid.NET_IF, netIF);
@@ -105,18 +109,39 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		sipConfig.setLocalPort(localPort);
 		sipConfig.setProxyAddress(proxyIP);
 		sipConfig.setProxyPort(proxyPort);
-//		sipConfig.setPublicAddress(publicAddress.getHostAddress());
-//		sipConfig.setPublicPort(publicPort);
+		sipConfig.setStunAddress(stunHost);
+		sipConfig.setStunPort(stunPort);
 
+		ApplicationContext.contextTable.put("isStunOk", isStunOk);
+		Integer trying = 0;
+		while (!isInitUA) {
+			try {
+				if (ua != null) {
+					ua.terminate();
+					Log.d(LOG_TAG, "UA Terminate");
+				}
+				ua = UaFactory.getInstance(sipConfig);
+				localPort = ua.getLocalPort();
+				isInitUA = true;
+				ApplicationContext.contextTable.put("localPort", localPort);
 
-		Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig);
-
-		if (ua != null) {
-			ua.terminate();
-			Log.d(LOG_TAG, "UA Terminate");
+				Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig);
+			} catch (Exception e) {
+				Log.e(LOG_TAG, e.toString() + ". Looking for a free port.");
+				if (localPort != 0)
+					localPort++;
+				trying++;
+				sipConfig.setLocalPort(localPort);
+				ua = null;
+				if ((trying > 5)
+						|| (!e.toString().contains("Address already in use"))) {
+					Log.e(LOG_TAG, "Break initUA");
+					isStunOk = false;
+					ApplicationContext.contextTable.put("isStunOk", isStunOk);
+					break;
+				}
+			}
 		}
-
-		ua = UaFactory.getInstance(sipConfig);
 
 		register(localUser, localPassword, localRealm);
 	}
@@ -180,6 +205,8 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		if (SipEndPointEvent.REGISTER_USER_SUCESSFUL.equals(eventType)) {
 			this.pendingEndPointEvent = event;
 			try {
+				ApplicationContext.contextTable.put("isRegister", true);
+
 				if (callListener != null)
 					callListener.registerUserSucessful();
 			} catch (Exception e) {
@@ -192,6 +219,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 				|| SipEndPointEvent.SERVER_INTERNAL_ERROR.equals(eventType)) {
 			this.pendingEndPointEvent = event;
 			try {
+				ApplicationContext.contextTable.put("isRegister", false);
 				if (callListener != null)
 					callListener.registerUserFailed();
 			} catch (Exception e) {

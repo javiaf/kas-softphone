@@ -166,7 +166,7 @@ public class MediaControlIncoming extends Activity implements
 				ContentValues nValue = new ContentValues();
 				nValue.put("id", idContact);
 				nValue.put("date", dateS);
-				nValue.put("uri", sipUri);
+				nValue.put("uri", uri.substring(4));
 				nValue.put("name", name);
 				nValue.put("type", true);
 				db.insert("DBHistoryCall", null, nValue);

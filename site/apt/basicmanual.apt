@@ -44,9 +44,9 @@ Basic user manual:
         	
         	In connection preferences, you can configure connection parameters SIP how the username, domain, server proxy and port.
 
-        * Video Preferences.
+        * Media Preferences.
         	
-        	In video  preferences, you can configure:
+        	In media preferences, you can configure:
         	
         		* Max BandWidth
         		        	
@@ -65,6 +65,10 @@ Basic user manual:
         		* Codecs audio
         		
         		* Audio direction
+        		
+        * Stun Preferences
+        
+        	In stun preferences, you can choose a stun server of the list or configurate a stun server. 
         		
         
      * '''Exit''': Exit the application.
