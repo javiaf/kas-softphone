@@ -1,15 +1,19 @@
 
 Kurento Android Application K-Phone
 
-	This application is mainly intended for tests. It's a video soft phone application that uses Kurento Android SDK.
+	K-Phone is an Android video softphone intended for test purposes. It uses
+	Kurento Android SDK as communication framework and provides a menu
+	enabling modification of most media core parameters.K-Phone implements
+	the most simple model of use based in one-to-one
+	communication with a remote peer.
 	
-	Here you can find:
+	This site provides resources listed below:
 	
-	* How it {{{./installation.html}install}}?
+	* {{{./installation.html}How to install K-phone}}?
 		
-	* How it {{{./configuration.html}configurate}}?
+	* {{{./configuration.html}How to configure K-phone}}?
 	
-	* {{{./basicmanual.html}Basic manual.}}
+	* {{{./basicmanual.html}Basic user manual.}}
 	
 	* {{{./testplan.html}Test plan.}}
 	
