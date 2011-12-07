@@ -97,6 +97,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private int proxyPort;
 
 	private Integer max_BW;
+	private Integer cameraFacing; // Camera.CameraInfo.CAMERA_FACING_X
 	private Integer max_FR;
 	private Integer gop_size;
 	private Integer max_queue;
@@ -751,7 +752,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			} else {
 				stunHost = "";
 				stunPort = 0;
-				
+
 			}
 		} else {
 			stunHost = stunHostAux;
@@ -795,7 +796,22 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			} catch (NumberFormatException e) {
 				max_BW = null;
 			}
+			String camera = "Camera Back";
+			try {
+				Boolean camera_t = settings.getBoolean("CAMERA_FRONT", false);
 
+				if (camera_t) {
+					cameraFacing = 1; // Camera Front
+					camera = "Camera Front";
+				} else {
+					cameraFacing = 0; // Camera Back
+					camera = "Camera Back";
+				}
+			} catch (NumberFormatException e) {
+				cameraFacing = 0;
+			}
+			Log.d(LOG_TAG, "Camera seleted =" + cameraFacing);
+			ApplicationContext.contextTable.put("cameraFacing", cameraFacing);
 			try {
 				max_FR = Integer.parseInt(settings.getString("MAX_FR", "15"));
 			} catch (NumberFormatException e) {
@@ -818,9 +834,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 			callDirectionMap = getCallDirectionMapFromSettings();
 
-			info_call_type += "\n\nMax BW:\n" + max_BW + "\n\nMax FR:\n"
-					+ max_FR + "\n\nGOP Size:\n" + gop_size
-					+ "\n\nMax Queue:\n" + max_queue;
+			info_call_type += "\n\nMax BW:\n" + max_BW + "\n\nCamera:\n:"
+					+ camera + "\n\nMax FR:\n" + max_FR + "\n\nGOP Size:\n"
+					+ gop_size + "\n\nMax Queue:\n" + max_queue;
 
 			ApplicationContext.contextTable.put("callDirection",
 					callDirectionMap);
@@ -862,7 +878,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 				info_network = "IP Private: \n "
 						+ localAddress.getHostAddress() + ":" + localPort;
-				ApplicationContext.contextTable.put("info_network", info_network);
+				ApplicationContext.contextTable.put("info_network",
+						info_network);
 				ApplicationContext.contextTable.put("localAddress",
 						localAddress);
 

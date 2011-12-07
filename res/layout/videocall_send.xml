@@ -17,30 +17,79 @@
 				android:layout_alignParentBottom="true"
 				android:layout_alignParentRight="true" android:layout_gravity="left|bottom" />
 		</TableRow>
-		<TableRow android:id="@+id/TableRow01"
-			android:layout_gravity="center">
-			<TextView android:id="@+id/TextView02" android:text=""
-				android:width="30px" />
-		</TableRow>
-		<TableRow android:id="@+id/TableRow01"
-			android:layout_gravity="center">
-			<ToggleButton android:id="@+id/button_headset"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:textOn="" android:textOff="" android:padding="10dp"
-				android:background="@drawable/headset_button" />
-		</TableRow>
-		<TableRow android:id="@+id/TableRow01"
-			android:layout_gravity="center">
-			<TextView android:id="@+id/TextView02" android:text=""
-				android:width="30px" />
-		</TableRow>
-		<TableRow android:id="@+id/TableRow01"
-			android:layout_gravity="center">
-			<ToggleButton android:id="@+id/button_mute"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:textOn="" android:textOff="" android:padding="10dp"
-				android:background="@drawable/mute_button" />
-		</TableRow>
+        <TableRow
+            android:id="@+id/TableRow01"
+            android:layout_gravity="center" >
+
+<!--             <TextView -->
+<!--                 android:id="@+id/TextView02" -->
+<!--                 android:text="" -->
+<!--                 android:width="10px" /> -->
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/TableRow01"
+            android:layout_gravity="center" >
+
+            <ToggleButton
+                android:id="@+id/button_camera"
+                android:layout_width="60dip"
+                android:layout_height="50dip"
+                android:background="@drawable/camera"
+                android:padding="10dp"
+                android:textOff=""
+                android:textOn="" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/TableRow01"
+            android:layout_gravity="center" >
+
+<!--             <TextView -->
+<!--                 android:id="@+id/TextView02" -->
+<!--                 android:text="" -->
+<!--                 android:width="10px" /> -->
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/TableRow01"
+            android:layout_gravity="center" >
+
+            <ToggleButton
+                android:id="@+id/button_headset"
+                android:layout_width="60dip"
+                android:layout_height="50dip"
+                android:background="@drawable/headset_button"
+                android:padding="10dp"
+                android:textOff=""
+                android:textOn="" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/TableRow01"
+            android:layout_gravity="center" >
+
+<!--             <TextView -->
+<!--                 android:id="@+id/TextView02" -->
+<!--                 android:text="" -->
+<!--                 android:width="10px" /> -->
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/TableRow01"
+            android:layout_gravity="center" >
+
+            <ToggleButton
+                android:id="@+id/button_mute"
+                android:layout_width="60dip"
+                android:layout_height="50dip"
+                android:background="@drawable/mute_button"
+                android:padding="10dp"
+                android:textOff=""
+                android:textOn="" />
+        </TableRow>
+    </TableLayout>
+
 	</TableLayout>
 </FrameLayout>
 

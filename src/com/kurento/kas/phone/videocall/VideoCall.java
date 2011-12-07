@@ -75,6 +75,9 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		callDirectionMap = (Map<MediaType, Mode>) ApplicationContext.contextTable
 				.get("callDirection");
 
+		cameraFacing = (Integer) ApplicationContext.contextTable
+				.get("cameraFacing");
+
 		Mode videoMode = callDirectionMap.get(MediaType.VIDEO);
 
 		if ((videoMode != null) && (Mode.RECVONLY.equals(videoMode)))
@@ -112,7 +115,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 							(View) findViewById(R.id.video_capture_surface));
 					params.put(MediaComponentAndroid.DISPLAY_ORIENTATION,
 							Orientation);
-					params.put(MediaComponentAndroid.CAMERA_FACING, cameraFacing);
+					params.put(MediaComponentAndroid.CAMERA_FACING,
+							cameraFacing);
 					videoPlayerComponent = mediaSession.createMediaComponent(
 							MediaComponentAndroid.VIDEO_PLAYER, params);
 				}
@@ -170,7 +174,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				Log.e(LOG_TAG, "networkConnection is NULL");
 				return;
 			}
-			//TODO: Review. Not do it when the button Camara has been pushed
+			// TODO: Review. Not do it when the button Camara has been pushed
 			try {
 				if (videoPlayerComponent != null) {
 					videoPlayerComponent.join(Direction.SEND,
@@ -205,6 +209,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 					finish();
 				}
 			});
+
 			final Button buttonMute = (Button) findViewById(R.id.button_mute);
 
 			buttonMute.setOnClickListener(new OnClickListener() {
@@ -245,79 +250,92 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 					}
 				}
 			});
+			try {
+				final Button buttonCamera = (Button) findViewById(R.id.button_camera);
 
-			final Button buttonCamera = (Button) findViewById(R.id.button_camera);
+				buttonCamera.setOnClickListener(new OnClickListener() {
 
-			buttonCamera.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						Log.d(LOG_TAG, "Button Push");
 
-				@Override
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					Log.d(LOG_TAG, "Button Push");
-					
-//					Log.d(LOG_TAG, "VideoPlayercomponent is Stop");
-					Controller controller = (Controller) ApplicationContext.contextTable
-							.get("controller");
-					NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
-							.get("networkConnection");
-					if (videoPlayerComponent != null){
-						videoPlayerComponent.release();
-						try {
-							videoPlayerComponent.unjoin(nc.getJoinableStream(StreamType.video));
-						} catch (MsControlException e) {
-							// TODO Auto-generated catch block
-							Log.e(LOG_TAG, "Exception unjoin " + e.toString());
-							e.printStackTrace();
+						// Log.d(LOG_TAG, "VideoPlayercomponent is Stop");
+						Controller controller = (Controller) ApplicationContext.contextTable
+								.get("controller");
+						NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
+								.get("networkConnection");
+						if (videoPlayerComponent != null) {
+							videoPlayerComponent.release();
+							try {
+								videoPlayerComponent.unjoin(nc
+										.getJoinableStream(StreamType.video));
+							} catch (MsControlException e) {
+								// TODO Auto-generated catch block
+								Log.e(LOG_TAG,
+										"Exception unjoin " + e.toString());
+								e.printStackTrace();
+							}
+							videoPlayerComponent = null;
+
 						}
-						videoPlayerComponent = null;
-						
+						Log.d(LOG_TAG, "videoPlayercomonent is null, it's Ok");
+						if (controller != null) {
+							MediaSession mediaSession = controller
+									.getMediaSession();
+
+							Log.d(LOG_TAG, "Create MediaSession");
+
+							DisplayMetrics dm = new DisplayMetrics();
+							getWindowManager().getDefaultDisplay().getMetrics(
+									dm);
+							int Orientation = getWindowManager()
+									.getDefaultDisplay().getOrientation();
+							Parameters params = MSControlFactory
+									.createParameters();
+							params.put(
+									MediaComponentAndroid.PREVIEW_SURFACE,
+									(View) findViewById(R.id.video_capture_surface));
+							params.put(
+									MediaComponentAndroid.DISPLAY_ORIENTATION,
+									Orientation);
+							if (cameraFacing == 0) {
+								params.put(MediaComponentAndroid.CAMERA_FACING,
+										1);
+								cameraFacing = 1;
+							} else {
+								params.put(MediaComponentAndroid.CAMERA_FACING,
+										0);
+								cameraFacing = 0;
+							}
+							ApplicationContext.contextTable.put("cameraFacing",
+									cameraFacing);
+							try {
+								videoPlayerComponent = mediaSession
+										.createMediaComponent(
+												MediaComponentAndroid.VIDEO_PLAYER,
+												params);
+								Log.d(LOG_TAG,
+										"Create new videoPlayerComponent");
+								videoPlayerComponent.join(Direction.SEND,
+										nc.getJoinableStream(StreamType.video));
+								videoPlayerComponent.start();
+								Log.d(LOG_TAG,
+										"Create videoPlayercomponent start");
+							} catch (MsControlException e) {
+								// TODO Auto-generated catch block
+								Log.d(LOG_TAG,
+										"Exception button Camera "
+												+ e.toString());
+								e.printStackTrace();
+							}
+						}
 					}
-					Log.d(LOG_TAG, "videoPlayercomonent is null, it's Ok");
-					if (controller != null) {
-						MediaSession mediaSession = controller
-								.getMediaSession();
-						
-						Log.d(LOG_TAG, "Create MediaSession");
+				});
+			} catch (Exception e) {
+				Log.d(LOG_TAG, "This button doesn't exist in xml");
+			}
 
-						DisplayMetrics dm = new DisplayMetrics();
-						getWindowManager().getDefaultDisplay().getMetrics(dm);
-						int Orientation = getWindowManager()
-								.getDefaultDisplay().getOrientation();
-						Parameters params = MSControlFactory.createParameters();
-						params.put(MediaComponentAndroid.PREVIEW_SURFACE,
-								(View) findViewById(R.id.video_capture_surface));
-						params.put(MediaComponentAndroid.DISPLAY_ORIENTATION,
-								Orientation);
-						if (cameraFacing == 0){
-							params.put(MediaComponentAndroid.CAMERA_FACING, 1);
-							cameraFacing = 1;
-						}
-						else {
-							params.put(MediaComponentAndroid.CAMERA_FACING, 0);
-							cameraFacing = 0;
-						}
-						try {
-							videoPlayerComponent = mediaSession
-									.createMediaComponent(
-											MediaComponentAndroid.VIDEO_PLAYER,
-											params);
-							Log.d(LOG_TAG, "Create new videoPlayerComponent");
-							videoPlayerComponent.join(Direction.SEND,
-									nc.getJoinableStream(StreamType.video));
-							videoPlayerComponent.start();
-							Log.d(LOG_TAG, "Create videoPlayercomponent start");
-						} catch (MsControlException e) {
-							// TODO Auto-generated catch block
-							Log.d(LOG_TAG, "Exception button Camera " + e.toString());
-							e.printStackTrace();
-						}
-					}
-				}
-			});
-
-			
-			
-			
 			final Button buttonSpeaker = (Button) findViewById(R.id.button_headset);
 
 			buttonSpeaker.setOnClickListener(new OnClickListener() {

@@ -66,8 +66,8 @@ public class Video_Preferences extends PreferenceActivity {
 		CheckBoxPreference cameraFacing = new CheckBoxPreference(this);
 		cameraFacing.setDefaultValue(false);
 		cameraFacing.setKey("CAMERA_FRONT");
-		cameraFacing.setTitle("Camera Front");
-		cameraFacing.setSummary("If it selected, it used the Camera Front. Else, it used the camera back.");
+		cameraFacing.setTitle("Front Camera");
+		cameraFacing.setSummary("If it selected, it used the Front Camera. Else, it used the Back Camera.");
 		
 		generalCategory.addPreference(cameraFacing);
 
