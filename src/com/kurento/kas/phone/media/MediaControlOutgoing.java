@@ -13,7 +13,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package com.kurento.kas.phone.media;
 
 import java.util.ArrayList;
@@ -57,12 +57,15 @@ public class MediaControlOutgoing extends Activity {
 	private Intent notifIntent;
 	private String notificationTitle = "Calling ...";
 	private String notificationTitleSoft = "KurentoPhone";
+	private boolean exit = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.control_call_outgoingcall);
-	
+		
+		exit = false;
+
 		mNotificationMgr = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -108,7 +111,7 @@ public class MediaControlOutgoing extends Activity {
 		}
 		Log.d(LOG_TAG, "Media Control Outgoing Created; uri = " + uri
 				+ " id = " + id + "; Name = " + name);
-		
+
 		@SuppressWarnings("unchecked")
 		ArrayList<ListViewHistoryItem> items = (ArrayList<ListViewHistoryItem>) ApplicationContext.contextTable
 				.get("itemsHistory");
@@ -166,6 +169,18 @@ public class MediaControlOutgoing extends Activity {
 		Log.d(LOG_TAG, "onRestart");
 	}
 
+	private void cancel() {
+		Log.d(LOG_TAG, "Call Canceled...");
+		Controller controller = (Controller) ApplicationContext.contextTable
+				.get("controller");
+		Log.d(LOG_TAG, "controller: " + controller);
+		try {
+			controller.cancel();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -175,16 +190,10 @@ public class MediaControlOutgoing extends Activity {
 		buttonReject.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.d(LOG_TAG, "Call Canceled...");
-				Controller controller = (Controller) ApplicationContext.contextTable
-						.get("controller");
-				Log.d(LOG_TAG, "controller: " + controller);
-				try {
-					controller.cancel();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				cancel();
+				exit = true;
 				finish();
+				
 			}
 		});
 
@@ -204,7 +213,8 @@ public class MediaControlOutgoing extends Activity {
 
 	@Override
 	protected void onDestroy() {
-
+		if (!exit)
+			cancel();
 		mNotificationMgr.cancel(NOTIF_CALLING_OUT);
 		mNotif = new Notification(R.drawable.icon, notificationTitleSoft,
 				System.currentTimeMillis());
