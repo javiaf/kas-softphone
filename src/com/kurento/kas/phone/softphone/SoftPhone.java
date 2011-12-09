@@ -412,15 +412,19 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				if (controller != null)
 					controller.finishUA();
 				isRegister = false;
-				ApplicationContext.contextTable.put("isRegister", isRegister);
 
-				ApplicationContext.contextTable.clear();
-				dialogWait.dismiss();
+				if (ApplicationContext.contextTable != null) {
+					ApplicationContext.contextTable.put("isRegister",
+							isRegister);
+					ApplicationContext.contextTable.clear();
+				}
+				if (dialogWait != null)
+					dialogWait.dismiss();
 				Log.d(LOG_TAG, " FinishUA");
 			}
 
 		} catch (Exception e) {
-//			e.printStackTrace();
+			// e.printStackTrace();
 		}
 		super.onDestroy();
 	}
@@ -538,7 +542,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				}).start();
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.toString());
-//				e.printStackTrace();
+				// e.printStackTrace();
 			}
 
 		} else
@@ -847,7 +851,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			return true;
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Error in parse preferences.");
-//			e.printStackTrace();
+			// e.printStackTrace();
 			return false;
 		}
 	}
@@ -920,7 +924,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					else
 						info_network = "Not connected";
 
-//					e.printStackTrace();
+					// e.printStackTrace();
 				}
 				dialogWait.dismiss();
 			}
