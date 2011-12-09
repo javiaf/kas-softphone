@@ -275,10 +275,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Log.d(LOG_TAG, "On Resume");
-
 		/* Listener for change of networking */
-
 		signalManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 		signalManager.listen(signalListener,
 				PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
@@ -373,13 +370,11 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	@Override
 	protected void onPause() {
-		Log.d(LOG_TAG, "On Pause");
 		super.onPause();
 	}
 
 	@Override
 	protected void onStop() {
-		Log.d(LOG_TAG, "On Stop");
 		super.onStop();
 	}
 
@@ -393,10 +388,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	@Override
 	protected void onDestroy() {
-		Log.d(LOG_TAG, "On Destroy");
-		try {
+	try {
 			if (getIsExit()) {
-
+				Log.d(LOG_TAG, "On Destroy");
 				intentService = (Intent) ApplicationContext.contextTable
 						.get("intentService");
 				try {
@@ -616,9 +610,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			intentService = new Intent(this, SoftPhoneService.class);
 			ApplicationContext.contextTable.put("intentService", intentService);
 			startService(intentService);
-
-			Log.d(LOG_TAG, "StartService");
-
 		}
 		SoftPhoneService.setUpdateListener(this);
 		if (initControllerUAFromSettings())
@@ -814,7 +805,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			} catch (NumberFormatException e) {
 				cameraFacing = 0;
 			}
-			Log.d(LOG_TAG, "Camera seleted =" + cameraFacing);
+
 			ApplicationContext.contextTable.put("cameraFacing", cameraFacing);
 			try {
 				max_FR = Integer.parseInt(settings.getString("MAX_FR", "15"));
@@ -915,6 +906,11 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 							gop_size, max_queue, width, height, proxyIP,
 							proxyPort, localUser, localPassword, localRealm,
 							stunHost, stunPort);
+					Boolean isStun = (Boolean) ApplicationContext.contextTable
+							.get("isStunOk");
+					if (isStun != null)
+						Log.d(LOG_TAG, "STUN IS " + isStun);
+
 				} catch (Exception e) {
 					Log.e(LOG_TAG, "Init UA : " + e.toString());
 					if (localAddress != null)
@@ -1038,7 +1034,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					// Destruir Service and UA
 					Log.d(LOG_TAG, "****IsNetwoking ; isNewIp = " + isNewIp());
 					if (isNewIp()) {
-
 						try {
 							if (controller != null) {
 								controller.finishUA();
