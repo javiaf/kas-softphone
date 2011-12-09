@@ -31,6 +31,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -57,14 +58,12 @@ public class MediaControlOutgoing extends Activity {
 	private Intent notifIntent;
 	private String notificationTitle = "Calling ...";
 	private String notificationTitleSoft = "KurentoPhone";
-	private boolean exit = false;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.control_call_outgoingcall);
-		
-		exit = false;
 
 		mNotificationMgr = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -191,12 +190,19 @@ public class MediaControlOutgoing extends Activity {
 			@Override
 			public void onClick(View v) {
 				cancel();
-				exit = true;
 				finish();
-				
+
 			}
 		});
 
+	}
+
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			cancel();
+			finish();
+		}
+		return true;
 	}
 
 	@Override
@@ -213,8 +219,6 @@ public class MediaControlOutgoing extends Activity {
 
 	@Override
 	protected void onDestroy() {
-		if (!exit)
-			cancel();
 		mNotificationMgr.cancel(NOTIF_CALLING_OUT);
 		mNotif = new Notification(R.drawable.icon, notificationTitleSoft,
 				System.currentTimeMillis());
