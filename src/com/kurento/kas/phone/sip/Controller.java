@@ -138,7 +138,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 					Log.e(LOG_TAG, "Break initUA");
 					isStunOk = false;
 					ApplicationContext.contextTable.put("isStunOk", isStunOk);
-					break;
+					return;
 				}
 			}
 		}
