@@ -50,7 +50,6 @@ public class MediaControlOutgoing extends Activity {
 
 	private NotificationManager mNotificationMgr;
 	private final static int NOTIF_CALLING_OUT = 3;
-	private final static int NOTIF_VIDEOCALL = 2;
 	private final static int NOTIF_SOFTPHONE = 1;
 
 	private Notification mNotif;
@@ -58,7 +57,6 @@ public class MediaControlOutgoing extends Activity {
 	private Intent notifIntent;
 	private String notificationTitle = "Calling ...";
 	private String notificationTitleSoft = "KurentoPhone";
-	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +113,6 @@ public class MediaControlOutgoing extends Activity {
 		ArrayList<ListViewHistoryItem> items = (ArrayList<ListViewHistoryItem>) ApplicationContext.contextTable
 				.get("itemsHistory");
 
-		String[] onlyUri = uri.split(":");
 		if (items == null)
 			items = new ArrayList<ListViewHistoryItem>();
 
@@ -157,15 +154,24 @@ public class MediaControlOutgoing extends Activity {
 	}
 
 	@Override
+	protected void onUserLeaveHint() {
+		super.onUserLeaveHint();
+		ApplicationContext.contextTable.put("outgoingCall", getIntent());
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+	}
+
+	@Override
 	protected void onStart() {
 		super.onStart();
-		Log.d(LOG_TAG, "onStart");
 	}
 
 	@Override
 	protected void onRestart() {
 		super.onRestart();
-		Log.d(LOG_TAG, "onRestart");
 	}
 
 	private void cancel() {
@@ -173,6 +179,8 @@ public class MediaControlOutgoing extends Activity {
 		Controller controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
 		Log.d(LOG_TAG, "controller: " + controller);
+		ApplicationContext.contextTable.remove("outgoingCall");
+		finish();
 		try {
 			controller.cancel();
 		} catch (Exception e) {
@@ -183,15 +191,11 @@ public class MediaControlOutgoing extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Log.d(LOG_TAG, "onResume");
-
 		final Button buttonReject = (Button) findViewById(R.id.button_call_reject);
 		buttonReject.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				cancel();
-				finish();
-
 			}
 		});
 
@@ -200,7 +204,6 @@ public class MediaControlOutgoing extends Activity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			cancel();
-			finish();
 		}
 		return true;
 	}
@@ -208,13 +211,11 @@ public class MediaControlOutgoing extends Activity {
 	@Override
 	protected void onStop() {
 		super.onStop();
-		Log.d(LOG_TAG, "onStop");
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		Log.d(LOG_TAG, "onPause");
 	}
 
 	@Override
@@ -228,7 +229,6 @@ public class MediaControlOutgoing extends Activity {
 				.getActivity(this, 0, notifIntent, 0);
 		mNotif.setLatestEventInfo(this, notificationTitleSoft, "",
 				mNotifContentIntent);
-
 		mNotificationMgr.notify(NOTIF_SOFTPHONE, mNotif);
 		Log.d(LOG_TAG, "onDestroy");
 		super.onDestroy();

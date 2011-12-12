@@ -18,9 +18,13 @@ package com.kurento.kas.phone.softphone;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -209,6 +213,24 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
+
+		/*
+		 * With this, I can control if some activity has been created and the
+		 * user has pushed the home button and to start that activity.
+		 */
+		if ((Intent) ApplicationContext.contextTable.get("outgoingCall") != null) {
+			Intent i = (Intent) ApplicationContext.contextTable
+					.get("outgoingCall");
+			Log.d(LOG_TAG,
+					"*****The user pushed Home Button. I have to start the intent, outgoingCall");
+			startActivityForResult(i, MEDIA_CONTROL_OUTGOING);
+		} else if ((Intent) ApplicationContext.contextTable.get("incomingCall") != null) {
+			Intent i = (Intent) ApplicationContext.contextTable
+					.get("incomingCall");
+			Log.d(LOG_TAG,
+					"*****The user pushed Home Button. I have to start the intent, incomingCall");
+			startActivity(i);
+		}
 
 		SoftPhoneService.setUpdateListener(this);
 
@@ -898,7 +920,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			dialogWait = ProgressDialog.show(SoftPhone.this, "",
 					"Please wait for few seconds...", true);
 		} catch (Exception e) {
-			
+
 		}
 		new Thread(new Runnable() {
 			public void run() {
@@ -950,7 +972,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		} else if (message.getData().containsKey("finishActivity")) {
 			if (message.getData().getString("finishActivity")
 					.equals("MEDIA_CONTROL_OUTGOING")) {
-				ApplicationContext.contextTable.put("finishMCO", true);
+				ApplicationContext.contextTable.remove("outgoingCall");
 				finishActivity(MEDIA_CONTROL_OUTGOING);
 			}
 		} else if (message.getData().containsKey("Call")) {
@@ -979,13 +1001,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			if (!getIsExit()) {
 				ConnectivityManager ConnectManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-				String sNetworkType = "No Activate";
-				/*
-				 * Control para sólo transmitir cuando tengamos conexión si es
-				 * false
-				 */
-				boolean backgroundEnabled = ConnectManager
-						.getBackgroundDataSetting();
 				int networkType = -1;
 				NetworkInfo activeNetwork = ConnectManager
 						.getActiveNetworkInfo();

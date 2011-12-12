@@ -166,6 +166,9 @@ public class SoftPhoneService extends Service implements CallListener {
 		b.putString("finishActivity", "MEDIA_CONTROL_OUTGOING");
 		msg.setData(b);
 		handler.sendMessage(msg);
+		
+		ApplicationContext.contextTable.remove("incomingCall");
+		
 		msg = new Message();
 		b = new Bundle();
 		b.putString("Call", "Reject");

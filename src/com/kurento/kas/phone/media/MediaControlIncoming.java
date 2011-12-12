@@ -33,6 +33,7 @@ import android.os.Bundle;
 import android.os.Message;
 import android.os.Vibrator;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -54,8 +55,6 @@ public class MediaControlIncoming extends Activity implements
 
 	private NotificationManager mNotificationMgr;
 	private final static int NOTIF_CALLING_IN = 4;
-	private final static int NOTIF_CALLING_OUT = 3;
-	private final static int NOTIF_VIDEOCALL = 2;
 	private final static int NOTIF_SOFTPHONE = 1;
 
 	private Notification mNotif;
@@ -174,6 +173,12 @@ public class MediaControlIncoming extends Activity implements
 			}
 		}
 	}
+	
+	@Override
+	protected void onUserLeaveHint() {
+		super.onUserLeaveHint();
+		ApplicationContext.contextTable.put("incomingCall", getIntent());
+	}
 
 	@Override
 	protected void onStart() {
@@ -187,6 +192,19 @@ public class MediaControlIncoming extends Activity implements
 		Log.d(LOG_TAG, "onRestart");
 	}
 
+	private void reject(){
+		vibrator.cancel();
+		if (controller != null) {
+			try {
+				controller.reject();
+				ApplicationContext.contextTable.remove("incomingCall");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		finish();
+	}
+	
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -201,6 +219,7 @@ public class MediaControlIncoming extends Activity implements
 				if (controller != null) {
 					try {
 						controller.aceptCall();
+						ApplicationContext.contextTable.remove("incomingCall");
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -214,20 +233,18 @@ public class MediaControlIncoming extends Activity implements
 			@Override
 			public void onClick(View v) {
 				Log.d(LOG_TAG, "Call Canceled");
-				vibrator.cancel();
-				if (controller != null) {
-					try {
-						controller.reject();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				finish();
+				reject();
 			}
 		});
-
 	}
 
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			reject();
+		}
+		return true;
+	}
+	
 	@Override
 	protected void onStop() {
 		super.onStop();
