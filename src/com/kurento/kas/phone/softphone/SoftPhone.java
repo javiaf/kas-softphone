@@ -388,7 +388,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	@Override
 	protected void onDestroy() {
-	try {
+		try {
 			if (getIsExit()) {
 				Log.d(LOG_TAG, "On Destroy");
 				intentService = (Intent) ApplicationContext.contextTable
@@ -894,9 +894,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private void initUA() {
 
 		Log.d(LOG_TAG, "Init UA ....");
-
-		dialogWait = ProgressDialog.show(SoftPhone.this, "",
-				"Please wait for few seconds...", true);
+		try {
+			dialogWait = ProgressDialog.show(SoftPhone.this, "",
+					"Please wait for few seconds...", true);
+		} catch (Exception e) {
+			
+		}
 		new Thread(new Runnable() {
 			public void run() {
 				try {
@@ -919,10 +922,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 								+ localPort;
 					else
 						info_network = "Not connected";
-
-					// e.printStackTrace();
 				}
-				dialogWait.dismiss();
+				if (dialogWait != null)
+					dialogWait.dismiss();
 			}
 		}).start();
 
@@ -932,8 +934,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		if (localPortAux != null)
 			info_network = "IP Private: \n " + localAddress.getHostAddress()
 					+ ":" + localPortAux;
-		// + "\n IP Public: \n " + publicAddress.getHostAddress()
-		// + ":" + publicPort;
 
 		ApplicationContext.contextTable.put("controller", controller);
 		ApplicationContext.contextTable.put("info_network", info_network);
@@ -950,6 +950,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		} else if (message.getData().containsKey("finishActivity")) {
 			if (message.getData().getString("finishActivity")
 					.equals("MEDIA_CONTROL_OUTGOING")) {
+				ApplicationContext.contextTable.put("finishMCO", true);
 				finishActivity(MEDIA_CONTROL_OUTGOING);
 			}
 		} else if (message.getData().containsKey("Call")) {
@@ -1052,8 +1053,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 						try {
 							stopService(intentService);
 						} catch (Exception e) {
-							Log.e(LOG_TAG, "stopService " + e.getMessage()
-									+ "; " + e.toString());
+
 						}
 						Log.d(LOG_TAG, "All Destroy");
 						ApplicationContext.contextTable.clear();
