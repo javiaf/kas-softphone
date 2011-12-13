@@ -29,6 +29,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -109,8 +110,9 @@ public class MediaControlOutgoing extends Activity {
 		Bitmap bm = controlcontacts.getPhoto(id);
 
 		if (bm != null) {
-
-			imageCall.setImageBitmap(bm);
+			imageCall.setImageBitmap(controlcontacts.getRefelection(bm));
+		}else{
+			imageCall.setImageBitmap(controlcontacts.getRefelection(BitmapFactory.decodeResource(getResources(),R.drawable.image_call)));
 		}
 		Log.d(LOG_TAG, "Media Control Outgoing Created; uri = " + uri
 				+ " id = " + id + "; Name = " + name);

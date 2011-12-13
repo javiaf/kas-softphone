@@ -29,6 +29,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Vibrator;
@@ -128,7 +129,9 @@ public class MediaControlIncoming extends Activity implements
 			ImageView imageCall = (ImageView) findViewById(R.id.image_call);
 			Bitmap bm = controlcontacts.getPhoto(idContact);
 			if (bm != null) {
-				imageCall.setImageBitmap(bm);
+				imageCall.setImageBitmap(controlcontacts.getRefelection(bm));
+			}else{
+				imageCall.setImageBitmap(controlcontacts.getRefelection(BitmapFactory.decodeResource(getResources(),R.drawable.image_call)));
 			}
 		}
 
