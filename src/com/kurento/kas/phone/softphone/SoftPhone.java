@@ -231,6 +231,13 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					"*****The user pushed Home Button. I have to start the intent, incomingCall");
 			startActivity(i);
 		}
+		else if ((Intent) ApplicationContext.contextTable.get("videoCall") != null) {
+			Intent i = (Intent) ApplicationContext.contextTable
+					.get("videoCall");
+			Log.d(LOG_TAG,
+					"*****The user pushed Home Button. I have to start the intent, videoCall");
+			startActivity(i);
+		}
 
 		SoftPhoneService.setUpdateListener(this);
 

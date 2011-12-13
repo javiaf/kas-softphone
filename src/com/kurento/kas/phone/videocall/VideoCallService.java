@@ -198,6 +198,8 @@ public class VideoCallService extends Service {
 		if (audioRecorderComponent != null)
 			audioRecorderComponent.stop();
 
+		ApplicationContext.contextTable.remove("videoCall");
+		
 		Message msg = new Message();
 		Bundle b = new Bundle();
 		b.putString("Call", "Terminate");
