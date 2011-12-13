@@ -30,11 +30,15 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -57,6 +61,8 @@ public class MediaControlOutgoing extends Activity {
 	private Intent notifIntent;
 	private String notificationTitle = "Calling ...";
 	private String notificationTitleSoft = "KurentoPhone";
+
+	private Boolean isCanceled = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -191,14 +197,42 @@ public class MediaControlOutgoing extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		final Button buttonReject = (Button) findViewById(R.id.button_call_reject);
-		buttonReject.setOnClickListener(new OnClickListener() {
+
+		isCanceled = false;
+
+		final DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+		final ImageButton buttonReject = (ImageButton) findViewById(R.id.button_call_reject);
+		buttonReject.setOnTouchListener(new OnTouchListener() {
+
 			@Override
-			public void onClick(View v) {
-				cancel();
+			public boolean onTouch(View v, MotionEvent event) {
+
+				switch (event.getAction()) {
+				case MotionEvent.ACTION_MOVE: {
+					if (v.equals(buttonReject)) {
+						int x = (int) event.getRawX() - 120;
+
+						if ((x < dm.widthPixels / 2 - 20) && (x > -70)) {
+							int a = x - buttonReject.getLeft();
+							buttonReject.layout(buttonReject.getLeft() + a,
+									buttonReject.getTop(),
+									buttonReject.getRight() + a,
+									buttonReject.getBottom());
+
+						} else if ((x > dm.widthPixels / 2) && (!isCanceled)) {
+							cancel();
+							isCanceled = true;
+						}
+					}
+				}
+					break;
+				}
+				return true;
+
 			}
 		});
-
 	}
 
 	public boolean onKeyDown(int keyCode, KeyEvent event) {

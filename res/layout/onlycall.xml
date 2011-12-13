@@ -10,7 +10,7 @@
 		<TableRow android:id="@+id/TableRow01"
 			android:layout_gravity="center">
 			<Button android:id="@+id/button_terminate_call"
-				android:layout_width="wrap_content" android:background="@drawable/ic_jog_dial_decline"
+				android:layout_width="wrap_content" android:background="@drawable/ic_jog_dial_end_call"
 				android:layout_height="wrap_content"
 				android:layout_alignParentBottom="true"
 				android:layout_alignParentRight="true" android:layout_gravity="left|bottom" />

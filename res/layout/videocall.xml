@@ -27,7 +27,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
                 android:layout_gravity="left|bottom"
-                android:background="@drawable/ic_jog_dial_decline" />
+                android:background="@drawable/ic_jog_dial_end_call" />
         </TableRow>
 
         <TableRow
