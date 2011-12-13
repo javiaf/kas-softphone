@@ -80,7 +80,7 @@ public class VideoCallService extends Service {
 		mNotificationMgr = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		mNotif = new Notification(R.drawable.ic_jog_dial_answer,
+		mNotif = new Notification(R.drawable.ic_jog_dial_call,
 				notificationTitle, System.currentTimeMillis());
 		mNotif.flags |= Notification.FLAG_ONGOING_EVENT;
 
