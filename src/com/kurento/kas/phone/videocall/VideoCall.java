@@ -29,6 +29,7 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -177,6 +178,18 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	protected void onStart() {
 		super.onStart();
 	}
+	
+	private void hang(){
+		Log.d(LOG_TAG, "Hang ...");
+		Controller controller = (Controller) ApplicationContext.contextTable
+				.get("controller");
+		if (controller != null) {
+			ApplicationContext.contextTable.remove("videoCall");
+			controller.hang();
+			hang = true;
+		}
+		finish();
+	}
 
 	@Override
 	protected void onResume() {
@@ -215,15 +228,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 				@Override
 				public void onClick(View v) {
-					Log.d(LOG_TAG, "Hang ...");
-					Controller controller = (Controller) ApplicationContext.contextTable
-							.get("controller");
-					if (controller != null) {
-						ApplicationContext.contextTable.remove("videoCall");
-						controller.hang();
-						hang = true;
-					}
-					finish();
+					hang();
 				}
 			});
 
@@ -584,6 +589,13 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		}
 	}
 
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			hang();
+		}
+		return true;
+	}
+	
 	@Override
 	public void finish() {
 		Log.d(LOG_TAG, "Finish");
