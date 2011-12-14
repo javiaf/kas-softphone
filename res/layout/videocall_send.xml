@@ -6,87 +6,72 @@
 	<SurfaceView android:layout_height="match_parent"
 		android:layout_width="match_parent" android:id="@+id/video_capture_surface"
 		android:layout_gravity="bottom|right"></SurfaceView>
-		<TableLayout android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:id="@+id/tableLayout1"
-		android:layout_gravity="top|right">
-		<TableRow android:id="@+id/TableRow01"
-			android:layout_gravity="center">
-			<Button android:id="@+id/button_terminate_call"
-				android:layout_width="wrap_content" android:background="@drawable/ic_jog_dial_end_call"
-				android:layout_height="wrap_content"
-				android:layout_alignParentBottom="true"
-				android:layout_alignParentRight="true" android:layout_gravity="left|bottom" />
-		</TableRow>
-        <TableRow
-            android:id="@+id/TableRow01"
-            android:layout_gravity="center" >
-
-<!--             <TextView -->
-<!--                 android:id="@+id/TextView02" -->
-<!--                 android:text="" -->
-<!--                 android:width="10px" /> -->
-        </TableRow>
+<TableLayout
+        android:id="@+id/tableLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|right" >
 
         <TableRow
             android:id="@+id/TableRow01"
             android:layout_gravity="center" >
 
-            <ToggleButton
-                android:id="@+id/button_camera"
-                android:layout_width="60dip"
-                android:layout_height="50dip"
-                android:background="@drawable/camera"
-                android:padding="10dp"
-                android:textOff=""
-                android:textOn="" />
-        </TableRow>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
 
-        <TableRow
-            android:id="@+id/TableRow01"
-            android:layout_gravity="center" >
+                <Button
+                    android:id="@+id/btnOcculPanel"
+                    android:layout_width="60dip"
+                    android:layout_height="221dp"
+                    android:background="@drawable/occult_menu_out"
+                    android:textOff=""
+                    android:textOn="" />
+            </LinearLayout>
 
-<!--             <TextView -->
-<!--                 android:id="@+id/TextView02" -->
-<!--                 android:text="" -->
-<!--                 android:width="10px" /> -->
-        </TableRow>
+            <LinearLayout
+                 android:id="@+id/LinearLayout1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
 
-        <TableRow
-            android:id="@+id/TableRow01"
-            android:layout_gravity="center" >
+                <Button
+                    android:id="@+id/button_terminate_call"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_gravity="left|bottom"
+                    android:background="@drawable/ic_jog_dial_end_call" />
 
-            <ToggleButton
-                android:id="@+id/button_headset"
-                android:layout_width="60dip"
-                android:layout_height="50dip"
-                android:background="@drawable/headset_button"
-                android:padding="10dp"
-                android:textOff=""
-                android:textOn="" />
-        </TableRow>
+                <ToggleButton
+                    android:id="@+id/button_camera"
+                    android:layout_width="60dip"
+                    android:layout_height="50dip"
+                    android:background="@drawable/camera"
+                    android:padding="10dp"
+                    android:textOff=""
+                    android:textOn="" />
 
-        <TableRow
-            android:id="@+id/TableRow01"
-            android:layout_gravity="center" >
+                <ToggleButton
+                    android:id="@+id/button_headset"
+                    android:layout_width="60dip"
+                    android:layout_height="50dip"
+                    android:background="@drawable/headset_button"
+                    android:padding="10dp"
+                    android:textOff=""
+                    android:textOn="" />
 
-<!--             <TextView -->
-<!--                 android:id="@+id/TextView02" -->
-<!--                 android:text="" -->
-<!--                 android:width="10px" /> -->
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/TableRow01"
-            android:layout_gravity="center" >
-
-            <ToggleButton
-                android:id="@+id/button_mute"
-                android:layout_width="60dip"
-                android:layout_height="50dip"
-                android:background="@drawable/mute_button"
-                android:padding="10dp"
-                android:textOff=""
-                android:textOn="" />
+                <ToggleButton
+                    android:id="@+id/button_mute"
+                    android:layout_width="60dip"
+                    android:layout_height="50dip"
+                    android:background="@drawable/mute_button"
+                    android:padding="10dp"
+                    android:textOff=""
+                    android:textOn="" />
+            </LinearLayout>
         </TableRow>
     </TableLayout>
 </FrameLayout>

@@ -32,9 +32,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
+import android.view.ViewGroup.LayoutParams;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.view.animation.Animation.AnimationListener;
 import android.widget.Button;
+import android.widget.TableLayout;
 
 import com.kurento.commons.mscontrol.MediaSession;
 import com.kurento.commons.mscontrol.MsControlException;
@@ -64,6 +73,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 	MediaComponent videoPlayerComponent = null;
 	MediaComponent videoRecorderComponent = null;
+	private Boolean isOccult = true;
 
 	Boolean isStarted = true;
 
@@ -151,13 +161,12 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			Log.e(LOG_TAG, "Controller is null");
 	}
 
-	
 	@Override
 	protected void onUserLeaveHint() {
 		super.onUserLeaveHint();
 		ApplicationContext.contextTable.put("videoCall", getIntent());
 	}
-	
+
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
@@ -415,6 +424,161 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 					}
 				}
 			});
+
+			final Button btnOccult = (Button) findViewById(R.id.btnOcculPanel);
+
+			btnOccult.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+
+					final TableLayout t = (TableLayout) findViewById(R.id.tableLayout1);
+
+					Animation a = new Animation() {
+					};
+					if (!isOccult) {
+						a = new TranslateAnimation(100, 0, 0, 0);
+						a.setDuration(1000L);
+						a.setInterpolator(new AccelerateDecelerateInterpolator());
+						t.setAnimation(a);
+						t.startAnimation(a);
+						a.setAnimationListener(new AnimationListener() {
+
+							@Override
+							public void onAnimationStart(Animation animation) {
+
+								t.layout(t.getLeft() - 100, t.getTop(),
+										t.getRight() - 100, t.getBottom());
+								btnOccult
+										.setBackgroundResource(R.drawable.occult_menu_in);
+							}
+
+							@Override
+							public void onAnimationEnd(Animation animation) {
+								btnOccult
+										.setBackgroundResource(R.drawable.occult_menu_out);
+							}
+
+							@Override
+							public void onAnimationRepeat(Animation animation) {
+
+							}
+						});
+						isOccult = true;
+					} else {
+						isOccult = false;
+						a = new TranslateAnimation(0, 100, 0, 0);
+						a.setDuration(1000L);
+
+						a.setInterpolator(new AccelerateDecelerateInterpolator());
+						t.setAnimation(a);
+						t.startAnimation(a);
+						a.setAnimationListener(new AnimationListener() {
+
+							@Override
+							public void onAnimationStart(Animation animation) {
+								btnOccult
+										.setBackgroundResource(R.drawable.occult_menu_out);
+							}
+
+							@Override
+							public void onAnimationRepeat(Animation animation) {
+
+							}
+
+							@Override
+							public void onAnimationEnd(Animation animation) {
+								t.layout(t.getLeft() + 100, t.getTop(),
+										t.getRight() + 100, t.getBottom());
+								btnOccult
+										.setBackgroundResource(R.drawable.occult_menu_in);
+							}
+						});
+					}
+				}
+			});
+
+			/****** Move Surfaces ******/
+//			final SurfaceView sv = (SurfaceView) findViewById(R.id.video_capture_surface);
+//			final SurfaceView sv2 = (SurfaceView) findViewById(R.id.video_receive_surface);
+//
+//			sv.setOnTouchListener(new OnTouchListener() {
+//
+//				@Override
+//				public boolean onTouch(View v, MotionEvent event) {
+//
+//					switch (event.getAction()) {
+//					case MotionEvent.ACTION_MOVE: {
+//						if (v.equals(sv)) {
+//							int x = (int) event.getRawX();
+//							Log.d("AC", "X:" + x);
+//
+//							int a = x - sv.getLeft();
+//							sv.layout(sv.getLeft() + a, sv.getTop(),
+//									sv.getRight() + a, sv.getBottom());
+//
+//							Log.d("AC", "X:" + x + "; A:" + a);
+//
+//						}
+//						break;
+//					}
+//					case MotionEvent.ACTION_DOWN: {
+//
+//						LayoutParams lp = sv2.getLayoutParams();
+//						lp.width = 120;
+//						lp.height = 120;
+//						sv2.setLayoutParams(lp);
+//						lp = sv.getLayoutParams();
+//						lp.width = 300;
+//						lp.height = 200;
+//						sv.setLayoutParams(lp);
+//						break;
+//					}
+//
+//					}
+//					return true;
+//
+//				}
+//			});
+//
+//			sv2.setOnTouchListener(new OnTouchListener() {
+//
+//				@Override
+//				public boolean onTouch(View v, MotionEvent event) {
+//
+//					switch (event.getAction()) {
+//					case MotionEvent.ACTION_MOVE: {
+//						if (v.equals(sv2)) {
+//							int x = (int) event.getRawX() - 200;
+//							Log.d("AC", "X:" + x);
+//
+//							int a = x - sv2.getLeft();
+//							sv2.layout(sv2.getLeft() + a, sv2.getTop(),
+//									sv2.getRight() + a, sv2.getBottom());
+//
+//							Log.d("AC", "X:" + x + "; A:" + a);
+//
+//						}
+//						break;
+//					}
+//
+//					case MotionEvent.ACTION_DOWN: {
+//						LayoutParams lp = sv2.getLayoutParams();
+//						lp.width = 380;
+//						lp.height = 330;
+//						sv2.setLayoutParams(lp);
+//						lp = sv.getLayoutParams();
+//						lp.width = 117;
+//						lp.height = 96;
+//						sv.setLayoutParams(lp);
+//						break;
+//					}
+//
+//					}
+//					return true;
+//
+//				}
+//			});
 
 			Log.e(LOG_TAG, "onResume OK");
 		}
