@@ -162,11 +162,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			Log.e(LOG_TAG, "Controller is null");
 	}
 
-	@Override
-	protected void onUserLeaveHint() {
-		super.onUserLeaveHint();
-		ApplicationContext.contextTable.put("videoCall", getIntent());
-	}
+
 
 	@Override
 	protected void onNewIntent(Intent intent) {
@@ -589,9 +585,16 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		}
 	}
 
+	@Override
+	protected void onUserLeaveHint() {
+		super.onUserLeaveHint();
+		ApplicationContext.contextTable.put("videoCall", getIntent());
+	}
+	
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			hang();
+			ApplicationContext.contextTable.put("videoCall", getIntent());
+			super.onKeyDown(keyCode, event);
 		}
 		return true;
 	}
