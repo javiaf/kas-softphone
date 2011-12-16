@@ -160,7 +160,7 @@ public class SoftPhoneService extends Service implements CallListener {
 
 	@Override
 	public void callReject() {
-		Log.d(LOG_TAG, "Call Reject Received");
+		Log.d(LOG_TAG, "Call Reject Received or INVITE sent");
 		Message msg = new Message();
 		Bundle b = new Bundle();
 		b.putString("finishActivity", "MEDIA_CONTROL_OUTGOING");
