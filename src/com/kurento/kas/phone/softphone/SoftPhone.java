@@ -858,7 +858,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 			callDirectionMap = getCallDirectionMapFromSettings();
 
-			info_call_type += "\n\nMax BW:\n" + max_BW + "\n\nCamera:\n:"
+			info_call_type += "\n\nMax BW:\n" + max_BW + "\n\nCamera:\n"
 					+ camera + "\n\nMax FR:\n" + max_FR + "\n\nGOP Size:\n"
 					+ gop_size + "\n\nMax Queue:\n" + max_queue;
 
