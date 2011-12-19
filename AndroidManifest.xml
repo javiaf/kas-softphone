@@ -31,7 +31,7 @@
 		<activity android:name="com.kurento.kas.phone.softphone.Register"
 			android:label="Register"></activity>
 		<activity android:name="com.kurento.kas.phone.historycall.HistoryCall"
-			android:label="HistoryCall"></activity>
+			android:label="History Call"></activity>
 
 
 		<activity android:name="com.kurento.kas.phone.media.MediaControlIncoming"
