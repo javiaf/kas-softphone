@@ -66,11 +66,11 @@ public class Controller implements SipEndPointListener, SipCallListener,
 
 	private synchronized void setIsCall(Boolean isCall) {
 		this.isCall = isCall;
-		Log.w(LOG_TAG, "--- setIsCall -> " + this.isCall );
+		Log.w(LOG_TAG, "--- setIsCall -> " + this.isCall);
 	}
 
 	private synchronized Boolean getIsCall() {
-		Log.w(LOG_TAG, "--- getIsCall -> " + this.isCall );
+		Log.w(LOG_TAG, "--- getIsCall -> " + this.isCall);
 		return this.isCall;
 	}
 
@@ -137,7 +137,6 @@ public class Controller implements SipEndPointListener, SipCallListener,
 				localPort = ua.getLocalPort();
 				isInitUA = true;
 				ApplicationContext.contextTable.put("localPort", localPort);
-
 				Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig);
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.toString() + ". Looking for a free port.");
@@ -300,6 +299,10 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			if (callListener != null)
 				callListener.callReject();
 			// ApplicationContext.contextTable.remove("getCallSource");
+		} else if (SipCallEvent.MEDIA_NOT_SUPPORTED.equals(eventType)) {
+
+		} else if (SipCallEvent.MEDIA_RESOURCE_NOT_AVAILABLE.equals(eventType)) {
+
 		}
 	}
 
@@ -331,8 +334,8 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			Log.d(LOG_TAG, "***Send an INVITE to " + remoteURI);
 			currentCall = endPoint.dial(remoteURI, this);
 
-//			ApplicationContext.contextTable.put("getCallSource",
-//					currentCall.toString());
+			// ApplicationContext.contextTable.put("getCallSource",
+			// currentCall.toString());
 		}
 		// String getCallSource = (String) ApplicationContext.contextTable
 		// .get("getCallSource");
@@ -352,7 +355,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 	@Override
 	public void hang() {
 		Log.d(LOG_TAG, "***Send a HANG");
-//		ApplicationContext.contextTable.remove("getCallSource");
+		// ApplicationContext.contextTable.remove("getCallSource");
 		setIsCall(false);
 		if (currentCall != null)
 			try {
@@ -365,7 +368,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 	@Override
 	public void cancel() {
 		Log.d(LOG_TAG, "***Send a CANCEL");
-//		ApplicationContext.contextTable.remove("getCallSource");
+		// ApplicationContext.contextTable.remove("getCallSource");
 		setIsCall(false);
 		if (currentCall != null)
 			try {
