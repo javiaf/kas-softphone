@@ -410,7 +410,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	protected void onDestroy() {
 		try {
 			if (getIsExit()) {
-					intentService = (Intent) ApplicationContext.contextTable
+				intentService = (Intent) ApplicationContext.contextTable
 						.get("intentService");
 				try {
 					stopService(intentService);
@@ -922,8 +922,14 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					Boolean isStun = (Boolean) ApplicationContext.contextTable
 							.get("isStunOk");
 					if (isStun != null) {
-						if (!isStun)
-							info_connect += "\n --Problem with Stun--";
+						if (!isStun) {
+							String stunInfo = (String) ApplicationContext.contextTable
+									.get("stunInfo");
+							if (stunInfo == null)
+								stunInfo = "Unknow";
+							info_connect += "\n -- Problem with Stun: \n "
+									+ stunInfo + " --";
+						}
 					}
 				} catch (Exception e) {
 					Log.e(LOG_TAG, "Init UA : " + e.toString());
@@ -1042,7 +1048,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 								controller.finishUA();
 							}
 						} catch (Exception e1) {
-							Log.e(LOG_TAG, "Exception (New ip) when controller.finishUA. " + e1.toString());
+							Log.e(LOG_TAG,
+									"Exception (New ip) when controller.finishUA. "
+											+ e1.toString());
 						}
 
 						isRegister = false;
@@ -1077,7 +1085,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 								try {
 									controller.finishUA();
 								} catch (Exception e1) {
-									Log.e(LOG_TAG, "Exception (not connection) when controller.finishUA. " + e1.toString());
+									Log.e(LOG_TAG,
+											"Exception (not connection) when controller.finishUA. "
+													+ e1.toString());
 								}
 							isRegister = false;
 							ApplicationContext.contextTable.put("isRegister",
@@ -1085,7 +1095,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 							intentService = (Intent) ApplicationContext.contextTable
 									.get("intentService");
-							
+
 							ApplicationContext.contextTable.clear();
 						}
 						registerFailed();
