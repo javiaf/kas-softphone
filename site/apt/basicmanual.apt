@@ -1,7 +1,7 @@
 
 Basic user manual:
 
-* Initial configiration
+* Initial configuration
 
 [image/new/init_register210x350.png] Register
 
@@ -55,7 +55,9 @@ Basic user manual:
         		* Max BandWidth: Defines the maximum bitrate used to transfer audio and video. This bandwidth is
         		already limited by the network interface: 380kbps for 3g and 3000kbps for WiFi.  
         		      		        	
-        		* Video codec: Enables activation/deactivation of supported video codecs.
+        		* Choose the back or the front camera.
+			
+			* Video codec: Enables activation/deactivation of supported video codecs.
         		
         		* Video size: Allows the user to select the frame size from the formats provided by the
         		terminal.
@@ -108,18 +110,18 @@ Basic user manual:
 
 [image/new/history210x350.png] History
      
-[image/outgoingcall210x350.png] Outgoing Call 
+[image/new/outgoingcall210x350.png] Outgoing Call 
    
 * Accepting a call
 
-	The K-Phone waits in background for incoming SIP calls. Press green icon to accept an incoming call
+	The K-Phone waits in background for incoming SIP calls. Slide green icon to accept an incoming call.
 
-[image/incomingcall210x350.png] Incoming Call
+[image/new/incomingcall210x350.png] Incoming Call
 
 	
 * Hang up a call
 
-	Calls are ghanged up by pressing the red icon.
+	Calls are hanged up by sliding the red icon.
 
 * Set the mute
 
@@ -130,4 +132,10 @@ Basic user manual:
 	Incoming audio can be switched between telephone speaker and the loudspeaker. Press the speaker
 	button for that purpose.
 
-[image/videocall210x350.png] VideoCall
+* Change camera
+
+	If the mobile has two cameras, you can choose the back or front camera.
+
+[image/new/videocall350x210.png] VideoCall
+
+[image/new/videocall_out350x210.png] VideoCall
