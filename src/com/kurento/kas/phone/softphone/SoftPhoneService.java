@@ -13,7 +13,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package com.kurento.kas.phone.softphone;
 
 import java.util.ArrayList;
@@ -28,6 +28,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
 import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
@@ -106,6 +108,18 @@ public class SoftPhoneService extends Service implements CallListener {
 	@Override
 	public void incomingCall(String uri) {
 		Log.d(LOG_TAG, "Invite received");
+
+		// Launch activity when screen is off.
+		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		if (!powerManager.isScreenOn()) {
+			Log.d(LOG_TAG, "Screen is Off");
+			WakeLock mWakeLock = powerManager.newWakeLock(
+					PowerManager.FULL_WAKE_LOCK
+							| PowerManager.ACQUIRE_CAUSES_WAKEUP, "K-Phone");
+			mWakeLock.acquire();
+		} else
+			Log.d(LOG_TAG, "Screen is On");
+
 		Intent mediaIntent = new Intent(this, MediaControlIncoming.class);
 		mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		mediaIntent.putExtra("Uri", uri);
@@ -155,7 +169,8 @@ public class SoftPhoneService extends Service implements CallListener {
 	@Override
 	public void callTerminate() {
 		Log.d(LOG_TAG, "callTerminate: " + videoCallIntent);
-		stopService(videoCallIntent);
+		if (videoCallIntent != null)
+			stopService(videoCallIntent);
 	}
 
 	@Override
@@ -166,9 +181,9 @@ public class SoftPhoneService extends Service implements CallListener {
 		b.putString("finishActivity", "MEDIA_CONTROL_OUTGOING");
 		msg.setData(b);
 		handler.sendMessage(msg);
-		
+
 		ApplicationContext.contextTable.remove("incomingCall");
-		
+
 		msg = new Message();
 		b = new Bundle();
 		b.putString("Call", "Reject");
@@ -189,7 +204,7 @@ public class SoftPhoneService extends Service implements CallListener {
 	public static ArrayList<ServiceUpdateUIListener> UI_UPDATE_LISTENERS = new ArrayList<ServiceUpdateUIListener>();
 
 	public static void setUpdateListener(ServiceUpdateUIListener l) {
-			UI_UPDATE_LISTENERS.add(l);
+		UI_UPDATE_LISTENERS.add(l);
 	}
 
 	private Handler handler = new Handler() {
