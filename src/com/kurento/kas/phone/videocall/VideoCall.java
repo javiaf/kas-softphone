@@ -29,12 +29,22 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
+import android.view.ViewGroup.LayoutParams;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.view.animation.Animation.AnimationListener;
 import android.widget.Button;
+import android.widget.TableLayout;
 
 import com.kurento.commons.mscontrol.MediaSession;
 import com.kurento.commons.mscontrol.MsControlException;
@@ -60,9 +70,11 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private PowerManager.WakeLock wl;
 	private boolean hang = false;
 	private Map<MediaType, Mode> callDirectionMap;
+	private int cameraFacing = 0;
 
 	MediaComponent videoPlayerComponent = null;
 	MediaComponent videoRecorderComponent = null;
+	private Boolean isOccult = true;
 
 	Boolean isStarted = true;
 
@@ -73,6 +85,9 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 		callDirectionMap = (Map<MediaType, Mode>) ApplicationContext.contextTable
 				.get("callDirection");
+
+		cameraFacing = (Integer) ApplicationContext.contextTable
+				.get("cameraFacing");
 
 		Mode videoMode = callDirectionMap.get(MediaType.VIDEO);
 
@@ -111,14 +126,16 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 							(View) findViewById(R.id.video_capture_surface));
 					params.put(MediaComponentAndroid.DISPLAY_ORIENTATION,
 							Orientation);
+					params.put(MediaComponentAndroid.CAMERA_FACING,
+							cameraFacing);
 					videoPlayerComponent = mediaSession.createMediaComponent(
 							MediaComponentAndroid.VIDEO_PLAYER, params);
 				}
 			} catch (MsControlException e) {
-				Log.e(LOG_TAG, e.getMessage());
+				Log.e(LOG_TAG, "MsControl + " + e.toString());
 				e.printStackTrace();
 			} catch (Exception e) {
-				Log.e(LOG_TAG, e.getMessage());
+				Log.e(LOG_TAG, "Exception " + e.toString());
 			}
 
 			try {
@@ -145,6 +162,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			Log.e(LOG_TAG, "Controller is null");
 	}
 
+
+
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
@@ -154,6 +173,18 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	@Override
 	protected void onStart() {
 		super.onStart();
+	}
+	
+	private void hang(){
+		Log.d(LOG_TAG, "Hang ...");
+		Controller controller = (Controller) ApplicationContext.contextTable
+				.get("controller");
+		if (controller != null) {
+			ApplicationContext.contextTable.remove("videoCall");
+			controller.hang();
+			hang = true;
+		}
+		finish();
 	}
 
 	@Override
@@ -168,7 +199,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				Log.e(LOG_TAG, "networkConnection is NULL");
 				return;
 			}
-
+			// TODO: Review. Not do it when the button Camara has been pushed
 			try {
 				if (videoPlayerComponent != null) {
 					videoPlayerComponent.join(Direction.SEND,
@@ -193,16 +224,10 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 				@Override
 				public void onClick(View v) {
-					Log.d(LOG_TAG, "Hang ...");
-					Controller controller = (Controller) ApplicationContext.contextTable
-							.get("controller");
-					if (controller != null) {
-						controller.hang();
-						hang = true;
-					}
-					finish();
+					hang();
 				}
 			});
+
 			final Button buttonMute = (Button) findViewById(R.id.button_mute);
 
 			buttonMute.setOnClickListener(new OnClickListener() {
@@ -243,6 +268,91 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 					}
 				}
 			});
+			try {
+				final Button buttonCamera = (Button) findViewById(R.id.button_camera);
+
+				buttonCamera.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						Log.d(LOG_TAG, "Button Push");
+
+						// Log.d(LOG_TAG, "VideoPlayercomponent is Stop");
+						Controller controller = (Controller) ApplicationContext.contextTable
+								.get("controller");
+						NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
+								.get("networkConnection");
+						if (videoPlayerComponent != null) {
+							videoPlayerComponent.release();
+							try {
+								videoPlayerComponent.unjoin(nc
+										.getJoinableStream(StreamType.video));
+							} catch (MsControlException e) {
+								// TODO Auto-generated catch block
+								Log.e(LOG_TAG,
+										"Exception unjoin " + e.toString());
+								e.printStackTrace();
+							}
+							videoPlayerComponent = null;
+
+						}
+						Log.d(LOG_TAG, "videoPlayercomonent is null, it's Ok");
+						if (controller != null) {
+							MediaSession mediaSession = controller
+									.getMediaSession();
+
+							Log.d(LOG_TAG, "Create MediaSession");
+
+							DisplayMetrics dm = new DisplayMetrics();
+							getWindowManager().getDefaultDisplay().getMetrics(
+									dm);
+							int Orientation = getWindowManager()
+									.getDefaultDisplay().getOrientation();
+							Parameters params = MSControlFactory
+									.createParameters();
+							params.put(
+									MediaComponentAndroid.PREVIEW_SURFACE,
+									(View) findViewById(R.id.video_capture_surface));
+							params.put(
+									MediaComponentAndroid.DISPLAY_ORIENTATION,
+									Orientation);
+							if (cameraFacing == 0) {
+								params.put(MediaComponentAndroid.CAMERA_FACING,
+										1);
+								cameraFacing = 1;
+							} else {
+								params.put(MediaComponentAndroid.CAMERA_FACING,
+										0);
+								cameraFacing = 0;
+							}
+							ApplicationContext.contextTable.put("cameraFacing",
+									cameraFacing);
+							try {
+								videoPlayerComponent = mediaSession
+										.createMediaComponent(
+												MediaComponentAndroid.VIDEO_PLAYER,
+												params);
+								Log.d(LOG_TAG,
+										"Create new videoPlayerComponent");
+								videoPlayerComponent.join(Direction.SEND,
+										nc.getJoinableStream(StreamType.video));
+								videoPlayerComponent.start();
+								Log.d(LOG_TAG,
+										"Create videoPlayercomponent start");
+							} catch (MsControlException e) {
+								// TODO Auto-generated catch block
+								Log.d(LOG_TAG,
+										"Exception button Camera "
+												+ e.toString());
+								e.printStackTrace();
+							}
+						}
+					}
+				});
+			} catch (Exception e) {
+				Log.d(LOG_TAG, "This button doesn't exist in xml");
+			}
 
 			final Button buttonSpeaker = (Button) findViewById(R.id.button_headset);
 
@@ -316,10 +426,181 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				}
 			});
 
+			final Button btnOccult = (Button) findViewById(R.id.btnOcculPanel);
+
+			btnOccult.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+
+					final TableLayout t = (TableLayout) findViewById(R.id.tableLayout1);
+
+					Animation a = new Animation() {
+					};
+					if (!isOccult) {
+						a = new TranslateAnimation(100, 0, 0, 0);
+						a.setDuration(1000L);
+						a.setInterpolator(new AccelerateDecelerateInterpolator());
+						t.setAnimation(a);
+						t.startAnimation(a);
+						a.setAnimationListener(new AnimationListener() {
+
+							@Override
+							public void onAnimationStart(Animation animation) {
+
+								t.layout(t.getLeft() - 100, t.getTop(),
+										t.getRight() - 100, t.getBottom());
+								btnOccult
+										.setBackgroundResource(R.drawable.occult_menu_in);
+							}
+
+							@Override
+							public void onAnimationEnd(Animation animation) {
+								btnOccult
+										.setBackgroundResource(R.drawable.occult_menu_out);
+							}
+
+							@Override
+							public void onAnimationRepeat(Animation animation) {
+
+							}
+						});
+						isOccult = true;
+					} else {
+						isOccult = false;
+						a = new TranslateAnimation(0, 100, 0, 0);
+						a.setDuration(1000L);
+
+						a.setInterpolator(new AccelerateDecelerateInterpolator());
+						t.setAnimation(a);
+						t.startAnimation(a);
+						a.setAnimationListener(new AnimationListener() {
+
+							@Override
+							public void onAnimationStart(Animation animation) {
+								btnOccult
+										.setBackgroundResource(R.drawable.occult_menu_out);
+							}
+
+							@Override
+							public void onAnimationRepeat(Animation animation) {
+
+							}
+
+							@Override
+							public void onAnimationEnd(Animation animation) {
+								t.layout(t.getLeft() + 100, t.getTop(),
+										t.getRight() + 100, t.getBottom());
+								btnOccult
+										.setBackgroundResource(R.drawable.occult_menu_in);
+							}
+						});
+					}
+				}
+			});
+
+			/****** Move Surfaces ******/
+//			final SurfaceView sv = (SurfaceView) findViewById(R.id.video_capture_surface);
+//			final SurfaceView sv2 = (SurfaceView) findViewById(R.id.video_receive_surface);
+//
+//			sv.setOnTouchListener(new OnTouchListener() {
+//
+//				@Override
+//				public boolean onTouch(View v, MotionEvent event) {
+//
+//					switch (event.getAction()) {
+//					case MotionEvent.ACTION_MOVE: {
+//						if (v.equals(sv)) {
+//							int x = (int) event.getRawX();
+//							Log.d("AC", "X:" + x);
+//
+//							int a = x - sv.getLeft();
+//							sv.layout(sv.getLeft() + a, sv.getTop(),
+//									sv.getRight() + a, sv.getBottom());
+//
+//							Log.d("AC", "X:" + x + "; A:" + a);
+//
+//						}
+//						break;
+//					}
+//					case MotionEvent.ACTION_DOWN: {
+//
+//						LayoutParams lp = sv2.getLayoutParams();
+//						lp.width = 120;
+//						lp.height = 120;
+//						sv2.setLayoutParams(lp);
+//						lp = sv.getLayoutParams();
+//						lp.width = 300;
+//						lp.height = 200;
+//						sv.setLayoutParams(lp);
+//						break;
+//					}
+//
+//					}
+//					return true;
+//
+//				}
+//			});
+//
+//			sv2.setOnTouchListener(new OnTouchListener() {
+//
+//				@Override
+//				public boolean onTouch(View v, MotionEvent event) {
+//
+//					switch (event.getAction()) {
+//					case MotionEvent.ACTION_MOVE: {
+//						if (v.equals(sv2)) {
+//							int x = (int) event.getRawX() - 200;
+//							Log.d("AC", "X:" + x);
+//
+//							int a = x - sv2.getLeft();
+//							sv2.layout(sv2.getLeft() + a, sv2.getTop(),
+//									sv2.getRight() + a, sv2.getBottom());
+//
+//							Log.d("AC", "X:" + x + "; A:" + a);
+//
+//						}
+//						break;
+//					}
+//
+//					case MotionEvent.ACTION_DOWN: {
+//						LayoutParams lp = sv2.getLayoutParams();
+//						lp.width = 380;
+//						lp.height = 330;
+//						sv2.setLayoutParams(lp);
+//						lp = sv.getLayoutParams();
+//						lp.width = 117;
+//						lp.height = 96;
+//						sv.setLayoutParams(lp);
+//						break;
+//					}
+//
+//					}
+//					return true;
+//
+//				}
+//			});
+
 			Log.e(LOG_TAG, "onResume OK");
 		}
 	}
 
+	@Override
+	protected void onUserLeaveHint() {
+		super.onUserLeaveHint();
+		ApplicationContext.contextTable.put("videoCall", getIntent());
+	}
+	
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			ApplicationContext.contextTable.put("videoCall", getIntent());
+			super.onKeyDown(keyCode, event);
+		}else{
+			super.onKeyDown(keyCode, event);
+		}
+		return true;
+	}
+	
 	@Override
 	public void finish() {
 		Log.d(LOG_TAG, "Finish");

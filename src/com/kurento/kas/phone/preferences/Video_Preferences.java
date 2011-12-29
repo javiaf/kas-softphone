@@ -61,6 +61,15 @@ public class Video_Preferences extends PreferenceActivity {
 		editTextMaxBw.setSummary("Select max bandwidth");
 
 		generalCategory.addPreference(editTextMaxBw);
+		
+		// Camera Facing
+		CheckBoxPreference cameraFacing = new CheckBoxPreference(this);
+		cameraFacing.setDefaultValue(false);
+		cameraFacing.setKey("CAMERA_FRONT");
+		cameraFacing.setTitle("Front Camera");
+		cameraFacing.setSummary("If it selected, it used the Front Camera. Else, it used the Back Camera.");
+		
+		generalCategory.addPreference(cameraFacing);
 
 		// ------//
 		// Video Category

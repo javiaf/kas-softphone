@@ -13,7 +13,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package com.kurento.kas.phone.media;
 
 import java.util.ArrayList;
@@ -29,13 +29,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Vibrator;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.view.View.OnTouchListener;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -54,8 +58,6 @@ public class MediaControlIncoming extends Activity implements
 
 	private NotificationManager mNotificationMgr;
 	private final static int NOTIF_CALLING_IN = 4;
-	private final static int NOTIF_CALLING_OUT = 3;
-	private final static int NOTIF_VIDEOCALL = 2;
 	private final static int NOTIF_SOFTPHONE = 1;
 
 	private Notification mNotif;
@@ -63,6 +65,9 @@ public class MediaControlIncoming extends Activity implements
 	private Intent notifIntent;
 	private String notificationTitle = "Calling ...";
 	private String notificationTitleSoft = "KurentoPhone";
+
+	private Boolean isAccepted = false;
+	private Boolean isRejected = false;
 
 	private ControlContacts controlcontacts = new ControlContacts(this);
 	Vibrator vibrator;
@@ -124,7 +129,9 @@ public class MediaControlIncoming extends Activity implements
 			ImageView imageCall = (ImageView) findViewById(R.id.image_call);
 			Bitmap bm = controlcontacts.getPhoto(idContact);
 			if (bm != null) {
-				imageCall.setImageBitmap(bm);
+				imageCall.setImageBitmap(controlcontacts.getRefelection(bm));
+			}else{
+				imageCall.setImageBitmap(controlcontacts.getRefelection(BitmapFactory.decodeResource(getResources(),R.drawable.image_call)));
 			}
 		}
 
@@ -176,6 +183,12 @@ public class MediaControlIncoming extends Activity implements
 	}
 
 	@Override
+	protected void onUserLeaveHint() {
+		super.onUserLeaveHint();
+		ApplicationContext.contextTable.put("incomingCall", getIntent());
+	}
+
+	@Override
 	protected void onStart() {
 		super.onStart();
 		Log.d(LOG_TAG, "onStart");
@@ -187,45 +200,110 @@ public class MediaControlIncoming extends Activity implements
 		Log.d(LOG_TAG, "onRestart");
 	}
 
+	private void reject() {
+		vibrator.cancel();
+		if (controller != null) {
+			try {
+				controller.reject();
+				ApplicationContext.contextTable.remove("incomingCall");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		finish();
+	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 		Log.d(LOG_TAG, "onResume");
 
-		final Button buttonCall = (Button) findViewById(R.id.button_call_accept);
-		buttonCall.setOnClickListener(new OnClickListener() {
+		isAccepted = false;
+		isRejected = false;
+
+		final DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+		final ImageButton buttonCall = (ImageButton) findViewById(R.id.button_call_accept);
+		buttonCall.setOnTouchListener(new OnTouchListener() {
+
 			@Override
-			public void onClick(View v) {
-				Log.d(LOG_TAG, "Call Accepted " + RESULT_OK);
-				vibrator.cancel();
-				if (controller != null) {
-					try {
-						controller.aceptCall();
-					} catch (Exception e) {
-						e.printStackTrace();
+			public boolean onTouch(View v, MotionEvent event) {
+
+				switch (event.getAction()) {
+				case MotionEvent.ACTION_MOVE: {
+					if (v.equals(buttonCall)) {
+						int x = (int) event.getRawX() - 120;
+
+						if ((x < dm.widthPixels / 4 - 70) && (x > -70)) {
+							int a = x - buttonCall.getLeft();
+							buttonCall.layout(buttonCall.getLeft() + a,
+									buttonCall.getTop(), buttonCall.getRight()
+											+ a, buttonCall.getBottom());
+
+						} else if ((x > dm.widthPixels / 4) && (!isAccepted)) {
+							vibrator.cancel();
+							if (controller != null) {
+								try {
+									controller.aceptCall();
+									ApplicationContext.contextTable
+											.remove("incomingCall");
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
+							isAccepted = true;
+							finish();
+						}
 					}
 				}
-				finish();
+					break;
+				}
+				return true;
+
 			}
 		});
 
-		final Button buttonReject = (Button) findViewById(R.id.button_call_reject);
-		buttonReject.setOnClickListener(new OnClickListener() {
+		final ImageButton buttonReject = (ImageButton) findViewById(R.id.button_call_reject);
+		buttonReject.setOnTouchListener(new OnTouchListener() {
+
 			@Override
-			public void onClick(View v) {
-				Log.d(LOG_TAG, "Call Canceled");
-				vibrator.cancel();
-				if (controller != null) {
-					try {
-						controller.reject();
-					} catch (Exception e) {
-						e.printStackTrace();
+			public boolean onTouch(View v, MotionEvent event) {
+
+				switch (event.getAction()) {
+				case MotionEvent.ACTION_MOVE: {
+					if (v.equals(buttonReject)) {
+						int x = (int) event.getRawX() - 120;
+
+						if ((x < dm.widthPixels - 100)
+								&& (x > dm.widthPixels / 2)) {
+							int a = x - buttonReject.getLeft();
+							buttonReject.layout(buttonReject.getLeft() + a,
+									buttonReject.getTop(),
+									buttonReject.getRight() + a,
+									buttonReject.getBottom());
+
+						} else if ((x < dm.widthPixels / 2) && (!isRejected)) {
+							Log.d(LOG_TAG, "Call Canceled");
+							isRejected = true;
+							reject();
+						}
 					}
 				}
-				finish();
+					break;
+				}
+				return true;
+
 			}
 		});
 
+	}
+
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			reject();
+		}
+		return true;
 	}
 
 	@Override

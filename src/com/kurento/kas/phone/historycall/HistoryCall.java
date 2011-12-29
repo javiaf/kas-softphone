@@ -196,22 +196,6 @@ public class HistoryCall extends ListActivity {
 			}
 		});
 
-		final Button infoRemoteUri = (Button) findViewById(R.id.infoRemoteUri);
-		infoRemoteUri.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				try {
-					Dialog dialog = new Dialog(v.getContext());
-					dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-					dialog.setContentView(R.layout.inforemoteuri);
-					dialog.show();
-				} catch (Exception e) {
-					Log.e(LOG_TAG, "Exception " + e.toString());
-				}
-			}
-		});
-
 		final Button buttonContacts = (Button) findViewById(R.id.contactsHistory);
 		buttonContacts.setOnClickListener(new OnClickListener() {
 

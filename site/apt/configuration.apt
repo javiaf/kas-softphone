@@ -1,15 +1,17 @@
 
 Configuration
 
-	For configuration the application, you need:
+	Provide VoIP connection information:
 	
-	* Username SIP: demo
+	* <<Username>>: This is the SIP username used to identify this instance within the VoIP network, i.e. <demo>
 	
-	* Domain SIP: kurento.com
+	* <<Password>>: This is the SIP password used to identify this instance within the VoIP network, in this case is empty.
 	
-	* Proxy Server SIP: 193.147.51.37
+	* <<Domain>>: This is the SIP realm, i.e. <kurento.com>
 	
-	* Proxy Port SIP: 5080
+	* <<SIP Proxy Server>>: External SIP proxy and registrar where all SIP messages will be sent, i.e. <193.147.51.24>
 	
-	In {{{./basicmanual.html}basic manual}}, you can see how configurate the application. 
+	* <<SIP Proxy Port>>: Remote port where the SIP Proxy will listen form messages, i.e. <5060>
+	
+	{{{./basicmanual.html}K-Phone basic user manual}} shows how to configure this attributes. 
 	

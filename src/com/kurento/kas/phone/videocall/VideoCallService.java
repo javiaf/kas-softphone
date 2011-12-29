@@ -80,7 +80,7 @@ public class VideoCallService extends Service {
 		mNotificationMgr = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		mNotif = new Notification(R.drawable.ic_jog_dial_answer,
+		mNotif = new Notification(R.drawable.ic_jog_dial_call,
 				notificationTitle, System.currentTimeMillis());
 		mNotif.flags |= Notification.FLAG_ONGOING_EVENT;
 
@@ -198,6 +198,8 @@ public class VideoCallService extends Service {
 		if (audioRecorderComponent != null)
 			audioRecorderComponent.stop();
 
+		ApplicationContext.contextTable.remove("videoCall");
+		
 		Message msg = new Message();
 		Bundle b = new Bundle();
 		b.putString("Call", "Terminate");

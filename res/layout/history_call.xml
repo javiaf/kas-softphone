@@ -2,24 +2,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:orientation="vertical" android:layout_width="fill_parent"
 	android:layout_height="fill_parent" android:background="@android:color/white">
-	<TextView android:layout_height="wrap_content"
-		android:layout_width="wrap_content" android:text="Texto explicativo de la caja de texto"
-		android:textColor="@android:color/black" android:textSize="16dp" />
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 		android:orientation="horizontal" android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:background="@android:color/white">
 
-		<EditText android:id="@+id/textRemoteUri" android:hint="SIP format: user@host"
-			android:text="" android:layout_gravity="top" android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:singleLine="true"
-			android:imeActionLabel="Call" android:imeOptions="actionGo">
+		<EditText
+		    android:id="@+id/textRemoteUri"
+		    android:layout_width="224dp"
+		    android:layout_height="wrap_content"
+		    android:layout_gravity="top"
+		    android:hint="SIP format: user@host"
+		    android:imeActionLabel="Call"
+		    android:imeOptions="actionGo"
+		    android:singleLine="true"
+		    android:text="" >
+
 		</EditText>
-		<Button android:id="@+id/infoRemoteUri" android:layout_width="wrap_content"
-			android:text="" android:layout_height="wrap_content"
-			android:background="@drawable/ic_menu_help" />
 		<Button android:id="@+id/buttonCallHistory" android:layout_width="wrap_content"
 			android:text="" android:layout_height="wrap_content"
-			android:background="@drawable/ic_jog_dial_answer" />
+			android:background="@drawable/ic_jog_dial_call" />
 	</LinearLayout>
 	<Button android:id="@+id/contactsHistory" android:layout_width="75dip"
 		android:layout_height="75dip" android:background="@drawable/peoplecontactsicon" />

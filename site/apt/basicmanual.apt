@@ -1,120 +1,141 @@
 
 Basic user manual:
 
-* Register data
+* Initial configuration
 
 [image/new/init_register210x350.png] Register
 
-	The first screen is to record our data. 
+	First time we start the application or after configuration deletion, the K-Phone request
+	the basic user identity information. 
 
-* The application is divided into 3 parts
+* GUI layout
 
+	The application consist of Two main sections
+
+	* <<Control buttons>>:
+	   
+		* Agenda: Opens the agenda enabling contact search.
+	      
+		* Call: Allows the user to start a video conference.
+		
+		[]
+		
 [image/new/connected_wifi210x350.png] Init
 
+	* <<Status bar>>: Provides relevant information 
+		
+		* Connection: Shows conectivity to the VoIP network. Any of following states are possible: Not connected,
+		Connecting and Connected.
+		 
+		* WIFI: It is active when wifi interface is active.
+		
+		* 3G: Active when connecting through 3G network
+		
+		* Media configuration: Provides information about available audio and video codecs.
+		
 [image/new/all_info210x350.png] Info
 
-	* A status bar:
-		
-		* Status connection.
-		 
-		* Status WIFI.
-		
-		* Status 3G.
-		
-		* Configuration of media (Video and Audio)
-		
-			       
-	* Two buttons:
-	   
-		* Button for to access contacts.
-	      
-		* Button for to access history calls.
-		
+	
 * Menu
 
+	Menu button provides access to the preference and allows application exit the application.
+ 
 [image/new/push_button_menu210x350.png] Menu
-
-     When we push the menu button, we can: To access preferences, exit the application or you get information.
      
-[image/new/all_preferences210x350.png] Info
-     
-     *  '''Preferences''': Show the application preferences.
+     *  <<Preferences>>
  
-        * Connection Preferences.
+        * <Connection Preferences>.
         	
-        	In connection preferences, you can configure connection parameters SIP how the username, domain, server proxy and port.
+        	Allows configuration of VoIP connection settings: username, domain, SIP Proxy address and SIP Proxy port.
 
-        * Media Preferences.
+        * <Media Preferences>.
         	
-        	In media preferences, you can configure:
+        	Following parameters are available for configuration:
         	
-        		* Max BandWidth
-        		        	
-        		* Codecs video
+        		* Max BandWidth: Defines the maximum bitrate used to transfer audio and video. This bandwidth is
+        		already limited by the network interface: 380kbps for 3g and 3000kbps for WiFi.  
+        		      		        	
+        		* Choose the back or the front camera.
+			
+			* Video codec: Enables activation/deactivation of supported video codecs.
         		
-        		* Video size
+        		* Video size: Allows the user to select the frame size from the formats provided by the
+        		terminal.
         		
-        		* Video direction
+        		* Video direction: Allows the user to select video stream direction: <send and receive>, <send only>
+        		or <receive only>
         		
-        		* Max frame rate
+        		* Max frame rate: This is the target frame rate used by the video stream. The actual
+        		frame rate might be ower, depending on frame size and CPU resources. 
         		
-        		* Gop size
+        		* GoP size: Enables the user to provide the ration between <P> and <I> frames. <B> frames are
+        		not used. Default value is 6
         		
-        		* Max frame queue size
+        		* Max frame queue size: Sets the internal jitter buffer size. The lower the number the 
+        		better the latency. Low latency makes stream quite sensitive to jitter. Default value is 2 frames
         		 
-        		* Codecs audio
+        		* Audio codec: Enables activation/deactivation of supported audio codecs.
         		
-        		* Audio direction
+        		* Audio direction: Allows the user to select audio stream direction: <send and receive>, <send only>
+        		or <receive only>
+        		 
         		
-        * Stun Preferences
+        * <STUN Preferences>
         
-        	In stun preferences, you can choose a stun server of the list or configurate a stun server. 
+        	Allows the user to choose a stun server or configure its own. Selecting <-> signals K-Phone to
+        	deactivate STUN.
         		
         
-     * '''Exit''': Exit the application.
+     * <<Exit>>: Exits the application.
      
-     * '''About''': Get information of application.
-     
-* Make a call: You can make a call in various ways.
+     * <<About>>: Shows version information.
 
+[image/new/all_preferences210x350.png] Info
+
+
+    
+* Making a phone call
  
 
-     * From the phonebook, choose the contact and opens the application to make the call.
+     * Calling from the address book. Press contact button and search desired contact. The contact must have
+     a MI field customized to name <sip>.
      
-     * From button of call:
+     * Calling K-Phone:
 
-		* Enter the contact's address in the text box and press the call button.
-       
-		* Access phonebook from the contacts button.
-       
-		* Use the list of history call.
+		* Press the call button
 		
+		* Write called address in the text box and press call icon.
+       		
 		[]
 
 [image/new/history210x350.png] History
      
-[image/outgoingcall210x350.png] Outgoing Call 
+[image/new/outgoingcall210x350.png] Outgoing Call 
    
 * Accepting a call
 
-[image/incomingcall210x350.png] Incoming Call
+	The K-Phone waits in background for incoming SIP calls. Slide green icon to accept an incoming call.
 
-	Accepting the call by pressing the call button.
+[image/new/incomingcall210x350.png] Incoming Call
+
 	
 * Hang up a call
 
-	Hanging the call by pressing the hang button.
+	Calls are hanged up by sliding the red icon.
 
 * Set the mute
 
-	Press the mute button.
+	The K-Phone allows the user to mute is microphone. Press the mute button for that purpose.
 
 * Change speaker
 
-	We may change the internal speaker or external speaker. Press the button to change speaker.
+	Incoming audio can be switched between telephone speaker and the loudspeaker. Press the speaker
+	button for that purpose.
 
-[image/videocall210x350.png] VideoCall
+* Change camera
 
-* To exit a call and return to it, we will use the notification called ''VideoCall'' in the notification bar.
+	If the mobile has two cameras, you can choose the back or front camera.
 
-* To access the application once opened, we will use the notification called ''Softphone'' in the notification bar.
+[image/new/videocall350x210.png] VideoCall
+
+[image/new/videocall_out350x210.png] VideoCall
