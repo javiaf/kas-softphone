@@ -86,10 +86,11 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress,
 			Integer localPort, NetIF netIF,
 			Map<MediaType, Mode> callDirectionMap, Integer maxBW,
-			Integer maxFR, Integer gopSize, Integer maxQueueSize,
-			Integer width, Integer height, String proxyIP, int proxyPort,
-			String localUser, String localPassword, String localRealm,
-			String stunHost, Integer stunPort) throws Exception {
+			Integer maxDelay, Integer maxFR, Integer gopSize,
+			Integer maxQueueSize, Integer width, Integer height,
+			String proxyIP, int proxyPort, String localUser,
+			String localPassword, String localRealm, String stunHost,
+			Integer stunPort) throws Exception {
 
 		Boolean isInitUA = false;
 		Boolean isStunOk = true;
@@ -98,6 +99,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		params.put(MediaSessionAndroid.NET_IF, netIF);
 		params.put(MediaSessionAndroid.LOCAL_ADDRESS, localAddress);
 		params.put(MediaSessionAndroid.MAX_BANDWIDTH, maxBW);
+		params.put(MediaSessionAndroid.MAX_DELAY, maxDelay);
 
 		params.put(MediaSessionAndroid.STREAMS_MODES, callDirectionMap);
 		params.put(MediaSessionAndroid.AUDIO_CODECS, audioCodecs);

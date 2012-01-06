@@ -61,6 +61,15 @@ public class Video_Preferences extends PreferenceActivity {
 		editTextMaxBw.setSummary("Select max bandwidth");
 
 		generalCategory.addPreference(editTextMaxBw);
+
+		// Max delay
+		EditTextPreference editTextMaxDelay = new EditTextPreference(this);
+		editTextMaxDelay.setDialogTitle("MAX_DELAY");
+		editTextMaxDelay.setKey("MAX_DELAY");
+		editTextMaxDelay.setTitle("Max delay (ms)");
+		editTextMaxDelay.setSummary("Select max delay");
+
+		generalCategory.addPreference(editTextMaxDelay);
 		
 		// Camera Facing
 		CheckBoxPreference cameraFacing = new CheckBoxPreference(this);

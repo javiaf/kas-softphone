@@ -101,6 +101,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private int proxyPort;
 
 	private Integer max_BW;
+	private Integer max_delay;
 	private Integer cameraFacing; // Camera.CameraInfo.CAMERA_FACING_X
 	private String camera = "Camera Back";
 	private Integer max_FR;
@@ -803,6 +804,11 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			} catch (NumberFormatException e) {
 				max_BW = null;
 			}
+			try {
+				max_delay = Integer.parseInt(settings.getString("MAX_DELAY", ""));
+			} catch (NumberFormatException e) {
+				max_delay = null;
+			}
 
 			try {
 				Boolean camera_t = settings.getBoolean("CAMERA_FRONT", false);
@@ -915,10 +921,10 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			public void run() {
 				try {
 					controller.initUA(audioCodecs, videoCodecs, localAddress,
-							localPort, netIF, callDirectionMap, max_BW, max_FR,
-							gop_size, max_queue, width, height, proxyIP,
-							proxyPort, localUser, localPassword, localRealm,
-							stunHost, stunPort);
+							localPort, netIF, callDirectionMap, max_BW,
+							max_delay, max_FR, gop_size, max_queue, width,
+							height, proxyIP, proxyPort, localUser,
+							localPassword, localRealm, stunHost, stunPort);
 					Boolean isStun = (Boolean) ApplicationContext.contextTable
 							.get("isStunOk");
 					if (isStun != null) {
