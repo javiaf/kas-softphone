@@ -45,7 +45,7 @@
 		<dependency>
 			<groupId>com.kurento.kas</groupId>
 			<artifactId>kurento-android-sdk</artifactId>
-			<version>1.0.0-RC-5</version>
+			<version>1.0.0-RC-6-SNAPSHOT</version>
 			<type>pom</type>
 			<scope>compile</scope> 
 		</dependency>
