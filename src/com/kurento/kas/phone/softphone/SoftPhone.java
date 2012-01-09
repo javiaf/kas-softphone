@@ -805,9 +805,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				max_BW = null;
 			}
 			try {
-				max_delay = Integer.parseInt(settings.getString("MAX_DELAY", ""));
+				max_delay = Integer.parseInt(settings.getString("MAX_DELAY", "200"));
 			} catch (NumberFormatException e) {
-				max_delay = null;
+				max_delay = 200;
 			}
 
 			try {
@@ -879,9 +879,10 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 						max_BW = 384000;
 				}
 
-				info_call_type += "\n\nMax BW:\n" + max_BW + "\n\nCamera:\n"
-						+ camera + "\n\nMax FR:\n" + max_FR + "\n\nGOP Size:\n"
-						+ gop_size + "\n\nMax Queue:\n" + max_queue;
+				info_call_type += "\n\nMax BW:\n" + max_BW + "\n\nMax Delay:\n"
+						+ max_delay + "\n\nCamera:\n" + camera + "\n\nMax FR:\n"
+						+ max_FR + "\n\nGOP Size:\n" + gop_size
+						+ "\n\nMax Queue:\n" + max_queue;
 
 				this.localAddress = NetworkIP.getLocalAddress();
 				publicAddress = localAddress;
