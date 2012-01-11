@@ -590,17 +590,13 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		super.onUserLeaveHint();
 		ApplicationContext.contextTable.put("videoCall", getIntent());
 	}
-	
+
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
+		if (keyCode == KeyEvent.KEYCODE_BACK)
 			ApplicationContext.contextTable.put("videoCall", getIntent());
-			super.onKeyDown(keyCode, event);
-		}else{
-			super.onKeyDown(keyCode, event);
-		}
-		return true;
+		return super.onKeyDown(keyCode, event);
 	}
-	
+
 	@Override
 	public void finish() {
 		Log.d(LOG_TAG, "Finish");
