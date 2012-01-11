@@ -548,8 +548,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 						try {
 							controller.call(rUri);
 						} catch (Exception e) {
-							Log.e(LOG_TAG,
-									"Controller is null, Faild in thread for call");
+							Log.e(LOG_TAG, "Fail in thread for call");
 							e.printStackTrace();
 						}
 					}
