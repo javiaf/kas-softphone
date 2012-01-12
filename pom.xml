@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.kurento.kas</groupId>
 	<artifactId>kas-softphone</artifactId>
@@ -47,7 +48,7 @@
 			<artifactId>kurento-android-sdk</artifactId>
 			<version>1.0.0-RC-6-SNAPSHOT</version>
 			<type>pom</type>
-			<scope>compile</scope> 
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.sdp</groupId>
@@ -71,6 +72,18 @@
 					<groupId>log4j</groupId>
 					<artifactId>log4j</artifactId>
 					<version>[1.2.16,)</version>
+					<scope>compile</scope>
+				</dependency>
+				<dependency>
+					<groupId>javax.sip</groupId>
+					<artifactId>jain-sip-api</artifactId>
+					<version>1.2</version>
+					<scope>compile</scope>
+				</dependency>
+				<dependency>
+					<groupId>javax.sip</groupId>
+					<artifactId>jain-sip-ri</artifactId>
+					<version>1.2.76</version>
 					<scope>compile</scope>
 				</dependency>
 			</dependencies>
