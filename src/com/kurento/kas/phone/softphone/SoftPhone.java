@@ -700,6 +700,14 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			selectedAudioCodecs.add(AudioCodecType.AAC);
 			codec += "\n AAC";
 		}
+		if (settings.getBoolean("PCMU_AUDIO_CODEC", false)) {
+			selectedAudioCodecs.add(AudioCodecType.PCMU);
+			codec += "\n PCMU";
+		}
+		if (settings.getBoolean("PCMA_AUDIO_CODEC", false)) {
+			selectedAudioCodecs.add(AudioCodecType.PCMA);
+			codec += "\n PCMA";
+		}
 		info_audio_aux += codec;
 		return selectedAudioCodecs;
 	}

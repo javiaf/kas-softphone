@@ -212,6 +212,14 @@ public class Video_Preferences extends PreferenceActivity {
 		nextAudioCodecPref.setKey("AAC_AUDIO_CODEC");
 		nextAudioCodecPref.setTitle("AAC");
 		audioCodecPref.addPreference(nextAudioCodecPref);
+		nextAudioCodecPref = new CheckBoxPreference(this);
+		nextAudioCodecPref.setKey("PCMU_AUDIO_CODEC");
+		nextAudioCodecPref.setTitle("PCMU");
+		audioCodecPref.addPreference(nextAudioCodecPref);
+		nextAudioCodecPref = new CheckBoxPreference(this);
+		nextAudioCodecPref.setKey("PCMA_AUDIO_CODEC");
+		nextAudioCodecPref.setTitle("PCMA");
+		audioCodecPref.addPreference(nextAudioCodecPref);
 
 		// Direction Call
 		CharSequence[] entriesA = { "SEND/RECEIVE", "SEND ONLY", "RECEIVE ONLY" };
