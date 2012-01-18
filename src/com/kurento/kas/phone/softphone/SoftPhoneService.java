@@ -109,11 +109,12 @@ public class SoftPhoneService extends Service implements CallListener {
 	public void incomingCall(String uri) {
 		Log.d(LOG_TAG, "Invite received");
 
+		WakeLock mWakeLock = null;
 		// Launch activity when screen is off.
 		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		if (!powerManager.isScreenOn()) {
 			Log.d(LOG_TAG, "Screen is Off");
-			WakeLock mWakeLock = powerManager.newWakeLock(
+			mWakeLock = powerManager.newWakeLock(
 					PowerManager.FULL_WAKE_LOCK
 							| PowerManager.ACQUIRE_CAUSES_WAKEUP, "K-Phone");
 			mWakeLock.acquire();
@@ -124,6 +125,8 @@ public class SoftPhoneService extends Service implements CallListener {
 		mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		mediaIntent.putExtra("Uri", uri);
 		startActivity(mediaIntent);
+		if (mWakeLock != null)
+			mWakeLock.release();
 	}
 
 	@Override
