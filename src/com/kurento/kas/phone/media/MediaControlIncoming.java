@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Vibrator;
@@ -69,6 +70,8 @@ public class MediaControlIncoming extends Activity implements
 
 	private Boolean isAccepted = false;
 	private Boolean isRejected = false;
+	
+	MediaPlayer mPlayer;
 
 	private ControlContacts controlcontacts = new ControlContacts(this);
 	Vibrator vibrator;
@@ -143,6 +146,7 @@ public class MediaControlIncoming extends Activity implements
 		}
 
 		vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+		mPlayer = MediaPlayer.create(this, R.raw.tone_call);
 		long[] pattern = { 0, 1000, 2000, 3000 };
 
 		vibrator.vibrate(pattern, 1);
@@ -227,6 +231,8 @@ public class MediaControlIncoming extends Activity implements
 
 		isAccepted = false;
 		isRejected = false;
+		mPlayer.setLooping(true);
+		mPlayer.start();
 
 		final DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -250,6 +256,8 @@ public class MediaControlIncoming extends Activity implements
 
 						} else if ((x > dm.widthPixels / 4) && (!isAccepted)) {
 							vibrator.cancel();
+							if (mPlayer != null)
+								mPlayer.stop();
 							if (controller != null) {
 								try {
 									controller.aceptCall();
@@ -293,6 +301,8 @@ public class MediaControlIncoming extends Activity implements
 						} else if ((x < dm.widthPixels / 2) && (!isRejected)) {
 							Log.d(LOG_TAG, "Call Canceled");
 							isRejected = true;
+							if (mPlayer != null)
+								mPlayer.stop();
 							reject();
 						}
 					}
@@ -331,6 +341,8 @@ public class MediaControlIncoming extends Activity implements
 	protected void onDestroy() {
 
 		vibrator.cancel();
+		if (mPlayer != null)
+			mPlayer.stop();
 		mNotificationMgr.cancel(NOTIF_CALLING_IN);
 		mNotif = new Notification(R.drawable.icon, notificationTitleSoft,
 				System.currentTimeMillis());
