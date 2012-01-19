@@ -26,6 +26,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -36,6 +37,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
@@ -75,6 +77,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	MediaComponent videoPlayerComponent = null;
 	MediaComponent videoRecorderComponent = null;
 	private Boolean isOccult = true;
+	WakeLock mWakeLock = null;
 
 	Boolean isStarted = true;
 
@@ -82,6 +85,15 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		
+		mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK
+				| PowerManager.ACQUIRE_CAUSES_WAKEUP, "K-Phone");
+		mWakeLock.acquire();
+		
+		getWindow().addFlags(
+				WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+						| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		callDirectionMap = (Map<MediaType, Mode>) ApplicationContext.contextTable
 				.get("callDirection");
@@ -103,9 +115,6 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		VideoCallService.setUpdateListener(this);
 		hang = false;
 		Log.d(LOG_TAG, "OnCreate " + hang);
-		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "VideoCall");
-		wl.acquire();
 
 		Controller controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
@@ -162,8 +171,6 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			Log.e(LOG_TAG, "Controller is null");
 	}
 
-
-
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
@@ -174,8 +181,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	protected void onStart() {
 		super.onStart();
 	}
-	
-	private void hang(){
+
+	private void hang() {
 		Log.d(LOG_TAG, "Hang ...");
 		Controller controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
@@ -546,8 +553,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	@Override
 	protected void onDestroy() {
 		Log.d(LOG_TAG, "OnDestroy ");
-		if (wl != null)
-			wl.release();
+		if (mWakeLock != null)
+			mWakeLock.release();
 		super.onDestroy();
 	}
 
