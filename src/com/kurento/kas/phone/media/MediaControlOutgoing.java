@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -64,6 +65,8 @@ public class MediaControlOutgoing extends Activity {
 	private String notificationTitleSoft = "KurentoPhone";
 
 	private Boolean isCanceled = false;
+
+	MediaPlayer mPlayer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -111,8 +114,10 @@ public class MediaControlOutgoing extends Activity {
 
 		if (bm != null) {
 			imageCall.setImageBitmap(controlcontacts.getRefelection(bm));
-		}else{
-			imageCall.setImageBitmap(controlcontacts.getRefelection(BitmapFactory.decodeResource(getResources(),R.drawable.image_call)));
+		} else {
+			imageCall.setImageBitmap(controlcontacts
+					.getRefelection(BitmapFactory.decodeResource(
+							getResources(), R.drawable.image_call)));
 		}
 		Log.d(LOG_TAG, "Media Control Outgoing Created; uri = " + uri
 				+ " id = " + id + "; Name = " + name);
@@ -159,6 +164,8 @@ public class MediaControlOutgoing extends Activity {
 				ApplicationContext.contextTable.put("db", db);
 			}
 		}
+		// Play sound
+		mPlayer = MediaPlayer.create(this, R.raw.tone_call);
 	}
 
 	@Override
@@ -202,6 +209,9 @@ public class MediaControlOutgoing extends Activity {
 
 		isCanceled = false;
 
+		mPlayer.setLooping(true);
+		mPlayer.start();
+		
 		final DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 
@@ -266,6 +276,8 @@ public class MediaControlOutgoing extends Activity {
 		mNotif.setLatestEventInfo(this, notificationTitleSoft, "",
 				mNotifContentIntent);
 		mNotificationMgr.notify(NOTIF_SOFTPHONE, mNotif);
+		if (mPlayer != null)
+			mPlayer.stop();
 		Log.d(LOG_TAG, "onDestroy");
 		super.onDestroy();
 	}
