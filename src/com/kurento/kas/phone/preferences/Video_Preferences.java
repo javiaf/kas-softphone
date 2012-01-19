@@ -19,11 +19,8 @@ package com.kurento.kas.phone.preferences;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Intent;
-import android.content.res.TypedArray;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -31,9 +28,6 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
-import android.util.Log;
-
-import com.kurento.kas.phone.softphone.R;
 
 public class Video_Preferences extends PreferenceActivity {
 	@Override

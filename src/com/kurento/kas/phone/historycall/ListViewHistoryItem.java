@@ -29,7 +29,6 @@ public class ListViewHistoryItem {
 		
 	}
 	public ListViewHistoryItem(Integer id, String uri, String name, Boolean type, String date) {
-		super();
 		this.setId(id);
 		this.uri = uri;
 		this.name = name;

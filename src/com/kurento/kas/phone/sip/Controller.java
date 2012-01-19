@@ -20,8 +20,6 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Map;
 
-import javax.sql.rowset.spi.SyncResolver;
-
 import android.util.Log;
 
 import com.kurento.commons.mscontrol.Parameters;

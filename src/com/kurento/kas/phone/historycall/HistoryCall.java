@@ -20,7 +20,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -39,7 +38,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -55,18 +53,15 @@ public class HistoryCall extends ListActivity {
 	private ListViewAdapter listViewAdapter;
 	private static final String LOG_TAG = "HistoryCall";
 	private static final String DB = "DBHistoryCall";
-	private SQLiteDatabase db = null;
 
 	private SQLiteDatabase openOrCreateBD() {
-
-		db = openOrCreateDatabase(DB + ".db",
+		SQLiteDatabase db = openOrCreateDatabase(DB + ".db",
 				SQLiteDatabase.CREATE_IF_NECESSARY, null);
 		db.setVersion(1);
 		db.setLocale(Locale.getDefault());
 		db.setLockingEnabled(true);
 
 		try {
-
 			ListViewHistoryItem l = new ListViewHistoryItem();
 
 			@SuppressWarnings("rawtypes")
@@ -90,7 +85,7 @@ public class HistoryCall extends ListActivity {
 			Log.d(LOG_TAG, "onCreate " + sqlCreate);
 			db.execSQL(sqlCreate);
 		} catch (Exception e) {
-			Log.d(LOG_TAG, "Ya está creada ");
+			Log.d(LOG_TAG, "Table created yet.");
 		}
 		return db;
 	}
@@ -134,6 +129,7 @@ public class HistoryCall extends ListActivity {
 					listViewAdapter.add(item);
 					cur.moveToNext();
 				}
+				cur.close();
 			}
 		} 
 		setListAdapter(listViewAdapter);
@@ -146,16 +142,13 @@ public class HistoryCall extends ListActivity {
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		// TODO Auto-generated method stub
 		super.onListItemClick(l, v, position, id);
-		Log.e(LOG_TAG, "Has seleccionado el elemento " + position);
 		Intent resultIntent = new Intent();
 
 		resultIntent.putExtra("type", "history");
 		resultIntent.putExtra("positionContact", position);
 		setResult(RESULT_OK, resultIntent);
 		finish();
-
 	}
 
 	@Override
@@ -231,7 +224,8 @@ public class HistoryCall extends ListActivity {
 				ApplicationContext.contextTable.put("itemsHistory", items);
 				listViewAdapter.clear();
 				setListAdapter(listViewAdapter);
-				db.delete(DB, null, null);
+				boolean ret = deleteDatabase(DB + ".db");
+				Log.d(LOG_TAG, "DB deleted: " + ret);
 			}
 		}
 		return super.onOptionsItemSelected(item);
@@ -283,7 +277,6 @@ public class HistoryCall extends ListActivity {
 
 			holder.uri.setText(listViewItem.getUri());
 			holder.date.setText("   " + listViewItem.getDate());
-			Log.d(LOG_TAG, "Type = " + listViewItem.getType());
 			holder.icon.setImageBitmap(listViewItem.getType() ? mIconIn
 					: mIconOut);
 			return v;
