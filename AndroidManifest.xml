@@ -6,7 +6,7 @@
 
 	<application android:icon="@drawable/icon" android:label="@string/app_name">
 		<activity android:name="SoftPhone" android:label="@string/app_name"
-			android:launchMode="singleTask" android:screenOrientation="portrait">
+			android:launchMode="singleTask" android:screenOrientation="portrait" android:stateNotNeeded="true">
 			<!-- android:screenOrientation="portrait"> -->
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -29,45 +29,45 @@
 
 		</activity>
 		<activity android:name="com.kurento.kas.phone.softphone.Register"
-			android:label="Register"></activity>
+			android:label="Register" android:stateNotNeeded="true"></activity>
 		<activity android:name="com.kurento.kas.phone.historycall.HistoryCall"
-			android:label="History Call"></activity>
+			android:label="History Call" android:stateNotNeeded="true"></activity>
 
 
 		<activity android:name="com.kurento.kas.phone.media.MediaControlIncoming"
-			android:label="Media Control Incoming" android:launchMode="singleInstance" android:screenOrientation="portrait">
+			android:label="Media Control Incoming" android:launchMode="singleInstance" android:screenOrientation="portrait" android:stateNotNeeded="true">
 			<action android:name="android.intent.action.MAIN" />
 
 		</activity>
 
 		<activity android:name="com.kurento.kas.phone.media.MediaControlOutgoing"
-			android:label="Media Control Outgoing" android:launchMode="singleTop" android:screenOrientation="portrait">
+			android:label="Media Control Outgoing" android:launchMode="singleTop" android:screenOrientation="portrait" android:stateNotNeeded="true">
 			<action android:name="android.intent.action.MAIN" />
 			<!-- android:screenOrientation="portrait"> -->
 		</activity>
 
 		<activity android:name="com.kurento.kas.phone.videocall.VideoCall"
 			android:label="Video Call" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-			android:screenOrientation="landscape" android:launchMode="singleTop">
+			android:screenOrientation="landscape" android:launchMode="singleTop" android:stateNotNeeded="true">
 			<!-- android:screenOrientation="portrait"> android:launchMode="singleTask" 
 				android:theme="@android:style/Theme.NoTitleBar.Fullscreen"> -->
 
 		</activity>
 
 		<activity android:name="com.kurento.kas.phone.preferences.Connection_Preferences"
-			android:label="Connection Preferences" android:screenOrientation="portrait"></activity>
+			android:label="Connection Preferences" android:screenOrientation="portrait" android:stateNotNeeded="true"></activity>
 
 		<activity android:name="com.kurento.kas.phone.preferences.Video_Preferences"
-			android:label="Media Preferences" android:screenOrientation="portrait"></activity>
+			android:label="Media Preferences" android:screenOrientation="portrait" android:stateNotNeeded="true"></activity>
 
 		<activity android:name="com.kurento.kas.phone.preferences.VideoCall_Preferences"
-			android:label="Video Call Preferences" android:screenOrientation="portrait"></activity>
+			android:label="Video Call Preferences" android:screenOrientation="portrait" android:stateNotNeeded="true"></activity>
 
 		<activity android:name="com.kurento.kas.phone.preferences.Stun_Preferences"
-			android:label="Stun Preferences" android:screenOrientation="portrait"></activity>
+			android:label="Stun Preferences" android:screenOrientation="portrait" android:stateNotNeeded="true"></activity>
 
 		<activity android:name="com.kurento.kas.phone.preferences.Call_Preferences"
-			android:label="Call Preferences" android:screenOrientation="portrait"></activity>
+			android:label="Call Preferences" android:screenOrientation="portrait" android:stateNotNeeded="true"></activity>
 
 
 		<service android:enabled="true"
