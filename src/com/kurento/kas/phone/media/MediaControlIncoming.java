@@ -32,7 +32,9 @@ import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Message;
+import android.os.PowerManager;
 import android.os.Vibrator;
+import android.os.PowerManager.WakeLock;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -68,7 +70,9 @@ public class MediaControlIncoming extends Activity implements
 
 	private Boolean isAccepted = false;
 	private Boolean isRejected = false;
-	
+
+	WakeLock mWakeLock = null;
+
 	MediaPlayer mPlayer;
 
 	private ControlContacts controlcontacts = new ControlContacts(this);
@@ -78,15 +82,18 @@ public class MediaControlIncoming extends Activity implements
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.control_call_incomingcall);
 		Log.d(LOG_TAG, "Media Control Incoming Created");
+
+		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK
+				| PowerManager.ACQUIRE_CAUSES_WAKEUP, "K-Phone");
+		mWakeLock.acquire();
 		
 		getWindow().addFlags(
-				WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD 
-					| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-						| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-						| WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+				WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+						| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		mNotificationMgr = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -138,8 +145,10 @@ public class MediaControlIncoming extends Activity implements
 			Bitmap bm = controlcontacts.getPhoto(idContact);
 			if (bm != null) {
 				imageCall.setImageBitmap(controlcontacts.getRefelection(bm));
-			}else{
-				imageCall.setImageBitmap(controlcontacts.getRefelection(BitmapFactory.decodeResource(getResources(),R.drawable.image_call)));
+			} else {
+				imageCall.setImageBitmap(controlcontacts
+						.getRefelection(BitmapFactory.decodeResource(
+								getResources(), R.drawable.image_call)));
 			}
 		}
 
@@ -182,6 +191,8 @@ public class MediaControlIncoming extends Activity implements
 				ApplicationContext.contextTable.put("db", db);
 			}
 		}
+
+		super.onCreate(savedInstanceState);
 	}
 
 	@Override
@@ -334,6 +345,7 @@ public class MediaControlIncoming extends Activity implements
 		vibrator.cancel();
 		if (mPlayer != null)
 			mPlayer.stop();
+
 		mNotificationMgr.cancel(NOTIF_CALLING_IN);
 		mNotif = new Notification(R.drawable.icon, notificationTitleSoft,
 				System.currentTimeMillis());
@@ -346,6 +358,8 @@ public class MediaControlIncoming extends Activity implements
 
 		mNotificationMgr.notify(NOTIF_SOFTPHONE, mNotif);
 		Log.d(LOG_TAG, "onDestroy");
+		if (mWakeLock != null)
+			mWakeLock.release();
 		super.onDestroy();
 
 	}
