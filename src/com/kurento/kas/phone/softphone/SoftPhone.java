@@ -152,6 +152,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		PreferenceManager.setDefaultValues(this, R.layout.video_preferences,
+				true);
 		SoftPhoneService.setUpdateListener(this);
 
 		if ((Boolean) ApplicationContext.contextTable.get("isRegister") == null)
