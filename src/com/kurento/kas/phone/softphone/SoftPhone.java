@@ -928,7 +928,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 							localPort, netIF, callDirectionMap, max_BW,
 							max_delay, max_FR, gop_size, max_queue, width,
 							height, proxyIP, proxyPort, localUser,
-							localPassword, localRealm, stunHost, stunPort);
+							localPassword, localRealm, stunHost, stunPort,getApplicationContext());
 					Boolean isStun = (Boolean) ApplicationContext.contextTable
 							.get("isStunOk");
 					if (isStun != null) {

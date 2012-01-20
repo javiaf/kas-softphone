@@ -20,6 +20,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Map;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.kurento.commons.mscontrol.Parameters;
@@ -88,8 +89,9 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			Integer maxQueueSize, Integer width, Integer height,
 			String proxyIP, int proxyPort, String localUser,
 			String localPassword, String localRealm, String stunHost,
-			Integer stunPort) throws Exception {
-
+			Integer stunPort, Context context) throws Exception {
+		long keepAliveDelay = 5000;
+		boolean keepAliveEnable  = false;
 		Boolean isInitUA = false;
 		Boolean isStunOk = true;
 
@@ -116,6 +118,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		mediaSession = MSControlFactory.createMediaSession(params);
 		Log.d(LOG_TAG, "mediaSession: " + this.mediaSession);
 		UaFactory.setMediaSession(mediaSession);
+		UaFactory.setAndroidContext(context);
 
 		SipConfig sipConfig = new SipConfig();
 		sipConfig.setLocalAddress(localAddress.getHostAddress());
@@ -124,6 +127,8 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		sipConfig.setProxyPort(proxyPort);
 		sipConfig.setStunAddress(stunHost);
 		sipConfig.setStunPort(stunPort);
+		sipConfig.setEnableKeepAlive(keepAliveEnable);
+		sipConfig.setKeepAlivePeriod(keepAliveDelay);
 
 		ApplicationContext.contextTable.put("isStunOk", isStunOk);
 		Integer trying = 0;
@@ -156,7 +161,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			}
 		}
 
-		register(localUser, localPassword, localRealm);
+		register(localUser, localPassword, localRealm, context);
 		setIsCall(false);
 	}
 
@@ -171,7 +176,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 	}
 
 	private void register(String localUser, String localPassword,
-			String localRealm) throws Exception {
+			String localRealm, Context context) throws Exception {
 		Log.d(LOG_TAG, "localUser: " + localUser + "; localReal: " + localRealm);
 		endPoint = ua.registerEndPoint(localUser, localRealm, localPassword,
 				3600, this);
