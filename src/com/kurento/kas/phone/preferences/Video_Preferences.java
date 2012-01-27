@@ -13,7 +13,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package com.kurento.kas.phone.preferences;
 
 import java.util.ArrayList;
@@ -33,9 +33,9 @@ public class Video_Preferences extends PreferenceActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	
+
 		setPreferenceScreen(createPreferenceHierarchy());
-    }
+	}
 
 	private PreferenceScreen createPreferenceHierarchy() {
 		// Root
@@ -64,15 +64,53 @@ public class Video_Preferences extends PreferenceActivity {
 		editTextMaxDelay.setSummary("Select max delay");
 
 		generalCategory.addPreference(editTextMaxDelay);
-		
+
 		// Camera Facing
 		CheckBoxPreference cameraFacing = new CheckBoxPreference(this);
 		cameraFacing.setDefaultValue(false);
 		cameraFacing.setKey("CAMERA_FRONT");
 		cameraFacing.setTitle("Front Camera");
-		cameraFacing.setSummary("If it selected, it used the Front Camera. Else, it used the Back Camera.");
-		
+		cameraFacing
+				.setSummary("If it selected, it used the Front Camera. Else, it used the Back Camera.");
+
 		generalCategory.addPreference(cameraFacing);
+
+		// ------//
+		// Network Category
+		PreferenceCategory networkCategory = new PreferenceCategory(this);
+		networkCategory.setTitle("Network Preferences");
+		root.addPreference(networkCategory);
+
+		// KeepAliveEnable
+		CheckBoxPreference keepAliveEnable = new CheckBoxPreference(this);
+		keepAliveEnable.setDefaultValue(false);
+		keepAliveEnable.setKey("KEEP_ALIVE");
+		keepAliveEnable.setTitle("keep Alive ");
+		keepAliveEnable.setSummary("If it selected, it used the Keep Alive.");
+		networkCategory.addPreference(keepAliveEnable);
+
+		// KeepAliveTime
+		EditTextPreference keepAliveDelay = new EditTextPreference(this);
+		keepAliveDelay.setDialogTitle("Keep Delay");
+		keepAliveDelay.setKey("KEEP_DELAY");
+		keepAliveDelay.setTitle("Keep delay (ms)");
+		keepAliveDelay.setSummary("Select keep delay");
+		networkCategory.addPreference(keepAliveDelay);
+
+		// Transport
+		CharSequence[] entriesTV = { "TCP", "UDP" };
+		CharSequence[] entryValuesTV = { "TCP", "UDP" };
+		ListPreference listTransportV = new ListPreference(this);
+		listTransportV.setEntries(entriesTV);
+		listTransportV.setEntryValues(entryValuesTV);
+		listTransportV.setDefaultValue("UDP");
+		listTransportV.setDialogTitle("Transport");
+		listTransportV.setKey("TRANSPORT");
+		listTransportV.setTitle("Transport");
+		listTransportV.setSummary("Select transport");
+		networkCategory.addPreference(listTransportV);
+		
+		root.addPreference(networkCategory);
 
 		// ------//
 		// Video Category

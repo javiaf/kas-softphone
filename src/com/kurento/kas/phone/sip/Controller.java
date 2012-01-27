@@ -89,9 +89,9 @@ public class Controller implements SipEndPointListener, SipCallListener,
 			Integer maxQueueSize, Integer width, Integer height,
 			String proxyIP, int proxyPort, String localUser,
 			String localPassword, String localRealm, String stunHost,
-			Integer stunPort, Context context) throws Exception {
-		long keepAliveDelay = 5000;
-		boolean keepAliveEnable  = false;
+			Integer stunPort, long keepAliveDelay, boolean keepAliveEnable,
+			String transport, Context context) throws Exception {
+
 		Boolean isInitUA = false;
 		Boolean isStunOk = true;
 
@@ -129,6 +129,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 		sipConfig.setStunPort(stunPort);
 		sipConfig.setEnableKeepAlive(keepAliveEnable);
 		sipConfig.setKeepAlivePeriod(keepAliveDelay);
+		sipConfig.setTransport(transport);
 
 		ApplicationContext.contextTable.put("isStunOk", isStunOk);
 		Integer trying = 0;
@@ -155,7 +156,8 @@ public class Controller implements SipEndPointListener, SipCallListener,
 					Log.e(LOG_TAG, "Break initUA");
 					isStunOk = false;
 					ApplicationContext.contextTable.put("isStunOk", isStunOk);
-					ApplicationContext.contextTable.put("stunInfo", e.getMessage());
+					ApplicationContext.contextTable.put("stunInfo",
+							e.getMessage());
 					return;
 				}
 			}
