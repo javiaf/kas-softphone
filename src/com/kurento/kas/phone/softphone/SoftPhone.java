@@ -808,7 +808,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				max_BW = null;
 			}
 			try {
-				max_delay = Integer.parseInt(settings.getString("MAX_DELAY", "200"));
+				max_delay = Integer.parseInt(settings.getString("MAX_DELAY",
+						"200"));
 			} catch (NumberFormatException e) {
 				max_delay = 200;
 			}
@@ -883,16 +884,19 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				}
 
 				info_call_type += "\n\nMax BW:\n" + max_BW + "\n\nMax Delay:\n"
-						+ max_delay + "\n\nCamera:\n" + camera + "\n\nMax FR:\n"
-						+ max_FR + "\n\nGOP Size:\n" + gop_size
-						+ "\n\nMax Queue:\n" + max_queue;
+						+ max_delay + "\n\nCamera:\n" + camera
+						+ "\n\nMax FR:\n" + max_FR + "\n\nGOP Size:\n"
+						+ gop_size + "\n\nMax Queue:\n" + max_queue;
 
 				this.localAddress = NetworkIP.getLocalAddress();
 				publicAddress = localAddress;
 				publicPort = localPort;
-
-				info_network = "IP Private: \n "
-						+ localAddress.getHostAddress() + ":" + localPort;
+				if (localAddress != null) {
+					info_network = "IP Private: \n "
+							+ localAddress.getHostAddress() + ":" + localPort;
+				}else{
+					info_network = "Problems with your IP. Review the configuration.";
+				}
 				ApplicationContext.contextTable.put("info_network",
 						info_network);
 				ApplicationContext.contextTable.put("localAddress",
@@ -928,7 +932,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 							localPort, netIF, callDirectionMap, max_BW,
 							max_delay, max_FR, gop_size, max_queue, width,
 							height, proxyIP, proxyPort, localUser,
-							localPassword, localRealm, stunHost, stunPort,getApplicationContext());
+							localPassword, localRealm, stunHost, stunPort,
+							getApplicationContext());
 					Boolean isStun = (Boolean) ApplicationContext.contextTable
 							.get("isStunOk");
 					if (isStun != null) {
