@@ -26,40 +26,40 @@ import android.util.Log;
 import com.kurento.commons.mscontrol.Parameters;
 import com.kurento.commons.sdp.enums.MediaType;
 import com.kurento.commons.sdp.enums.Mode;
-import com.kurento.commons.sip.SipCall;
-import com.kurento.commons.sip.SipCallListener;
-import com.kurento.commons.sip.SipEndPoint;
-import com.kurento.commons.sip.SipEndPointListener;
-import com.kurento.commons.sip.UA;
 import com.kurento.commons.sip.agent.UaFactory;
-import com.kurento.commons.sip.event.SipCallEvent;
-import com.kurento.commons.sip.event.SipEndPointEvent;
-import com.kurento.commons.sip.event.SipEventType;
-import com.kurento.commons.sip.exception.ServerInternalErrorException;
 import com.kurento.commons.sip.util.SipConfig;
+import com.kurento.commons.ua.Call;
+import com.kurento.commons.ua.CallListener;
+import com.kurento.commons.ua.EndPoint;
+import com.kurento.commons.ua.EndPointListener;
+import com.kurento.commons.ua.UA;
+import com.kurento.commons.ua.event.CallEvent;
+import com.kurento.commons.ua.event.EndPointEvent;
+import com.kurento.commons.ua.event.EventType;
+import com.kurento.commons.ua.exception.ServerInternalErrorException;
 import com.kurento.kas.media.codecs.AudioCodecType;
 import com.kurento.kas.media.codecs.VideoCodecType;
 import com.kurento.kas.mscontrol.MSControlFactory;
 import com.kurento.kas.mscontrol.MediaSessionAndroid;
 import com.kurento.kas.mscontrol.networkconnection.NetIF;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
-import com.kurento.kas.phone.softphone.CallListener;
 import com.kurento.kas.phone.softphone.CallNotifier;
 import com.kurento.kas.phone.softphone.IPhone;
+import com.kurento.kas.phone.softphone.SoftphoneCallListener;
 
-public class Controller implements SipEndPointListener, SipCallListener,
+public class Controller implements EndPointListener, CallListener,
 		IPhone, CallNotifier {
 
 	public final static String LOG_TAG = "Controller";
 	private UA ua = null;
-	private SipEndPoint endPoint = null;;
-	private SipEndPointEvent pendingEndPointEvent;
-	private SipCall currentCall;
-	private SipCall incomingCall;
+	private EndPoint endPoint = null;;
+	private EndPointEvent pendingEndPointEvent;
+	private Call currentCall;
+	private Call incomingCall;
 
 	private Boolean isCall;
 
-	private CallListener callListener;
+	private SoftphoneCallListener callListener;
 
 	private MediaSessionAndroid mediaSession;
 
@@ -185,11 +185,11 @@ public class Controller implements SipEndPointListener, SipCallListener,
 	}
 
 	@Override
-	public void onEvent(SipEndPointEvent event) {
-		SipEventType eventType = event.getEventType();
+	public void onEvent(EndPointEvent event) {
+		EventType eventType = event.getEventType();
 		Log.d(LOG_TAG, "onEvent  SipEndPointEvent: " + eventType.toString());
 
-		if (SipEndPointEvent.INCOMING_CALL.equals(eventType)) {
+		if (EndPointEvent.INCOMING_CALL.equals(eventType)) {
 			this.pendingEndPointEvent = event;
 			incomingCall = pendingEndPointEvent.getCallSource();
 			incomingCall.addListener(this);
@@ -241,7 +241,7 @@ public class Controller implements SipEndPointListener, SipCallListener,
 				e.printStackTrace();
 			}
 		}
-		if (SipEndPointEvent.REGISTER_USER_SUCESSFUL.equals(eventType)) {
+		if (EndPointEvent.REGISTER_USER_SUCESSFUL.equals(eventType)) {
 			this.pendingEndPointEvent = event;
 			try {
 				ApplicationContext.contextTable.put("isRegister", true);
@@ -253,9 +253,9 @@ public class Controller implements SipEndPointListener, SipCallListener,
 				e.printStackTrace();
 			}
 		}
-		if (SipEndPointEvent.REGISTER_USER_FAIL.equals(eventType)
-				|| SipEndPointEvent.REGISTER_USER_NOT_FOUND.equals(eventType)
-				|| SipEndPointEvent.SERVER_INTERNAL_ERROR.equals(eventType)) {
+		if (EndPointEvent.REGISTER_USER_FAIL.equals(eventType)
+				|| EndPointEvent.REGISTER_USER_NOT_FOUND.equals(eventType)
+				|| EndPointEvent.SERVER_INTERNAL_ERROR.equals(eventType)) {
 			this.pendingEndPointEvent = event;
 			try {
 				ApplicationContext.contextTable.put("isRegister", false);
@@ -269,11 +269,11 @@ public class Controller implements SipEndPointListener, SipCallListener,
 	}
 
 	@Override
-	public void onEvent(SipCallEvent event) {
-		SipEventType eventType = event.getEventType();
+	public void onEvent(CallEvent event) {
+		EventType eventType = event.getEventType();
 		Log.d(LOG_TAG, "onEvent  SipCallEvent: " + eventType.toString());
 
-		if (SipCallEvent.CALL_SETUP.equals(eventType)) {
+		if (CallEvent.CALL_SETUP.equals(eventType)) {
 			currentCall = event.getSource();
 			setIsCall(true);
 			Log.d(LOG_TAG, "Setting currentCall");
@@ -282,34 +282,34 @@ public class Controller implements SipEndPointListener, SipCallListener,
 						currentCall.getMediaTypesModes());
 				callListener.callSetup(currentCall.getNetworkConnection(null));
 			}
-		} else if (SipCallEvent.CALL_TERMINATE.equals(eventType)) {
+		} else if (CallEvent.CALL_TERMINATE.equals(eventType)) {
 			setIsCall(false);
 			Log.d(LOG_TAG, "Call Terminate");
 			if (callListener != null)
 				callListener.callTerminate();
 			// ApplicationContext.contextTable.remove("getCallSource");
-		} else if (SipCallEvent.CALL_REJECT.equals(eventType)) {
+		} else if (CallEvent.CALL_REJECT.equals(eventType)) {
 			setIsCall(false);
 			Log.d(LOG_TAG, "Call Reject");
 			if (callListener != null)
 				callListener.callReject();
 
 			// ApplicationContext.contextTable.remove("getCallSource");
-		} else if (SipCallEvent.CALL_CANCEL.equals(eventType)) {
+		} else if (CallEvent.CALL_CANCEL.equals(eventType)) {
 			setIsCall(false);
 			Log.d(LOG_TAG, "Call Cancel");
 			if (callListener != null)
 				callListener.callCancel();
 			// ApplicationContext.contextTable.remove("getCallSource");
-		} else if (SipCallEvent.CALL_ERROR.equals(eventType)) {
+		} else if (CallEvent.CALL_ERROR.equals(eventType)) {
 			setIsCall(false);
 			Log.d(LOG_TAG, "Call Error");
 			if (callListener != null)
 				callListener.callReject();
 			// ApplicationContext.contextTable.remove("getCallSource");
-		} else if (SipCallEvent.MEDIA_NOT_SUPPORTED.equals(eventType)) {
+		} else if (CallEvent.MEDIA_NOT_SUPPORTED.equals(eventType)) {
 
-		} else if (SipCallEvent.MEDIA_RESOURCE_NOT_AVAILABLE.equals(eventType)) {
+		} else if (CallEvent.MEDIA_RESOURCE_NOT_AVAILABLE.equals(eventType)) {
 
 		}
 	}
@@ -387,12 +387,12 @@ public class Controller implements SipEndPointListener, SipCallListener,
 	}
 
 	@Override
-	public void addListener(CallListener listener) {
+	public void addListener(SoftphoneCallListener listener) {
 		callListener = listener;
 	}
 
 	@Override
-	public void removeListener(CallListener listener) {
+	public void removeListener(SoftphoneCallListener listener) {
 		callListener = null;
 	}
 
