@@ -38,7 +38,7 @@ import com.kurento.kas.phone.media.MediaControlIncoming;
 import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.videocall.VideoCallService;
 
-public class SoftPhoneService extends Service implements CallListener {
+public class SoftPhoneService extends Service implements SoftphoneCallListener {
 	private static final String LOG_TAG = "SoftPhoneService";
 
 	private NotificationManager mNotificationMgr;
@@ -108,17 +108,6 @@ public class SoftPhoneService extends Service implements CallListener {
 	@Override
 	public void incomingCall(String uri) {
 		Log.d(LOG_TAG, "Invite received");
-
-		// Launch activity when screen is off.
-		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		if (!powerManager.isScreenOn()) {
-			Log.d(LOG_TAG, "Screen is Off");
-			WakeLock mWakeLock = powerManager.newWakeLock(
-					PowerManager.FULL_WAKE_LOCK
-							| PowerManager.ACQUIRE_CAUSES_WAKEUP, "K-Phone");
-			mWakeLock.acquire();
-		} else
-			Log.d(LOG_TAG, "Screen is On");
 
 		Intent mediaIntent = new Intent(this, MediaControlIncoming.class);
 		mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -65,9 +65,9 @@ public class ControlContacts {
 				name = pidcursor.getString(0);
 			}
 		}
+		pidcursor.close();
 		Log.d(LOG_TAG, "Name: " + name);
 		return name;
-
 	}
 
 	/**
@@ -88,6 +88,8 @@ public class ControlContacts {
 
 			name = cursor.getString(nameIdx);
 		}
+		cursor.close();
+
 		Log.d(LOG_TAG, "Name: " + name);
 		if (name != null)
 			return name;
@@ -146,6 +148,8 @@ public class ControlContacts {
 
 			id = cursor.getInt(idIdx);
 		}
+		cursor.close();
+
 		Log.d(LOG_TAG, "ID: " + id);
 		if (id != null)
 			return id;
@@ -189,6 +193,8 @@ public class ControlContacts {
 			}
 			contactsIm.close();
 		}
+		cursor.close();
+
 		if (sip != null) {
 			return sip;
 		} else
@@ -221,6 +227,7 @@ public class ControlContacts {
 					photo_id = pidcursor.getInt(0);
 				}
 			}
+			pidcursor.close();
 
 			Cursor pcursor = c.getContentResolver().query(
 					ContactsContract.Data.CONTENT_URI,
@@ -229,6 +236,7 @@ public class ControlContacts {
 			if (pcursor.moveToFirst()) {
 				photo = pcursor.getBlob(0);
 			}
+			pcursor.close();
 			if (photo != null) {
 				bm = BitmapFactory.decodeByteArray(photo, 0, photo.length);
 			}
@@ -337,6 +345,8 @@ public class ControlContacts {
 					+ " IM: " + rvIm);
 
 		}
+		cursor.close();
+
 		if (sip != null) {
 			return sip;
 		} else

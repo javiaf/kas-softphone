@@ -22,7 +22,7 @@ import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
  * @author Miguel París Díaz
  * 
  */
-public interface CallListener {
+public interface SoftphoneCallListener {
 
 	public void incomingCall(String uri);
 

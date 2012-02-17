@@ -13,17 +13,14 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package com.kurento.kas.phone.preferences;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Intent;
-import android.content.res.TypedArray;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -31,17 +28,14 @@ import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
-import android.util.Log;
-
-import com.kurento.kas.phone.softphone.R;
 
 public class Video_Preferences extends PreferenceActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	
+
 		setPreferenceScreen(createPreferenceHierarchy());
-    }
+	}
 
 	private PreferenceScreen createPreferenceHierarchy() {
 		// Root
@@ -61,15 +55,62 @@ public class Video_Preferences extends PreferenceActivity {
 		editTextMaxBw.setSummary("Select max bandwidth");
 
 		generalCategory.addPreference(editTextMaxBw);
-		
+
+		// Max delay
+		EditTextPreference editTextMaxDelay = new EditTextPreference(this);
+		editTextMaxDelay.setDialogTitle("MAX_DELAY");
+		editTextMaxDelay.setKey("MAX_DELAY");
+		editTextMaxDelay.setTitle("Max delay (ms)");
+		editTextMaxDelay.setSummary("Select max delay");
+
+		generalCategory.addPreference(editTextMaxDelay);
+
 		// Camera Facing
 		CheckBoxPreference cameraFacing = new CheckBoxPreference(this);
 		cameraFacing.setDefaultValue(false);
 		cameraFacing.setKey("CAMERA_FRONT");
 		cameraFacing.setTitle("Front Camera");
-		cameraFacing.setSummary("If it selected, it used the Front Camera. Else, it used the Back Camera.");
-		
+		cameraFacing
+				.setSummary("If it selected, it used the Front Camera. Else, it used the Back Camera.");
+
 		generalCategory.addPreference(cameraFacing);
+
+		// ------//
+		// Network Category
+		PreferenceCategory networkCategory = new PreferenceCategory(this);
+		networkCategory.setTitle("Network Preferences");
+		root.addPreference(networkCategory);
+
+		// KeepAliveEnable
+		CheckBoxPreference keepAliveEnable = new CheckBoxPreference(this);
+		keepAliveEnable.setDefaultValue(false);
+		keepAliveEnable.setKey("KEEP_ALIVE");
+		keepAliveEnable.setTitle("keep Alive ");
+		keepAliveEnable.setSummary("If it selected, it used the Keep Alive.");
+		networkCategory.addPreference(keepAliveEnable);
+
+		// KeepAliveTime
+		EditTextPreference keepAliveDelay = new EditTextPreference(this);
+		keepAliveDelay.setDialogTitle("Keep Delay");
+		keepAliveDelay.setKey("KEEP_DELAY");
+		keepAliveDelay.setTitle("Keep delay (ms)");
+		keepAliveDelay.setSummary("Select keep delay");
+		networkCategory.addPreference(keepAliveDelay);
+
+		// Transport
+		CharSequence[] entriesTV = { "TCP", "UDP" };
+		CharSequence[] entryValuesTV = { "TCP", "UDP" };
+		ListPreference listTransportV = new ListPreference(this);
+		listTransportV.setEntries(entriesTV);
+		listTransportV.setEntryValues(entryValuesTV);
+		listTransportV.setDefaultValue("UDP");
+		listTransportV.setDialogTitle("Transport");
+		listTransportV.setKey("TRANSPORT");
+		listTransportV.setTitle("Transport");
+		listTransportV.setSummary("Select transport");
+		networkCategory.addPreference(listTransportV);
+		
+		root.addPreference(networkCategory);
 
 		// ------//
 		// Video Category
@@ -202,6 +243,14 @@ public class Video_Preferences extends PreferenceActivity {
 		nextAudioCodecPref = new CheckBoxPreference(this);
 		nextAudioCodecPref.setKey("AAC_AUDIO_CODEC");
 		nextAudioCodecPref.setTitle("AAC");
+		audioCodecPref.addPreference(nextAudioCodecPref);
+		nextAudioCodecPref = new CheckBoxPreference(this);
+		nextAudioCodecPref.setKey("PCMU_AUDIO_CODEC");
+		nextAudioCodecPref.setTitle("PCMU");
+		audioCodecPref.addPreference(nextAudioCodecPref);
+		nextAudioCodecPref = new CheckBoxPreference(this);
+		nextAudioCodecPref.setKey("PCMA_AUDIO_CODEC");
+		nextAudioCodecPref.setTitle("PCMA");
 		audioCodecPref.addPreference(nextAudioCodecPref);
 
 		// Direction Call

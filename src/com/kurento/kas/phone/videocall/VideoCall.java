@@ -26,6 +26,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -33,16 +34,13 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.view.animation.Animation.AnimationListener;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.TableLayout;
 
@@ -75,6 +73,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	MediaComponent videoPlayerComponent = null;
 	MediaComponent videoRecorderComponent = null;
 	private Boolean isOccult = true;
+	WakeLock mWakeLock = null;
 
 	Boolean isStarted = true;
 
@@ -82,6 +81,15 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		
+		mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK
+				| PowerManager.ACQUIRE_CAUSES_WAKEUP, "K-Phone");
+		mWakeLock.acquire();
+		
+		getWindow().addFlags(
+				WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+						| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		callDirectionMap = (Map<MediaType, Mode>) ApplicationContext.contextTable
 				.get("callDirection");
@@ -103,9 +111,6 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		VideoCallService.setUpdateListener(this);
 		hang = false;
 		Log.d(LOG_TAG, "OnCreate " + hang);
-		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "VideoCall");
-		wl.acquire();
 
 		Controller controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
@@ -162,8 +167,6 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			Log.e(LOG_TAG, "Controller is null");
 	}
 
-
-
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
@@ -174,8 +177,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	protected void onStart() {
 		super.onStart();
 	}
-	
-	private void hang(){
+
+	private void hang() {
 		Log.d(LOG_TAG, "Hang ...");
 		Controller controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
@@ -499,88 +502,6 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				}
 			});
 
-			/****** Move Surfaces ******/
-//			final SurfaceView sv = (SurfaceView) findViewById(R.id.video_capture_surface);
-//			final SurfaceView sv2 = (SurfaceView) findViewById(R.id.video_receive_surface);
-//
-//			sv.setOnTouchListener(new OnTouchListener() {
-//
-//				@Override
-//				public boolean onTouch(View v, MotionEvent event) {
-//
-//					switch (event.getAction()) {
-//					case MotionEvent.ACTION_MOVE: {
-//						if (v.equals(sv)) {
-//							int x = (int) event.getRawX();
-//							Log.d("AC", "X:" + x);
-//
-//							int a = x - sv.getLeft();
-//							sv.layout(sv.getLeft() + a, sv.getTop(),
-//									sv.getRight() + a, sv.getBottom());
-//
-//							Log.d("AC", "X:" + x + "; A:" + a);
-//
-//						}
-//						break;
-//					}
-//					case MotionEvent.ACTION_DOWN: {
-//
-//						LayoutParams lp = sv2.getLayoutParams();
-//						lp.width = 120;
-//						lp.height = 120;
-//						sv2.setLayoutParams(lp);
-//						lp = sv.getLayoutParams();
-//						lp.width = 300;
-//						lp.height = 200;
-//						sv.setLayoutParams(lp);
-//						break;
-//					}
-//
-//					}
-//					return true;
-//
-//				}
-//			});
-//
-//			sv2.setOnTouchListener(new OnTouchListener() {
-//
-//				@Override
-//				public boolean onTouch(View v, MotionEvent event) {
-//
-//					switch (event.getAction()) {
-//					case MotionEvent.ACTION_MOVE: {
-//						if (v.equals(sv2)) {
-//							int x = (int) event.getRawX() - 200;
-//							Log.d("AC", "X:" + x);
-//
-//							int a = x - sv2.getLeft();
-//							sv2.layout(sv2.getLeft() + a, sv2.getTop(),
-//									sv2.getRight() + a, sv2.getBottom());
-//
-//							Log.d("AC", "X:" + x + "; A:" + a);
-//
-//						}
-//						break;
-//					}
-//
-//					case MotionEvent.ACTION_DOWN: {
-//						LayoutParams lp = sv2.getLayoutParams();
-//						lp.width = 380;
-//						lp.height = 330;
-//						sv2.setLayoutParams(lp);
-//						lp = sv.getLayoutParams();
-//						lp.width = 117;
-//						lp.height = 96;
-//						sv.setLayoutParams(lp);
-//						break;
-//					}
-//
-//					}
-//					return true;
-//
-//				}
-//			});
-
 			Log.e(LOG_TAG, "onResume OK");
 		}
 	}
@@ -590,17 +511,13 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		super.onUserLeaveHint();
 		ApplicationContext.contextTable.put("videoCall", getIntent());
 	}
-	
+
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
+		if (keyCode == KeyEvent.KEYCODE_BACK)
 			ApplicationContext.contextTable.put("videoCall", getIntent());
-			super.onKeyDown(keyCode, event);
-		}else{
-			super.onKeyDown(keyCode, event);
-		}
-		return true;
+		return super.onKeyDown(keyCode, event);
 	}
-	
+
 	@Override
 	public void finish() {
 		Log.d(LOG_TAG, "Finish");
@@ -632,8 +549,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	@Override
 	protected void onDestroy() {
 		Log.d(LOG_TAG, "OnDestroy ");
-		if (wl != null)
-			wl.release();
+		if (mWakeLock != null)
+			mWakeLock.release();
 		super.onDestroy();
 	}
 

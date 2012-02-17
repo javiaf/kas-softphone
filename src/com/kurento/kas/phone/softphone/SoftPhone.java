@@ -18,13 +18,9 @@ package com.kurento.kas.phone.softphone;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningAppProcessInfo;
-import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -100,7 +96,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private String proxyIP;
 	private int proxyPort;
 
+	private long keepAliveDelay;
+	private boolean keepAliveEnable;
+	private String transport;
+
 	private Integer max_BW;
+	private Integer max_delay;
 	private Integer cameraFacing; // Camera.CameraInfo.CAMERA_FACING_X
 	private String camera = "Camera Back";
 	private Integer max_FR;
@@ -115,6 +116,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private String info_wifi = "Not connected";
 	private String info_3g = "Not connected";
 	private String info_network = "";
+	private String info_transport = "";
 	private String info_video;
 	private String info_audio_aux;
 	private String info_video_aux;
@@ -297,9 +299,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			public void onClick(View v) {
 				final Dialog dialog = new Dialog(v.getContext());
 				dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-				info_video = "Codecs: \n\n" + info_size_video + "\n\n"
-						+ info_video_aux + "\n\n" + info_audio_aux + " \n\n"
-						+ info_call_type;
+				info_video = info_transport + "\nCodecs: \n\n"
+						+ info_size_video + "\n\n" + info_video_aux + "\n\n"
+						+ info_audio_aux + " \n\n" + info_call_type;
 				dialog.setContentView(R.layout.info_video);
 				((TextView) dialog.findViewById(R.id.info_video))
 						.setText(info_video);
@@ -547,8 +549,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 						try {
 							controller.call(rUri);
 						} catch (Exception e) {
-							Log.e(LOG_TAG,
-									"Controller is null, Faild in thread for call");
+							Log.e(LOG_TAG, "Fail in thread for call");
 							e.printStackTrace();
 						}
 					}
@@ -702,6 +703,14 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			selectedAudioCodecs.add(AudioCodecType.AAC);
 			codec += "\n AAC";
 		}
+		if (settings.getBoolean("PCMU_AUDIO_CODEC", false)) {
+			selectedAudioCodecs.add(AudioCodecType.PCMU);
+			codec += "\n PCMU";
+		}
+		if (settings.getBoolean("PCMA_AUDIO_CODEC", false)) {
+			selectedAudioCodecs.add(AudioCodecType.PCMA);
+			codec += "\n PCMA";
+		}
 		info_audio_aux += codec;
 		return selectedAudioCodecs;
 	}
@@ -789,6 +798,21 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					+ proxyPort;
 
 			try {
+				keepAliveDelay = settings.getLong("KEEP_DELAY", 10000);
+				keepAliveEnable = settings.getBoolean("KEEP_ALIVE", false);
+				transport = settings.getString("TRANSPORT", "UDP");
+				Log.d(LOG_TAG, "New params ok");
+			} catch (Exception e) {
+				keepAliveDelay = 10000;
+				keepAliveEnable = false;
+				transport = "UDP";
+				Log.e(LOG_TAG, "Exception : ", e);
+			}
+
+			info_transport = "Transport: \nKeep Alive Enable:\n"
+					+ keepAliveEnable + "\nKeep Alive Delay(ms):\n" + keepAliveDelay
+					+ "\nTransport:\n" + transport +"\n";
+			try {
 				String size = settings.getString("VIDEO_SIZE", "352x288");
 				String sizes[] = size.split("x");
 				width = Integer.parseInt(sizes[0]);
@@ -802,6 +826,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				max_BW = Integer.parseInt(settings.getString("MAX_BW", ""));
 			} catch (NumberFormatException e) {
 				max_BW = null;
+			}
+			try {
+				max_delay = Integer.parseInt(settings.getString("MAX_DELAY",
+						"200"));
+			} catch (NumberFormatException e) {
+				max_delay = 200;
 			}
 
 			try {
@@ -873,16 +903,20 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 						max_BW = 384000;
 				}
 
-				info_call_type += "\n\nMax BW:\n" + max_BW + "\n\nCamera:\n"
-						+ camera + "\n\nMax FR:\n" + max_FR + "\n\nGOP Size:\n"
+				info_call_type += "\n\nMax BW:\n" + max_BW + "\n\nMax Delay:\n"
+						+ max_delay + "\n\nCamera:\n" + camera
+						+ "\n\nMax FR:\n" + max_FR + "\n\nGOP Size:\n"
 						+ gop_size + "\n\nMax Queue:\n" + max_queue;
 
 				this.localAddress = NetworkIP.getLocalAddress();
 				publicAddress = localAddress;
 				publicPort = localPort;
-
-				info_network = "IP Private: \n "
-						+ localAddress.getHostAddress() + ":" + localPort;
+				if (localAddress != null) {
+					info_network = "IP Private: \n "
+							+ localAddress.getHostAddress() + ":" + localPort;
+				} else {
+					info_network = "Problems with your IP. Review the configuration.";
+				}
 				ApplicationContext.contextTable.put("info_network",
 						info_network);
 				ApplicationContext.contextTable.put("localAddress",
@@ -915,10 +949,12 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			public void run() {
 				try {
 					controller.initUA(audioCodecs, videoCodecs, localAddress,
-							localPort, netIF, callDirectionMap, max_BW, max_FR,
-							gop_size, max_queue, width, height, proxyIP,
-							proxyPort, localUser, localPassword, localRealm,
-							stunHost, stunPort);
+							localPort, netIF, callDirectionMap, max_BW,
+							max_delay, max_FR, gop_size, max_queue, width,
+							height, proxyIP, proxyPort, localUser,
+							localPassword, localRealm, stunHost, stunPort,
+							keepAliveDelay, keepAliveEnable, transport,
+							getApplicationContext());
 					Boolean isStun = (Boolean) ApplicationContext.contextTable
 							.get("isStunOk");
 					if (isStun != null) {

@@ -16,7 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.kurento.kas.phone.media;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -30,22 +29,25 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Message;
+import android.os.PowerManager;
 import android.os.Vibrator;
+import android.os.PowerManager.WakeLock;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.controlcontacts.ControlContacts;
-import com.kurento.kas.phone.historycall.ListViewHistoryItem;
 import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.softphone.R;
 import com.kurento.kas.phone.softphone.ServiceUpdateUIListener;
@@ -69,6 +71,10 @@ public class MediaControlIncoming extends Activity implements
 	private Boolean isAccepted = false;
 	private Boolean isRejected = false;
 
+	WakeLock mWakeLock = null;
+
+	MediaPlayer mPlayer;
+
 	private ControlContacts controlcontacts = new ControlContacts(this);
 	Vibrator vibrator;
 	Controller controller = (Controller) ApplicationContext.contextTable
@@ -76,9 +82,18 @@ public class MediaControlIncoming extends Activity implements
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.control_call_incomingcall);
 		Log.d(LOG_TAG, "Media Control Incoming Created");
+
+		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK
+				| PowerManager.ACQUIRE_CAUSES_WAKEUP, "K-Phone");
+		mWakeLock.acquire();
+		
+		getWindow().addFlags(
+				WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+						| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		mNotificationMgr = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -130,22 +145,18 @@ public class MediaControlIncoming extends Activity implements
 			Bitmap bm = controlcontacts.getPhoto(idContact);
 			if (bm != null) {
 				imageCall.setImageBitmap(controlcontacts.getRefelection(bm));
-			}else{
-				imageCall.setImageBitmap(controlcontacts.getRefelection(BitmapFactory.decodeResource(getResources(),R.drawable.image_call)));
+			} else {
+				imageCall.setImageBitmap(controlcontacts
+						.getRefelection(BitmapFactory.decodeResource(
+								getResources(), R.drawable.image_call)));
 			}
 		}
 
 		vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+		mPlayer = MediaPlayer.create(this, R.raw.tone_call);
 		long[] pattern = { 0, 1000, 2000, 3000 };
 
 		vibrator.vibrate(pattern, 1);
-
-		@SuppressWarnings("unchecked")
-		ArrayList<ListViewHistoryItem> items = (ArrayList<ListViewHistoryItem>) ApplicationContext.contextTable
-				.get("itemsHistory");
-
-		if (items == null)
-			items = new ArrayList<ListViewHistoryItem>();
 
 		Calendar date = new GregorianCalendar();
 		Integer minute = date.get(Calendar.MINUTE);
@@ -180,6 +191,8 @@ public class MediaControlIncoming extends Activity implements
 				ApplicationContext.contextTable.put("db", db);
 			}
 		}
+
+		super.onCreate(savedInstanceState);
 	}
 
 	@Override
@@ -220,6 +233,8 @@ public class MediaControlIncoming extends Activity implements
 
 		isAccepted = false;
 		isRejected = false;
+		mPlayer.setLooping(true);
+		mPlayer.start();
 
 		final DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -243,6 +258,8 @@ public class MediaControlIncoming extends Activity implements
 
 						} else if ((x > dm.widthPixels / 4) && (!isAccepted)) {
 							vibrator.cancel();
+							if (mPlayer != null)
+								mPlayer.stop();
 							if (controller != null) {
 								try {
 									controller.aceptCall();
@@ -286,6 +303,8 @@ public class MediaControlIncoming extends Activity implements
 						} else if ((x < dm.widthPixels / 2) && (!isRejected)) {
 							Log.d(LOG_TAG, "Call Canceled");
 							isRejected = true;
+							if (mPlayer != null)
+								mPlayer.stop();
 							reject();
 						}
 					}
@@ -324,6 +343,9 @@ public class MediaControlIncoming extends Activity implements
 	protected void onDestroy() {
 
 		vibrator.cancel();
+		if (mPlayer != null)
+			mPlayer.stop();
+
 		mNotificationMgr.cancel(NOTIF_CALLING_IN);
 		mNotif = new Notification(R.drawable.icon, notificationTitleSoft,
 				System.currentTimeMillis());
@@ -336,6 +358,8 @@ public class MediaControlIncoming extends Activity implements
 
 		mNotificationMgr.notify(NOTIF_SOFTPHONE, mNotif);
 		Log.d(LOG_TAG, "onDestroy");
+		if (mWakeLock != null)
+			mWakeLock.release();
 		super.onDestroy();
 
 	}

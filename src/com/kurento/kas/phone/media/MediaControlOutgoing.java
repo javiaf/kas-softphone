@@ -16,7 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.kurento.kas.phone.media;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -30,22 +29,20 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.controlcontacts.ControlContacts;
-import com.kurento.kas.phone.historycall.ListViewHistoryItem;
 import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.softphone.R;
 import com.kurento.kas.phone.softphone.SoftPhone;
@@ -64,6 +61,8 @@ public class MediaControlOutgoing extends Activity {
 	private String notificationTitleSoft = "KurentoPhone";
 
 	private Boolean isCanceled = false;
+
+	MediaPlayer mPlayer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -111,18 +110,13 @@ public class MediaControlOutgoing extends Activity {
 
 		if (bm != null) {
 			imageCall.setImageBitmap(controlcontacts.getRefelection(bm));
-		}else{
-			imageCall.setImageBitmap(controlcontacts.getRefelection(BitmapFactory.decodeResource(getResources(),R.drawable.image_call)));
+		} else {
+			imageCall.setImageBitmap(controlcontacts
+					.getRefelection(BitmapFactory.decodeResource(
+							getResources(), R.drawable.image_call)));
 		}
 		Log.d(LOG_TAG, "Media Control Outgoing Created; uri = " + uri
 				+ " id = " + id + "; Name = " + name);
-
-		@SuppressWarnings("unchecked")
-		ArrayList<ListViewHistoryItem> items = (ArrayList<ListViewHistoryItem>) ApplicationContext.contextTable
-				.get("itemsHistory");
-
-		if (items == null)
-			items = new ArrayList<ListViewHistoryItem>();
 
 		Calendar date = new GregorianCalendar();
 		Integer minute = date.get(Calendar.MINUTE);
@@ -147,7 +141,6 @@ public class MediaControlOutgoing extends Activity {
 				.get("db");
 		if (db != null) {
 			if (db.isOpen()) {
-
 				ContentValues nValue = new ContentValues();
 				nValue.put("id", id);
 				nValue.put("date", dateS);
@@ -159,6 +152,8 @@ public class MediaControlOutgoing extends Activity {
 				ApplicationContext.contextTable.put("db", db);
 			}
 		}
+		// Play sound
+		mPlayer = MediaPlayer.create(this, R.raw.tone_call);
 	}
 
 	@Override
@@ -202,6 +197,9 @@ public class MediaControlOutgoing extends Activity {
 
 		isCanceled = false;
 
+		mPlayer.setLooping(true);
+		mPlayer.start();
+		
 		final DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 
@@ -266,6 +264,8 @@ public class MediaControlOutgoing extends Activity {
 		mNotif.setLatestEventInfo(this, notificationTitleSoft, "",
 				mNotifContentIntent);
 		mNotificationMgr.notify(NOTIF_SOFTPHONE, mNotif);
+		if (mPlayer != null)
+			mPlayer.stop();
 		Log.d(LOG_TAG, "onDestroy");
 		super.onDestroy();
 	}
