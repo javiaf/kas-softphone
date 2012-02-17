@@ -10,6 +10,10 @@
 		<project.build.sourceEncoding>UTF-8 </project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<sign.develop>true</sign.develop>
+		
+		<!-- Versions -->
+		<kurentoAndroidSdkVersion>1.0.0</kurentoAndroidSdkVersion>
+		<android.version>2.3.3</android.version>
 	</properties>
 
 	<name>K-Phone</name>
@@ -46,14 +50,14 @@
 		<dependency>
 			<groupId>com.kurento.kas</groupId>
 			<artifactId>kurento-android-sdk</artifactId>
-			<version>1.0.0</version>
+			<version>${kurentoAndroidSdkVersion}</version>
 			<type>pom</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>
-			<version>2.3.3</version>
+			<version>${android.version}</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
