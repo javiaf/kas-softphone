@@ -11,7 +11,7 @@
 		<sign.develop>true</sign.develop>
 		
 		<!-- Versions -->
-		<kurentoAndroidSdkVersion>1.0.0</kurentoAndroidSdkVersion>
+		<kurentoAndroidSdkVersion>1.0.1-SNAPSHOT</kurentoAndroidSdkVersion>
 		<android.version>2.3.3</android.version>
 	</properties>
 
