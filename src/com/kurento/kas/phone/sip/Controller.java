@@ -42,13 +42,14 @@ import com.kurento.kas.media.codecs.VideoCodecType;
 import com.kurento.kas.mscontrol.MSControlFactory;
 import com.kurento.kas.mscontrol.MediaSessionAndroid;
 import com.kurento.kas.mscontrol.networkconnection.NetIF;
+import com.kurento.kas.mscontrol.networkconnection.PortRange;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.softphone.CallNotifier;
 import com.kurento.kas.phone.softphone.IPhone;
 import com.kurento.kas.phone.softphone.SoftphoneCallListener;
 
-public class Controller implements EndPointListener, CallListener,
-		IPhone, CallNotifier {
+public class Controller implements EndPointListener, CallListener, IPhone,
+		CallNotifier {
 
 	public final static String LOG_TAG = "Controller";
 	private UA ua = null;
@@ -82,7 +83,8 @@ public class Controller implements EndPointListener, CallListener,
 	}
 
 	public void initUA(ArrayList<AudioCodecType> audioCodecs,
-			ArrayList<VideoCodecType> videoCodecs, InetAddress localAddress,
+			PortRange audioPortRange, ArrayList<VideoCodecType> videoCodecs,
+			PortRange videoPortRange, InetAddress localAddress,
 			Integer localPort, NetIF netIF,
 			Map<MediaType, Mode> callDirectionMap, Integer maxBW,
 			Integer maxDelay, Integer maxFR, Integer gopSize,
@@ -103,7 +105,9 @@ public class Controller implements EndPointListener, CallListener,
 
 		params.put(MediaSessionAndroid.STREAMS_MODES, callDirectionMap);
 		params.put(MediaSessionAndroid.AUDIO_CODECS, audioCodecs);
+		params.put(MediaSessionAndroid.AUDIO_LOCAL_PORT_RANGE, audioPortRange);
 		params.put(MediaSessionAndroid.VIDEO_CODECS, videoCodecs);
+		params.put(MediaSessionAndroid.VIDEO_LOCAL_PORT_RANGE, videoPortRange);
 
 		params.put(MediaSessionAndroid.FRAME_WIDTH, width);
 		params.put(MediaSessionAndroid.FRAME_HEIGHT, height);

@@ -53,6 +53,7 @@ import com.kurento.commons.sdp.enums.Mode;
 import com.kurento.kas.media.codecs.AudioCodecType;
 import com.kurento.kas.media.codecs.VideoCodecType;
 import com.kurento.kas.mscontrol.networkconnection.NetIF;
+import com.kurento.kas.mscontrol.networkconnection.PortRange;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.controlcontacts.ControlContacts;
 import com.kurento.kas.phone.historycall.HistoryCall;
@@ -74,7 +75,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private static final String LOG_TAG = "SoftPhone";
 
 	private ArrayList<AudioCodecType> audioCodecs;
+	private PortRange audioPortRange;
 	private ArrayList<VideoCodecType> videoCodecs;
+	private PortRange videoPortRange;
 	private Map<MediaType, Mode> callDirectionMap;
 	private InetAddress localAddress;
 	private InetAddress publicAddress;
@@ -810,8 +813,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			}
 
 			info_transport = "Transport: \nKeep Alive Enable:\n"
-					+ keepAliveEnable + "\nKeep Alive Delay(ms):\n" + keepAliveDelay
-					+ "\nTransport:\n" + transport +"\n";
+					+ keepAliveEnable + "\nKeep Alive Delay(ms):\n"
+					+ keepAliveDelay + "\nTransport:\n" + transport + "\n";
 			try {
 				String size = settings.getString("VIDEO_SIZE", "352x288");
 				String sizes[] = size.split("x");
@@ -873,12 +876,38 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			ApplicationContext.contextTable.put("callDirection",
 					callDirectionMap);
 
+			try {
+				int minVideoPort = Integer.parseInt(settings.getString(
+						"MIN_VIDEO_LOCAL_PORT", "0"));
+				int maxVideoPort = Integer.parseInt(settings.getString(
+						"MAX_VIDEO_LOCAL_PORT", "0"));
+				Log.d(LOG_TAG, "minVideoPort: " + minVideoPort
+						+ " maxVideoPort: " + maxVideoPort);
+				videoPortRange = new PortRange(minVideoPort, maxVideoPort);
+			} catch (Exception e) {
+				videoPortRange = null;
+				Log.d(LOG_TAG, "videoPortRange is null: " + e.toString());
+			}
+
+			try {
+				int minAudioPort = Integer.parseInt(settings.getString(
+						"MIN_AUDIO_LOCAL_PORT", "0"));
+				int maxAudioPort = Integer.parseInt(settings.getString(
+						"MAX_AUDIO_LOCAL_PORT", "0"));
+				Log.d(LOG_TAG, "minAudioPort: " + minAudioPort
+						+ " maxAudioPort: " + maxAudioPort);
+				audioPortRange = new PortRange(minAudioPort, maxAudioPort);
+			} catch (Exception e) {
+				audioPortRange = null;
+				Log.d(LOG_TAG, "audioPortRange is null: " + e.toString());
+			}
+
 			this.audioCodecs = getAudioCodecsFromSettings();
 			this.videoCodecs = getVideoCodecsFromSettings();
 
 			return true;
 		} catch (Exception e) {
-			Log.e(LOG_TAG, "Error in parse preferences.");
+			Log.e(LOG_TAG, "Error in parse preferences." + e.toString());
 			return false;
 		}
 	}
@@ -948,13 +977,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		new Thread(new Runnable() {
 			public void run() {
 				try {
-					controller.initUA(audioCodecs, videoCodecs, localAddress,
-							localPort, netIF, callDirectionMap, max_BW,
-							max_delay, max_FR, gop_size, max_queue, width,
-							height, proxyIP, proxyPort, localUser,
-							localPassword, localRealm, stunHost, stunPort,
-							keepAliveDelay, keepAliveEnable, transport,
-							getApplicationContext());
+					controller
+							.initUA(audioCodecs, audioPortRange, videoCodecs,
+									videoPortRange, localAddress, localPort,
+									netIF, callDirectionMap, max_BW, max_delay,
+									max_FR, gop_size, max_queue, width, height,
+									proxyIP, proxyPort, localUser,
+									localPassword, localRealm, stunHost,
+									stunPort, keepAliveDelay, keepAliveEnable,
+									transport, getApplicationContext());
 					Boolean isStun = (Boolean) ApplicationContext.contextTable
 							.get("isStunOk");
 					if (isStun != null) {

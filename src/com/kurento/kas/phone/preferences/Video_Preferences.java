@@ -109,7 +109,7 @@ public class Video_Preferences extends PreferenceActivity {
 		listTransportV.setTitle("Transport");
 		listTransportV.setSummary("Select transport");
 		networkCategory.addPreference(listTransportV);
-		
+
 		root.addPreference(networkCategory);
 
 		// ------//
@@ -140,6 +140,27 @@ public class Video_Preferences extends PreferenceActivity {
 		nextVideoCodecPref.setKey("H264_CODEC");
 		nextVideoCodecPref.setTitle("H264");
 		videoCodecPref.addPreference(nextVideoCodecPref);
+
+		// Video local port range
+		PreferenceScreen videoLocalPortRangecPref = getPreferenceManager()
+				.createPreferenceScreen(this);
+		videoLocalPortRangecPref.setKey("VIDEO_LOCAL_PORT_RANGE");
+		videoLocalPortRangecPref.setTitle("Video local port range");
+		videoLocalPortRangecPref.setSummary("Select video local port range");
+		videoCategory.addPreference(videoLocalPortRangecPref);
+
+		EditTextPreference editTextMinVideoPort = new EditTextPreference(this);
+		editTextMinVideoPort.setDialogTitle("Min video local port range");
+		editTextMinVideoPort.setKey("MIN_VIDEO_LOCAL_PORT");
+		editTextMinVideoPort.setTitle("Min video local port range");
+		editTextMinVideoPort.setSummary("Select min video local port of the range.");
+		videoLocalPortRangecPref.addPreference(editTextMinVideoPort);
+		EditTextPreference editTextMaxVideoPort = new EditTextPreference(this);
+		editTextMaxVideoPort.setDialogTitle("Max video local port range");
+		editTextMaxVideoPort.setKey("MAX_VIDEO_LOCAL_PORT");
+		editTextMaxVideoPort.setTitle("Max video local port range");
+		editTextMaxVideoPort.setSummary("Select max video local port of the range.");
+		videoLocalPortRangecPref.addPreference(editTextMaxVideoPort);
 
 		// Size Camera
 		ArrayList<String> list = new ArrayList<String>();
@@ -252,6 +273,27 @@ public class Video_Preferences extends PreferenceActivity {
 		nextAudioCodecPref.setKey("PCMA_AUDIO_CODEC");
 		nextAudioCodecPref.setTitle("PCMA");
 		audioCodecPref.addPreference(nextAudioCodecPref);
+
+		// Audio local port range
+		PreferenceScreen audioLocalPortRangecPref = getPreferenceManager()
+				.createPreferenceScreen(this);
+		audioLocalPortRangecPref.setKey("AUDIO_LOCAL_PORT_RANGE");
+		audioLocalPortRangecPref.setTitle("Audio local port range");
+		audioLocalPortRangecPref.setSummary("Select audio local port range");
+		audioCategory.addPreference(audioLocalPortRangecPref);
+
+		EditTextPreference editTextMinAudioPort = new EditTextPreference(this);
+		editTextMinAudioPort.setDialogTitle("Min video local port range");
+		editTextMinAudioPort.setKey("MIN_AUDIO_LOCAL_PORT");
+		editTextMinAudioPort.setTitle("Min audio local port range");
+		editTextMinAudioPort.setSummary("Select min audio local port of the range.");
+		audioLocalPortRangecPref.addPreference(editTextMinAudioPort);
+		EditTextPreference editTextMaxAudioPort = new EditTextPreference(this);
+		editTextMaxAudioPort.setDialogTitle("Max audio local port range");
+		editTextMaxAudioPort.setKey("MAX_AUDIO_LOCAL_PORT");
+		editTextMaxAudioPort.setTitle("Max audio local port range");
+		editTextMaxAudioPort.setSummary("Select max audio local port of the range.");
+		audioLocalPortRangecPref.addPreference(editTextMaxAudioPort);
 
 		// Direction Call
 		CharSequence[] entriesA = { "SEND/RECEIVE", "SEND ONLY", "RECEIVE ONLY" };
