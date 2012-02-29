@@ -148,8 +148,11 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 	private boolean isExit = false;
 
-	int portMin = 6060;
-	int portMax = 10000;
+	int sipPortMin;
+	int sipPortMax;
+
+	private static final int SIP_PORT_MIN_DEF = 6060;
+	private static final int SIP_PORT_MAX_DEF = 10000;
 
 	/** Called when the activity is first created. */
 	/* Cycle Life */
@@ -761,9 +764,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 				.getDefaultSharedPreferences(getBaseContext());
 		String stunHostAux = settings.getString("STUN_LIST", "stun.xten.com");
 
-		if (localPort == 0)
-			localPort = (int) Math.floor(Math.random()
-					* (portMin - portMax + 1) + portMax);
+		// if (localPort == 0)
+		// localPort = (int) Math.floor(Math.random()
+		// * (sipPortMin - sipPortMax + 1) + sipPortMax);
 		if (stunHostAux.equals("-")) {
 			stunHostAux = settings.getString("STUN_HOST", "-");
 			if (!stunHostAux.equals("-")) {
@@ -787,6 +790,25 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 			localUser = settings.getString("LOCAL_USERNAME", "");
 			localPassword = settings.getString("LOCAL_PASSWORD", "");
 			localRealm = settings.getString("LOCAL_DOMAIN", "");
+
+			try {
+				sipPortMin = Integer.parseInt(settings.getString(
+						"SIP_MIN_LOCAL_PORT",
+						Integer.toString(SIP_PORT_MIN_DEF)));
+			} catch (NumberFormatException e) {
+				sipPortMin = SIP_PORT_MIN_DEF;
+			}
+
+			try {
+				sipPortMax = Integer.parseInt(settings.getString(
+						"SIP_MAX_LOCAL_PORT",
+						Integer.toString(SIP_PORT_MAX_DEF)));
+			} catch (NumberFormatException e) {
+				sipPortMax = SIP_PORT_MAX_DEF;
+			}
+
+			localPort = sipPortMin;
+
 			proxyIP = settings.getString("PROXY_IP", "");
 			proxyPort = Integer.parseInt(settings.getString("PROXY_PORT", "0"));
 
