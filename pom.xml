@@ -138,7 +138,7 @@
 			</resource>
 			<resource>
 				<directory>${basedir}/res</directory>
-				<filtering>true</filtering>
+				<filtering>false</filtering>
 				<targetPath>${project.build.directory}/filtered-res</targetPath>
 				<excludes>
 					<exclude>**/*.xml</exclude>
