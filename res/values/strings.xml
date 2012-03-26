@@ -18,6 +18,12 @@
 	<string name="preference_local_password_summary">Local SIP URL password</string>
 	<string name="preference_local_domain">Local SIP URL domain</string>
 	<string name="preference_local_domain_summary">Local SIP URL domain</string>
+	<string name="preference_sip_local_port_range">SIP local port range</string>
+	<string name="preference_sip_local_port_range_summary">Select SIP local port range</string>
+	<string name="preference_sip_min_local_port">SIP min local port</string>
+	<string name="preference_sip_min_local_port_summary">Select SIP min local port</string>
+	<string name="preference_sip_max_local_port">SIP max local port</string>
+	<string name="preference_sip_max_local_port_summary">Select SIP max local port</string>
 
 	<string name="txt_videocall_preferences">VideoCall Preferences</string>
 
