@@ -28,11 +28,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
-import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.media.MediaControlIncoming;
 import com.kurento.kas.phone.sip.Controller;
@@ -138,9 +135,7 @@ public class SoftPhoneService extends Service implements SoftphoneCallListener {
 	}
 
 	@Override
-	public void callSetup(NetworkConnection networkConnection) {
-		ApplicationContext.contextTable.put("networkConnection",
-				networkConnection);
+	public void callSetup() {
 
 		Message msg = new Message();
 		Bundle b = new Bundle();

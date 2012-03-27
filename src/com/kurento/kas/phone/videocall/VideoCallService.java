@@ -13,7 +13,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package com.kurento.kas.phone.videocall;
 
 import java.util.Map;
@@ -33,9 +33,8 @@ import android.util.Log;
 
 import com.kurento.commons.mscontrol.MsControlException;
 import com.kurento.commons.mscontrol.Parameters;
+import com.kurento.commons.mscontrol.join.Joinable;
 import com.kurento.commons.mscontrol.join.Joinable.Direction;
-import com.kurento.commons.mscontrol.join.JoinableStream.StreamType;
-import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
 import com.kurento.commons.sdp.enums.MediaType;
 import com.kurento.commons.sdp.enums.Mode;
 import com.kurento.kas.mscontrol.MSControlFactory;
@@ -125,8 +124,10 @@ public class VideoCallService extends Service {
 			if ((audioMode != null)
 					&& (Mode.RECVONLY.equals(audioMode) || Mode.SENDRECV
 							.equals(audioMode))) {
-				// speaker = false, audioRecorderComponent was created as STREAM_MUSIC
-				// speaker = true, audioRecorderComponent was created as STREAM_VOICE_CALL
+				// speaker = false, audioRecorderComponent was created as
+				// STREAM_MUSIC
+				// speaker = true, audioRecorderComponent was created as
+				// STREAM_VOICE_CALL
 				ApplicationContext.contextTable.put("speaker", false);
 				Parameters params = MSControlFactory.createParameters();
 				params.put(MediaComponentAndroid.STREAM_TYPE,
@@ -146,24 +147,25 @@ public class VideoCallService extends Service {
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
 
-		NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
-				.get("networkConnection");
-		if (nc == null) {
-			Log.e(LOG_TAG, "networkConnection is NULL");
-			return;
-		}
+		// NetworkConnection nc = (NetworkConnection)
+		// ApplicationContext.contextTable
+		// .get("networkConnection");
+		Joinable audioJoinable = (Joinable) ApplicationContext.contextTable
+				.get("audioJoinable");
+		// if (audio == null) {
+		// Log.e(LOG_TAG, "Audio Joinable is NULL");
+		// return;
+		// }
 
 		try {
 
 			if (audioPlayerComponent != null) {
-				audioPlayerComponent.join(Direction.SEND,
-						nc.getJoinableStream(StreamType.audio));
+				audioPlayerComponent.join(Direction.SEND, audioJoinable);
 				audioPlayerComponent.start();
 			}
 
 			if (audioRecorderComponent != null) {
-				audioRecorderComponent.join(Direction.RECV,
-						nc.getJoinableStream(StreamType.audio));
+				audioRecorderComponent.join(Direction.RECV, audioJoinable);
 				audioRecorderComponent.start();
 			}
 
@@ -199,7 +201,7 @@ public class VideoCallService extends Service {
 			audioRecorderComponent.stop();
 
 		ApplicationContext.contextTable.remove("videoCall");
-		
+
 		Message msg = new Message();
 		Bundle b = new Bundle();
 		b.putString("Call", "Terminate");

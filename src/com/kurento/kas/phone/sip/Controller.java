@@ -24,8 +24,10 @@ import android.content.Context;
 import android.util.Log;
 
 import com.kurento.commons.mscontrol.Parameters;
+import com.kurento.commons.mscontrol.join.JoinableStream.StreamType;
 import com.kurento.commons.sdp.enums.MediaType;
 import com.kurento.commons.sdp.enums.Mode;
+import com.kurento.commons.sip.agent.EndPointFactory;
 import com.kurento.commons.sip.agent.UaFactory;
 import com.kurento.commons.sip.util.SipConfig;
 import com.kurento.commons.ua.Call;
@@ -33,9 +35,11 @@ import com.kurento.commons.ua.CallListener;
 import com.kurento.commons.ua.EndPoint;
 import com.kurento.commons.ua.EndPointListener;
 import com.kurento.commons.ua.UA;
+import com.kurento.commons.ua.UaStun;
 import com.kurento.commons.ua.event.CallEvent;
+import com.kurento.commons.ua.event.CallEventEnum;
 import com.kurento.commons.ua.event.EndPointEvent;
-import com.kurento.commons.ua.event.EventType;
+import com.kurento.commons.ua.event.EndpointEventEnum;
 import com.kurento.commons.ua.exception.ServerInternalErrorException;
 import com.kurento.kas.media.codecs.AudioCodecType;
 import com.kurento.kas.media.codecs.VideoCodecType;
@@ -52,7 +56,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 		CallNotifier {
 
 	public final static String LOG_TAG = "Controller";
-	private UA ua = null;
+	private UaStun ua = null;
 	private EndPoint endPoint = null;;
 	private EndPointEvent pendingEndPointEvent;
 	private Call currentCall;
@@ -143,8 +147,16 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 					ua.terminate();
 					Log.d(LOG_TAG, "UA Terminate");
 				}
-				ua = UaFactory.getInstance(sipConfig);
-				localPort = ua.getLocalPort();
+				UA uaAux = UaFactory.getInstance(sipConfig);
+				if (uaAux instanceof UaStun)
+					ua = (UaStun) uaAux;
+				else
+					// TODO Add Exception
+					return;
+				localPort = ua.getConnectionType().getLocalPort();
+				Log.d(LOG_TAG, "Stun Info: " + ua.getConnectionType());
+				ApplicationContext.contextTable.put("stunInfo",
+						ua.getConnectionType());
 				isInitUA = true;
 				ApplicationContext.contextTable.put("localPort", localPort);
 				Log.d(LOG_TAG, "CONFIGURATION User Agent: " + sipConfig);
@@ -160,7 +172,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 					Log.e(LOG_TAG, "Break initUA");
 					isStunOk = false;
 					ApplicationContext.contextTable.put("isStunOk", isStunOk);
-					ApplicationContext.contextTable.put("stunInfo",
+					ApplicationContext.contextTable.put("stunError",
 							e.getMessage());
 					return;
 				}
@@ -184,13 +196,14 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 	private void register(String localUser, String localPassword,
 			String localRealm, Context context) throws Exception {
 		Log.d(LOG_TAG, "localUser: " + localUser + "; localReal: " + localRealm);
-		endPoint = ua.registerEndPoint(localUser, localRealm, localPassword,
-				3600, this);
+
+		endPoint = EndPointFactory.getInstance(localUser, localRealm,
+				localPassword, 3600, ua, this, context);
 	}
 
 	@Override
 	public void onEvent(EndPointEvent event) {
-		EventType eventType = event.getEventType();
+		EndpointEventEnum eventType = event.getEventType();
 		Log.d(LOG_TAG, "onEvent  SipEndPointEvent: " + eventType.toString());
 
 		if (EndPointEvent.INCOMING_CALL.equals(eventType)) {
@@ -274,7 +287,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 
 	@Override
 	public void onEvent(CallEvent event) {
-		EventType eventType = event.getEventType();
+		CallEventEnum eventType = event.getEventType();
 		Log.d(LOG_TAG, "onEvent  SipCallEvent: " + eventType.toString());
 
 		if (CallEvent.CALL_SETUP.equals(eventType)) {
@@ -284,7 +297,12 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			if (callListener != null) {
 				ApplicationContext.contextTable.put("callDirection",
 						currentCall.getMediaTypesModes());
-				callListener.callSetup(currentCall.getNetworkConnection(null));
+				ApplicationContext.contextTable.put("audioJoinable",
+						currentCall.getJoinable(StreamType.audio));
+				ApplicationContext.contextTable.put("videoJoinable",
+						currentCall.getJoinable(StreamType.video));
+
+				callListener.callSetup();
 			}
 		} else if (CallEvent.CALL_TERMINATE.equals(eventType)) {
 			setIsCall(false);

@@ -16,7 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kurento.kas.phone.softphone;
 
-import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
 /**
  * 
  * @author Miguel París Díaz
@@ -30,7 +29,7 @@ public interface SoftphoneCallListener {
 
 	public void registerUserFailed();
 
-	public void callSetup(NetworkConnection networkConnection);
+	public void callSetup();
 
 	public void callTerminate();
 

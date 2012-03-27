@@ -65,6 +65,8 @@ import com.kurento.kas.phone.preferences.Stun_Preferences;
 import com.kurento.kas.phone.preferences.Video_Preferences;
 import com.kurento.kas.phone.sip.Controller;
 
+import de.javawi.jstun.test.DiscoveryInfo;
+
 public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 	private final int MEDIA_CONTROL_OUTGOING = 0;
 	private final int SHOW_PREFERENCES = 1;
@@ -649,6 +651,16 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 		isRegister = true;
 		ApplicationContext.contextTable.put("isRegister", isRegister);
 
+		if (!stunHost.equals("")) {
+			DiscoveryInfo stunInfo = (DiscoveryInfo) ApplicationContext.contextTable
+					.get("stunInfo");
+			if (stunInfo == null)
+				info_connect += "\n\n Not Stun Info";
+			else
+				info_connect += "\n\n " + stunInfo;
+		} else
+			info_connect += "\n\n Not use Stun";
+
 	}
 
 	public void registerFailed() {
@@ -660,6 +672,13 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 
 		isRegister = false;
 		ApplicationContext.contextTable.put("isRegister", isRegister);
+
+		DiscoveryInfo stunInfo = (DiscoveryInfo) ApplicationContext.contextTable
+				.get("stunInfo");
+		if (stunInfo == null)
+			info_connect += "\n\n Not Stun Info";
+		else
+			info_connect += "\n\n " + stunInfo;
 	}
 
 	public void notRegister() {
@@ -1013,13 +1032,14 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener {
 					if (isStun != null) {
 						if (!isStun) {
 							String stunInfo = (String) ApplicationContext.contextTable
-									.get("stunInfo");
+									.get("stunError");
 							if (stunInfo == null)
 								stunInfo = "Unknow";
 							info_connect += "\n -- Problem with Stun: \n "
 									+ stunInfo + " --";
 						}
 					}
+
 				} catch (Exception e) {
 					Log.e(LOG_TAG, "Init UA : " + e.toString());
 					if (localAddress != null)

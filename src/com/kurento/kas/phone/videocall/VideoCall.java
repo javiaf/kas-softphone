@@ -35,8 +35,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -47,10 +47,9 @@ import android.widget.TableLayout;
 import com.kurento.commons.mscontrol.MediaSession;
 import com.kurento.commons.mscontrol.MsControlException;
 import com.kurento.commons.mscontrol.Parameters;
+import com.kurento.commons.mscontrol.join.Joinable;
 import com.kurento.commons.mscontrol.join.Joinable.Direction;
-import com.kurento.commons.mscontrol.join.JoinableStream.StreamType;
 import com.kurento.commons.mscontrol.mediacomponent.MediaComponent;
-import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
 import com.kurento.commons.sdp.enums.MediaType;
 import com.kurento.commons.sdp.enums.Mode;
 import com.kurento.kas.mscontrol.MSControlFactory;
@@ -82,11 +81,11 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		
+
 		mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK
 				| PowerManager.ACQUIRE_CAUSES_WAKEUP, "K-Phone");
 		mWakeLock.acquire();
-		
+
 		getWindow().addFlags(
 				WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
 						| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -195,23 +194,24 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		super.onResume();
 		Log.d(LOG_TAG, "HANG = " + hang);
 		if (!hang) {
-			NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
-					.get("networkConnection");
-			Log.e(LOG_TAG, "nc: " + nc);
-			if (nc == null) {
-				Log.e(LOG_TAG, "networkConnection is NULL");
-				return;
-			}
+			// NetworkConnection nc = (NetworkConnection)
+			// ApplicationContext.contextTable
+			// .get("networkConnection");
+			Joinable videoJoinable = (Joinable) ApplicationContext.contextTable
+					.get("videoJoinable");
+			// Log.e(LOG_TAG, "nc: " + nc);
+			// if (nc == null) {
+			// Log.e(LOG_TAG, "networkConnection is NULL");
+			// return;
+			// }
 			// TODO: Review. Not do it when the button Camara has been pushed
 			try {
 				if (videoPlayerComponent != null) {
-					videoPlayerComponent.join(Direction.SEND,
-							nc.getJoinableStream(StreamType.video));
+					videoPlayerComponent.join(Direction.SEND, videoJoinable);
 					videoPlayerComponent.start();
 				}
 				if (videoRecorderComponent != null) {
-					videoRecorderComponent.join(Direction.RECV,
-							nc.getJoinableStream(StreamType.video));
+					videoRecorderComponent.join(Direction.RECV, videoJoinable);
 					videoRecorderComponent.start();
 				}
 
@@ -242,23 +242,24 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 					try {
 						if (audioPlayerComponent != null) {
-							NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
-									.get("networkConnection");
-							if (nc == null) {
-								Log.e(LOG_TAG, "networkConnection is NULL");
-								return;
-							}
+							// NetworkConnection nc = (NetworkConnection)
+							// ApplicationContext.contextTable
+							// .get("networkConnection");
+							// if (nc == null) {
+							// Log.e(LOG_TAG, "networkConnection is NULL");
+							// return;
+							// }
+							Joinable audioJoinable = (Joinable) ApplicationContext.contextTable
+									.get("audioJoinable");
 
 							Boolean mute = (Boolean) ApplicationContext.contextTable
 									.get("mute");
 							if (mute != null) {
 								if (mute)
-									audioPlayerComponent.join(
-											Direction.SEND,
-											nc.getJoinableStream(StreamType.audio));
+									audioPlayerComponent.join(Direction.SEND,
+											audioJoinable);
 								else
-									audioPlayerComponent.unjoin(nc
-											.getJoinableStream(StreamType.audio));
+									audioPlayerComponent.unjoin(audioJoinable);
 
 								mute = !mute;
 								ApplicationContext.contextTable.put("mute",
@@ -284,13 +285,15 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 						// Log.d(LOG_TAG, "VideoPlayercomponent is Stop");
 						Controller controller = (Controller) ApplicationContext.contextTable
 								.get("controller");
-						NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
-								.get("networkConnection");
+						// NetworkConnection nc = (NetworkConnection)
+						// ApplicationContext.contextTable
+						// .get("networkConnection");
+						Joinable videoJoinable = (Joinable) ApplicationContext.contextTable
+								.get("videoJoinable");
 						if (videoPlayerComponent != null) {
 							videoPlayerComponent.release();
 							try {
-								videoPlayerComponent.unjoin(nc
-										.getJoinableStream(StreamType.video));
+								videoPlayerComponent.unjoin(videoJoinable);
 							} catch (MsControlException e) {
 								// TODO Auto-generated catch block
 								Log.e(LOG_TAG,
@@ -339,7 +342,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 								Log.d(LOG_TAG,
 										"Create new videoPlayerComponent");
 								videoPlayerComponent.join(Direction.SEND,
-										nc.getJoinableStream(StreamType.video));
+										videoJoinable);
 								videoPlayerComponent.start();
 								Log.d(LOG_TAG,
 										"Create videoPlayercomponent start");
@@ -371,12 +374,16 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 						return;
 					}
 
-					NetworkConnection nc = (NetworkConnection) ApplicationContext.contextTable
-							.get("networkConnection");
-					if (nc == null) {
-						Log.e(LOG_TAG, "networkConnection is NULL");
-						return;
-					}
+					// NetworkConnection nc = (NetworkConnection)
+					// ApplicationContext.contextTable
+					// .get("networkConnection");
+					// if (nc == null) {
+					// Log.e(LOG_TAG, "networkConnection is NULL");
+					// return;
+					// }
+
+					Joinable audioJoinable = (Joinable) ApplicationContext.contextTable
+							.get("audioJoinable");
 
 					MediaSessionAndroid mediaSession = controller
 							.getMediaSession();
@@ -385,8 +392,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 					try {
 						if (audioRecorderComponent != null) {
 							audioRecorderComponent.stop();
-							audioRecorderComponent.unjoin(nc
-									.getJoinableStream(StreamType.audio));
+							audioRecorderComponent.unjoin(audioJoinable);
 						}
 
 						Parameters params = MSControlFactory.createParameters();
@@ -416,7 +422,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 							if (audioRecorderComponent != null) {
 								audioRecorderComponent.join(Direction.RECV,
-										nc.getJoinableStream(StreamType.audio));
+										audioJoinable);
 								audioRecorderComponent.start();
 
 							}
