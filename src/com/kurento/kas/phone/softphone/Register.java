@@ -27,6 +27,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.kurento.kas.phone.preferences.Keys_Preferences;
+
 public class Register extends Activity {
 	private static final String LOG_TAG = "Register";
 
@@ -67,15 +69,19 @@ public class Register extends Activity {
 					SharedPreferences settings = PreferenceManager
 							.getDefaultSharedPreferences(getBaseContext());
 					SharedPreferences.Editor editor = settings.edit();
-					editor.putString("LOCAL_USERNAME", textlocalusername
+					editor.putString(Keys_Preferences.SIP_LOCAL_USERNAME,
+							textlocalusername
 							.getText().toString());
-					editor.putString("LOCAL_PASSWORD", textlocalpassword
+					editor.putString(Keys_Preferences.SIP_LOCAL_PASSWORD,
+							textlocalpassword
 							.getText().toString());
-					editor.putString("LOCAL_DOMAIN", textlocaldomain.getText()
+					editor.putString(Keys_Preferences.SIP_LOCAL_DOMAIN,
+							textlocaldomain.getText()
 							.toString());
-					editor.putString("PROXY_IP", textproxyip.getText()
+					editor.putString(Keys_Preferences.SIP_PROXY_IP, textproxyip.getText()
 							.toString());
-					editor.putString("PROXY_PORT", textproxyport.getText()
+					editor.putString(Keys_Preferences.SIP_PROXY_PORT,
+							textproxyport.getText()
 							.toString());
 					editor.commit();
 					Log.d(LOG_TAG, "All data ok");

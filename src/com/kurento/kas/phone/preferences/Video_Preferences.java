@@ -16,25 +16,55 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.kurento.kas.phone.preferences;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 
-public class Video_Preferences extends PreferenceActivity {
+import com.kurento.commons.mscontrol.Parameters;
+import com.kurento.commons.sdp.enums.MediaType;
+import com.kurento.commons.sdp.enums.Mode;
+import com.kurento.kas.media.codecs.AudioCodecType;
+import com.kurento.kas.media.codecs.VideoCodecType;
+import com.kurento.kas.mscontrol.MSControlFactory;
+import com.kurento.kas.mscontrol.MediaSessionAndroid;
+import com.kurento.kas.mscontrol.mediacomponent.MediaComponentAndroid;
+import com.kurento.kas.mscontrol.networkconnection.NetIF;
+import com.kurento.kas.mscontrol.networkconnection.PortRange;
+import com.kurento.kas.phone.applicationcontext.ApplicationContext;
+
+public class Video_Preferences extends PreferenceActivity implements
+		OnSharedPreferenceChangeListener {
+
+	private static boolean preferenceMediaChanged = false;
+	private static String info;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		setPreferenceChanged(false);
 		setPreferenceScreen(createPreferenceHierarchy());
+		this.getPreferenceManager().getSharedPreferences()
+				.registerOnSharedPreferenceChangeListener(this);
 	}
 
 	private PreferenceScreen createPreferenceHierarchy() {
@@ -50,7 +80,7 @@ public class Video_Preferences extends PreferenceActivity {
 		// Max bandwidth
 		EditTextPreference editTextMaxBw = new EditTextPreference(this);
 		editTextMaxBw.setDialogTitle("MAX_BW");
-		editTextMaxBw.setKey("MAX_BW");
+		editTextMaxBw.setKey(Keys_Preferences.MEDIA_GENERAL_MAX_BW);
 		editTextMaxBw.setTitle("Max bandwidth");
 		editTextMaxBw.setSummary("Select max bandwidth");
 
@@ -59,7 +89,7 @@ public class Video_Preferences extends PreferenceActivity {
 		// Max delay
 		EditTextPreference editTextMaxDelay = new EditTextPreference(this);
 		editTextMaxDelay.setDialogTitle("MAX_DELAY");
-		editTextMaxDelay.setKey("MAX_DELAY");
+		editTextMaxDelay.setKey(Keys_Preferences.MEDIA_GENERAL_MAX_DELAY);
 		editTextMaxDelay.setTitle("Max delay (ms)");
 		editTextMaxDelay.setSummary("Select max delay");
 
@@ -68,7 +98,7 @@ public class Video_Preferences extends PreferenceActivity {
 		// Camera Facing
 		CheckBoxPreference cameraFacing = new CheckBoxPreference(this);
 		cameraFacing.setDefaultValue(false);
-		cameraFacing.setKey("CAMERA_FRONT");
+		cameraFacing.setKey(Keys_Preferences.MEDIA_GENERAL_FRONT_CAMERA);
 		cameraFacing.setTitle("Front Camera");
 		cameraFacing
 				.setSummary("If it selected, it used the Front Camera. Else, it used the Back Camera.");
@@ -84,7 +114,7 @@ public class Video_Preferences extends PreferenceActivity {
 		// KeepAliveEnable
 		CheckBoxPreference keepAliveEnable = new CheckBoxPreference(this);
 		keepAliveEnable.setDefaultValue(false);
-		keepAliveEnable.setKey("KEEP_ALIVE");
+		keepAliveEnable.setKey(Keys_Preferences.MEDIA_NET_KEEP_ALIVE);
 		keepAliveEnable.setTitle("keep Alive ");
 		keepAliveEnable.setSummary("If it selected, it used the Keep Alive.");
 		networkCategory.addPreference(keepAliveEnable);
@@ -92,7 +122,7 @@ public class Video_Preferences extends PreferenceActivity {
 		// KeepAliveTime
 		EditTextPreference keepAliveDelay = new EditTextPreference(this);
 		keepAliveDelay.setDialogTitle("Keep Delay");
-		keepAliveDelay.setKey("KEEP_DELAY");
+		keepAliveDelay.setKey(Keys_Preferences.MEDIA_NET_KEEP_DELAY);
 		keepAliveDelay.setTitle("Keep delay (ms)");
 		keepAliveDelay.setSummary("Select keep delay");
 		networkCategory.addPreference(keepAliveDelay);
@@ -105,7 +135,7 @@ public class Video_Preferences extends PreferenceActivity {
 		listTransportV.setEntryValues(entryValuesTV);
 		listTransportV.setDefaultValue("UDP");
 		listTransportV.setDialogTitle("Transport");
-		listTransportV.setKey("TRANSPORT");
+		listTransportV.setKey(Keys_Preferences.MEDIA_NET_TRANSPORT);
 		listTransportV.setTitle("Transport");
 		listTransportV.setSummary("Select transport");
 		networkCategory.addPreference(listTransportV);
@@ -121,7 +151,7 @@ public class Video_Preferences extends PreferenceActivity {
 		// Video codecs
 		PreferenceScreen videoCodecPref = getPreferenceManager()
 				.createPreferenceScreen(this);
-		videoCodecPref.setKey("VIDEO_CODECS");
+		videoCodecPref.setKey(Keys_Preferences.MEDIA_VIDEO_CODECS);
 		videoCodecPref.setTitle("Video codecs");
 		videoCodecPref.setSummary("Select video codecs");
 		videoCategory.addPreference(videoCodecPref);
@@ -129,37 +159,42 @@ public class Video_Preferences extends PreferenceActivity {
 		// Codecs
 		CheckBoxPreference nextVideoCodecPref = new CheckBoxPreference(this);
 		nextVideoCodecPref.setDefaultValue(true);
-		nextVideoCodecPref.setKey("H263_CODEC");
+		nextVideoCodecPref.setKey(Keys_Preferences.MEDIA_VIDEO_H263_CODEC);
 		nextVideoCodecPref.setTitle("H263");
 		videoCodecPref.addPreference(nextVideoCodecPref);
 		nextVideoCodecPref = new CheckBoxPreference(this);
-		nextVideoCodecPref.setKey("MPEG4_CODEC");
+		nextVideoCodecPref.setKey(Keys_Preferences.MEDIA_VIDEO_MPEG4_CODEC);
 		nextVideoCodecPref.setTitle("MPEG4");
 		videoCodecPref.addPreference(nextVideoCodecPref);
 		nextVideoCodecPref = new CheckBoxPreference(this);
-		nextVideoCodecPref.setKey("H264_CODEC");
+		nextVideoCodecPref.setKey(Keys_Preferences.MEDIA_VIDEO_H264_CODEC);
 		nextVideoCodecPref.setTitle("H264");
 		videoCodecPref.addPreference(nextVideoCodecPref);
 
 		// Video local port range
 		PreferenceScreen videoLocalPortRangecPref = getPreferenceManager()
 				.createPreferenceScreen(this);
-		videoLocalPortRangecPref.setKey("VIDEO_LOCAL_PORT_RANGE");
+		videoLocalPortRangecPref
+				.setKey(Keys_Preferences.MEDIA_VIDEO_LOCAL_PORT_RANGE);
 		videoLocalPortRangecPref.setTitle("Video local port range");
 		videoLocalPortRangecPref.setSummary("Select video local port range");
 		videoCategory.addPreference(videoLocalPortRangecPref);
 
 		EditTextPreference editTextMinVideoPort = new EditTextPreference(this);
 		editTextMinVideoPort.setDialogTitle("Min video local port range");
-		editTextMinVideoPort.setKey("MIN_VIDEO_LOCAL_PORT");
+		editTextMinVideoPort
+				.setKey(Keys_Preferences.MEDIA_MIN_VIDEO_LOCAL_PORT);
 		editTextMinVideoPort.setTitle("Min video local port range");
-		editTextMinVideoPort.setSummary("Select min video local port of the range.");
+		editTextMinVideoPort
+				.setSummary("Select min video local port of the range.");
 		videoLocalPortRangecPref.addPreference(editTextMinVideoPort);
 		EditTextPreference editTextMaxVideoPort = new EditTextPreference(this);
 		editTextMaxVideoPort.setDialogTitle("Max video local port range");
-		editTextMaxVideoPort.setKey("MAX_VIDEO_LOCAL_PORT");
+		editTextMaxVideoPort
+				.setKey(Keys_Preferences.MEDIA_MAX_VIDEO_LOCAL_PORT);
 		editTextMaxVideoPort.setTitle("Max video local port range");
-		editTextMaxVideoPort.setSummary("Select max video local port of the range.");
+		editTextMaxVideoPort
+				.setSummary("Select max video local port of the range.");
 		videoLocalPortRangecPref.addPreference(editTextMaxVideoPort);
 
 		// Size Camera
@@ -194,7 +229,7 @@ public class Video_Preferences extends PreferenceActivity {
 		listSizeCam.setEntryValues(entryValues);
 		listSizeCam.setDefaultValue("352x288");
 		listSizeCam.setDialogTitle("Video size");
-		listSizeCam.setKey("VIDEO_SIZE");
+		listSizeCam.setKey(Keys_Preferences.MEDIA_VIDEO_SIZE);
 		listSizeCam.setTitle("Video size");
 		listSizeCam.setSummary("Select a video size");
 		videoCategory.addPreference(listSizeCam);
@@ -208,7 +243,7 @@ public class Video_Preferences extends PreferenceActivity {
 		listDirectionV.setEntryValues(entryValuesV);
 		listDirectionV.setDefaultValue("SEND/RECEIVE");
 		listDirectionV.setDialogTitle("Call video direction");
-		listDirectionV.setKey("CALL_VIDEO_DIRECTION");
+		listDirectionV.setKey(Keys_Preferences.MEDIA_VIDEO_CALL_DIRECTION);
 		listDirectionV.setTitle("Call video direction");
 		listDirectionV.setSummary("Select call video direction");
 		videoCategory.addPreference(listDirectionV);
@@ -216,7 +251,7 @@ public class Video_Preferences extends PreferenceActivity {
 		// Max Frame Rate
 		EditTextPreference editTextMaxFr = new EditTextPreference(this);
 		editTextMaxFr.setDialogTitle("Max frame rate");
-		editTextMaxFr.setKey("MAX_FR");
+		editTextMaxFr.setKey(Keys_Preferences.MEDIA_VIDEO_MAX_FR);
 		editTextMaxFr.setTitle("Max frame rate");
 		editTextMaxFr.setSummary("Select max frame rate");
 		videoCategory.addPreference(editTextMaxFr);
@@ -224,7 +259,7 @@ public class Video_Preferences extends PreferenceActivity {
 		// Max Frame Rate
 		EditTextPreference editTextGop = new EditTextPreference(this);
 		editTextGop.setDialogTitle("Gop size");
-		editTextGop.setKey("GOP_SIZE");
+		editTextGop.setKey(Keys_Preferences.MEDIA_VIDEO_GOP_SIZE);
 		editTextGop.setTitle("Gop size");
 		editTextGop.setSummary("Select size between two I-frames");
 		videoCategory.addPreference(editTextGop);
@@ -232,7 +267,7 @@ public class Video_Preferences extends PreferenceActivity {
 		// Max Frame Rate
 		EditTextPreference editTextQueue = new EditTextPreference(this);
 		editTextQueue.setDialogTitle("Max Frame queue size");
-		editTextQueue.setKey("QUEUE_SIZE");
+		editTextQueue.setKey(Keys_Preferences.MEDIA_VIDEO_QUEUE_SIZE);
 		editTextQueue.setTitle("Max Frame queue size");
 		editTextQueue.setSummary("Select max frame queue size");
 		videoCategory.addPreference(editTextQueue);
@@ -246,7 +281,7 @@ public class Video_Preferences extends PreferenceActivity {
 		// Audio codecs
 		PreferenceScreen audioCodecPref = getPreferenceManager()
 				.createPreferenceScreen(this);
-		audioCodecPref.setKey("AUDIO_CODECS");
+		audioCodecPref.setKey(Keys_Preferences.MEDIA_AUDIO_CODECS);
 		audioCodecPref.setTitle("Audio codecs");
 		audioCodecPref.setSummary("Select audio codecs");
 		audioCategory.addPreference(audioCodecPref);
@@ -254,45 +289,50 @@ public class Video_Preferences extends PreferenceActivity {
 		// Codecs
 		CheckBoxPreference nextAudioCodecPref = new CheckBoxPreference(this);
 		nextAudioCodecPref.setDefaultValue(true);
-		nextAudioCodecPref.setKey("AMR_AUDIO_CODEC");
+		nextAudioCodecPref.setKey(Keys_Preferences.MEDIA_AUDIO_AMR_CODEC);
 		nextAudioCodecPref.setTitle("AMR");
 		audioCodecPref.addPreference(nextAudioCodecPref);
 		nextAudioCodecPref = new CheckBoxPreference(this);
-		nextAudioCodecPref.setKey("MP2_AUDIO_CODEC");
+		nextAudioCodecPref.setKey(Keys_Preferences.MEDIA_AUDIO_MP2_CODEC);
 		nextAudioCodecPref.setTitle("MP2");
 		audioCodecPref.addPreference(nextAudioCodecPref);
 		nextAudioCodecPref = new CheckBoxPreference(this);
-		nextAudioCodecPref.setKey("AAC_AUDIO_CODEC");
+		nextAudioCodecPref.setKey(Keys_Preferences.MEDIA_AUDIO_AAC_CODEC);
 		nextAudioCodecPref.setTitle("AAC");
 		audioCodecPref.addPreference(nextAudioCodecPref);
 		nextAudioCodecPref = new CheckBoxPreference(this);
-		nextAudioCodecPref.setKey("PCMU_AUDIO_CODEC");
+		nextAudioCodecPref.setKey(Keys_Preferences.MEDIA_AUDIO_PCMU_CODEC);
 		nextAudioCodecPref.setTitle("PCMU");
 		audioCodecPref.addPreference(nextAudioCodecPref);
 		nextAudioCodecPref = new CheckBoxPreference(this);
-		nextAudioCodecPref.setKey("PCMA_AUDIO_CODEC");
+		nextAudioCodecPref.setKey(Keys_Preferences.MEDIA_AUDIO_PCMA_CODEC);
 		nextAudioCodecPref.setTitle("PCMA");
 		audioCodecPref.addPreference(nextAudioCodecPref);
 
 		// Audio local port range
 		PreferenceScreen audioLocalPortRangecPref = getPreferenceManager()
 				.createPreferenceScreen(this);
-		audioLocalPortRangecPref.setKey("AUDIO_LOCAL_PORT_RANGE");
+		audioLocalPortRangecPref
+				.setKey(Keys_Preferences.MEDIA_AUDIO_LOCAL_PORT_RANGE);
 		audioLocalPortRangecPref.setTitle("Audio local port range");
 		audioLocalPortRangecPref.setSummary("Select audio local port range");
 		audioCategory.addPreference(audioLocalPortRangecPref);
 
 		EditTextPreference editTextMinAudioPort = new EditTextPreference(this);
 		editTextMinAudioPort.setDialogTitle("Min video local port range");
-		editTextMinAudioPort.setKey("MIN_AUDIO_LOCAL_PORT");
+		editTextMinAudioPort
+				.setKey(Keys_Preferences.MEDIA_MIN_AUDIO_LOCAL_PORT);
 		editTextMinAudioPort.setTitle("Min audio local port range");
-		editTextMinAudioPort.setSummary("Select min audio local port of the range.");
+		editTextMinAudioPort
+				.setSummary("Select min audio local port of the range.");
 		audioLocalPortRangecPref.addPreference(editTextMinAudioPort);
 		EditTextPreference editTextMaxAudioPort = new EditTextPreference(this);
 		editTextMaxAudioPort.setDialogTitle("Max audio local port range");
-		editTextMaxAudioPort.setKey("MAX_AUDIO_LOCAL_PORT");
+		editTextMaxAudioPort
+				.setKey(Keys_Preferences.MEDIA_MAX_AUDIO_LOCAL_PORT);
 		editTextMaxAudioPort.setTitle("Max audio local port range");
-		editTextMaxAudioPort.setSummary("Select max audio local port of the range.");
+		editTextMaxAudioPort
+				.setSummary("Select max audio local port of the range.");
 		audioLocalPortRangecPref.addPreference(editTextMaxAudioPort);
 
 		// Direction Call
@@ -304,11 +344,271 @@ public class Video_Preferences extends PreferenceActivity {
 		listDirectionA.setEntryValues(entryValuesA);
 		listDirectionA.setDefaultValue("SEND/RECEIVE");
 		listDirectionA.setDialogTitle("Call audio direction");
-		listDirectionA.setKey("CALL_AUDIO_DIRECTION");
+		listDirectionA.setKey(Keys_Preferences.MEDIA_AUDIO_CALL_DIRECTION);
 		listDirectionA.setTitle("Call audio direction");
 		listDirectionA.setSummary("Select call audio direction");
 		audioCategory.addPreference(listDirectionA);
 
 		return root;
 	}
+
+	public static Parameters getMediaPreferences(Context context) {
+		Parameters params = MSControlFactory.createParameters();
+
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(context);
+
+		try {
+			params.put(MediaSessionAndroid.LOCAL_ADDRESS,
+					InetAddress.getLocalHost());
+		} catch (UnknownHostException e1) {
+			e1.printStackTrace();
+		}
+
+		Integer cameraFacing = 0;
+		try {
+			Boolean camera_t = settings.getBoolean(
+					Keys_Preferences.MEDIA_GENERAL_FRONT_CAMERA, false);
+			if (camera_t) {
+				cameraFacing = 1; // Camera Front
+			} else {
+				cameraFacing = 0; // Camera Back
+			}
+		} catch (NumberFormatException e) {
+			cameraFacing = 0;
+		}
+		ApplicationContext.contextTable.put("cameraFacing", cameraFacing);
+
+		params.put(MediaComponentAndroid.CAMERA_FACING, cameraFacing);
+
+		params.put(MediaSessionAndroid.MAX_BANDWIDTH, Integer.parseInt(settings
+				.getString(Keys_Preferences.MEDIA_GENERAL_MAX_BW, "0")));
+		params.put(MediaSessionAndroid.MAX_DELAY, Integer.parseInt(settings
+				.getString(Keys_Preferences.MEDIA_GENERAL_MAX_DELAY, "200")));
+
+		params.put(MediaSessionAndroid.STREAMS_MODES,
+				getCallDirectionMapFromSettings(context));
+
+		ApplicationContext.contextTable.put("callDirection",
+				getCallDirectionMapFromSettings(context));
+
+		params.put(MediaSessionAndroid.AUDIO_CODECS,
+				getAudioCodecsFromSettings(context));
+
+		params.put(MediaSessionAndroid.VIDEO_CODECS,
+				getVideoCodecsFromSettings(context));
+
+		PortRange audioPortRange;
+		try {
+			int minAudioPort = Integer.parseInt(settings.getString(
+					Keys_Preferences.MEDIA_MIN_AUDIO_LOCAL_PORT, "0"));
+			int maxAudioPort = Integer.parseInt(settings.getString(
+					Keys_Preferences.MEDIA_MAX_AUDIO_LOCAL_PORT, "0"));
+			audioPortRange = new PortRange(minAudioPort, maxAudioPort);
+		} catch (Exception e) {
+			audioPortRange = null;
+		}
+		params.put(MediaSessionAndroid.AUDIO_LOCAL_PORT_RANGE, audioPortRange);
+
+		PortRange videoPortRange;
+		try {
+			int minVideoPort = Integer.parseInt(settings.getString(
+					Keys_Preferences.MEDIA_MIN_VIDEO_LOCAL_PORT, "0"));
+			int maxVideoPort = Integer.parseInt(settings.getString(
+					Keys_Preferences.MEDIA_MAX_VIDEO_LOCAL_PORT, "0"));
+			videoPortRange = new PortRange(minVideoPort, maxVideoPort);
+		} catch (Exception e) {
+			videoPortRange = null;
+		}
+		params.put(MediaSessionAndroid.VIDEO_LOCAL_PORT_RANGE, videoPortRange);
+
+		int width, height;
+		try {
+			String size = settings.getString(Keys_Preferences.MEDIA_VIDEO_SIZE,
+					"352x288");
+			String sizes[] = size.split("x");
+			width = Integer.parseInt(sizes[0]);
+			height = Integer.parseInt(sizes[1]);
+		} catch (NumberFormatException e) {
+			width = 352;
+			height = 288;
+		}
+		params.put(MediaSessionAndroid.FRAME_WIDTH, width);
+		params.put(MediaSessionAndroid.FRAME_HEIGHT, height);
+
+		params.put(MediaSessionAndroid.MAX_FRAME_RATE, Integer
+				.parseInt(settings.getString(
+						Keys_Preferences.MEDIA_VIDEO_MAX_FR, "15")));
+		params.put(MediaSessionAndroid.GOP_SIZE, Integer.parseInt(settings
+				.getString(Keys_Preferences.MEDIA_VIDEO_GOP_SIZE, "6")));
+		params.put(MediaSessionAndroid.FRAMES_QUEUE_SIZE, Integer
+				.parseInt(settings.getString(
+						Keys_Preferences.MEDIA_VIDEO_QUEUE_SIZE, "2")));
+
+		Map<String, String> stunParams = Stun_Preferences
+				.getStunPreferences(context);
+		params.put(MediaSessionAndroid.STUN_HOST,
+				stunParams.get(Keys_Preferences.STUN_HOST));
+		params.put(MediaSessionAndroid.STUN_PORT, Integer.parseInt(stunParams
+				.get(Keys_Preferences.STUN_HOST_PORT)));
+
+		ConnectivityManager connManager = (ConnectivityManager) context
+				.getSystemService(CONNECTIVITY_SERVICE);
+		NetworkInfo ni = connManager.getActiveNetworkInfo();
+		NetIF netIF = null;
+		ni = connManager.getActiveNetworkInfo();
+		String conType = ni.getTypeName();
+		if ("WIFI".equalsIgnoreCase(conType)) {
+			netIF = NetIF.WIFI;
+		} else if ("MOBILE".equalsIgnoreCase(conType)) {
+			netIF = NetIF.MOBILE;
+		}
+		params.put(MediaSessionAndroid.NET_IF, netIF);
+
+		return params;
+
+	}
+
+	private static ArrayList<AudioCodecType> getAudioCodecsFromSettings(
+			Context context) {
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(context);
+
+		ArrayList<AudioCodecType> selectedAudioCodecs = new ArrayList<AudioCodecType>();
+		if (settings.getBoolean(Keys_Preferences.MEDIA_AUDIO_AMR_CODEC, false)) {
+			selectedAudioCodecs.add(AudioCodecType.AMR);
+		}
+		if (settings.getBoolean(Keys_Preferences.MEDIA_AUDIO_MP2_CODEC, false)) {
+			selectedAudioCodecs.add(AudioCodecType.MP2);
+		}
+		if (settings.getBoolean(Keys_Preferences.MEDIA_AUDIO_AAC_CODEC, false)) {
+			selectedAudioCodecs.add(AudioCodecType.AAC);
+		}
+		if (settings.getBoolean(Keys_Preferences.MEDIA_AUDIO_PCMU_CODEC, false)) {
+			selectedAudioCodecs.add(AudioCodecType.PCMU);
+		}
+		if (settings.getBoolean(Keys_Preferences.MEDIA_AUDIO_PCMA_CODEC, false)) {
+			selectedAudioCodecs.add(AudioCodecType.PCMA);
+		}
+		return selectedAudioCodecs;
+	}
+
+	private static ArrayList<VideoCodecType> getVideoCodecsFromSettings(
+			Context context) {
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(context);
+
+		ArrayList<VideoCodecType> selectedVideoCodecs = new ArrayList<VideoCodecType>();
+
+		if (settings.getBoolean(Keys_Preferences.MEDIA_VIDEO_H263_CODEC, false)) {
+			selectedVideoCodecs.add(VideoCodecType.H263);
+		}
+		if (settings
+				.getBoolean(Keys_Preferences.MEDIA_VIDEO_MPEG4_CODEC, false)) {
+			selectedVideoCodecs.add(VideoCodecType.MPEG4);
+		}
+		if (settings.getBoolean(Keys_Preferences.MEDIA_VIDEO_H264_CODEC, false)) {
+			selectedVideoCodecs.add(VideoCodecType.H264);
+		}
+
+		return selectedVideoCodecs;
+	}
+
+	private static Map<MediaType, Mode> getCallDirectionMapFromSettings(
+			Context context) {
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		Map<MediaType, Mode> callDirection = new HashMap<MediaType, Mode>();
+
+		String videoDirection = settings.getString(
+				Keys_Preferences.MEDIA_VIDEO_CALL_DIRECTION, "SEND/RECEIVE");
+
+		if (videoDirection.equals("SEND ONLY")) {
+			callDirection.put(MediaType.VIDEO, Mode.SENDONLY);
+		}
+		if (videoDirection.equals("RECEIVE ONLY")) {
+			callDirection.put(MediaType.VIDEO, Mode.RECVONLY);
+		}
+		if (videoDirection.equals("SEND/RECEIVE")) {
+			callDirection.put(MediaType.VIDEO, Mode.SENDRECV);
+		}
+
+		String audioDirection = settings.getString(
+				Keys_Preferences.MEDIA_AUDIO_CALL_DIRECTION, "SEND/RECEIVE");
+
+		if (audioDirection.equals("SEND ONLY")) {
+			callDirection.put(MediaType.AUDIO, Mode.SENDONLY);
+		}
+		if (audioDirection.equals("RECEIVE ONLY")) {
+			callDirection.put(MediaType.AUDIO, Mode.RECVONLY);
+		}
+		if (audioDirection.equals("SEND/RECEIVE")) {
+			callDirection.put(MediaType.AUDIO, Mode.SENDRECV);
+		}
+
+		return callDirection;
+	}
+
+	public static Map<String, Object> getMediaNetPreferences(Context context) {
+		Map<String, Object> params = new HashMap<String, Object>();
+
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(context);
+
+		params.put(Keys_Preferences.MEDIA_NET_KEEP_ALIVE, settings.getBoolean(
+				Keys_Preferences.MEDIA_NET_KEEP_ALIVE, false));
+		params.put(Keys_Preferences.MEDIA_NET_KEEP_DELAY, Long
+				.parseLong(settings.getString(
+						Keys_Preferences.MEDIA_NET_KEEP_DELAY, "10000")));
+		params.put(Keys_Preferences.MEDIA_NET_TRANSPORT,
+				settings.getString(Keys_Preferences.MEDIA_NET_TRANSPORT, "UDP"));
+
+		return params;
+	}
+
+	public static String getMediaPreferencesInfo(Context context) {
+
+		Parameters params = getMediaPreferences(context);
+
+		info = "Media preferences\n" + "Interfaz\n"
+				+ params.get(MediaSessionAndroid.NET_IF)
+				+ "\n\nMax BandWidth\n"
+				+ params.get(MediaSessionAndroid.MAX_BANDWIDTH)
+				+ "\n\nVideo codec\n"
+				+ params.get(MediaSessionAndroid.VIDEO_CODECS)
+				+ "\n\nAudio codec\n"
+				+ params.get(MediaSessionAndroid.AUDIO_CODECS)
+				+ "\n\nCall direcction\n"
+				+ params.get(MediaSessionAndroid.STREAMS_MODES);
+
+		return info;
+	}
+
+	private synchronized static void setPreferenceChanged(boolean hasChanged) {
+		preferenceMediaChanged = hasChanged;
+	}
+
+	public static synchronized boolean isPreferenceChanged() {
+		return preferenceMediaChanged;
+	}
+
+	public static void resetChanged() {
+		setPreferenceChanged(false);
+	}
+
+	@Override
+	protected void onDestroy() {
+		this.getPreferenceManager().getSharedPreferences()
+				.unregisterOnSharedPreferenceChangeListener(this);
+		super.onDestroy();
+	}
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+			String key) {
+		Log.d(this.getClass().getName(), "Video Preferecnces Changed "
+				+ sharedPreferences);
+		setPreferenceChanged(true);
+	}
+
 }

@@ -23,9 +23,11 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -43,6 +45,7 @@ import android.widget.TextView;
 
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.controlcontacts.ControlContacts;
+import com.kurento.kas.phone.shared.Actions;
 import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.softphone.R;
 import com.kurento.kas.phone.softphone.SoftPhone;
@@ -63,6 +66,28 @@ public class MediaControlOutgoing extends Activity {
 	private Boolean isCanceled = false;
 
 	MediaPlayer mPlayer;
+
+	private IntentFilter intentFilter;
+	private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			if (Actions.OUTGOING_CALL_CLOSE.equals(action)) {
+				finish();
+			} else if (Actions.CALL_REJECT.equals(action)) {
+				// TODO Modify for to show the information
+				// outgoing_call.setTextColor(Color.RED);
+				// outgoing_call.setText("Busy line");
+				finish();
+			} else if (Actions.CALL_ERROR.equals(action)) {
+				// TODO Modify for to show the information
+				// outgoing_call.setBackgroundColor(Color.RED);
+				// outgoing_call.setText("Call error");
+				finish();
+			}
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -154,6 +179,8 @@ public class MediaControlOutgoing extends Activity {
 		}
 		// Play sound
 		mPlayer = MediaPlayer.create(this, R.raw.tone_call);
+
+		intentFilter = new IntentFilter();
 	}
 
 	@Override
@@ -195,6 +222,12 @@ public class MediaControlOutgoing extends Activity {
 	protected void onResume() {
 		super.onResume();
 
+		if (intentFilter != null) {
+			intentFilter.addAction(Actions.CALL_REJECT);
+			intentFilter.addAction(Actions.CALL_ERROR);
+			intentFilter.addAction(Actions.OUTGOING_CALL_CLOSE);
+		}
+		registerReceiver(mReceiver, intentFilter);
 		isCanceled = false;
 
 		mPlayer.setLooping(true);
@@ -267,6 +300,7 @@ public class MediaControlOutgoing extends Activity {
 		if (mPlayer != null)
 			mPlayer.stop();
 		Log.d(LOG_TAG, "onDestroy");
+		unregisterReceiver(mReceiver);
 		super.onDestroy();
 	}
 
