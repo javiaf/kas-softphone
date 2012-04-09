@@ -3,7 +3,7 @@
 	<PreferenceCategory android:title="Video Preferences">
 		<ListPreference android:key="STUN_LIST" android:title="Stun list"
 			android:summary="Select a Stun host" android:entries="@array/stun_host"
-			android:entryValues="@array/stun_host" android:defaultValue="stun.xten.com"
+			android:entryValues="@array/stun_host" android:defaultValue="193.147.51.24"
 			android:dialogTitle="Select a Stun host" />
 			
 		<EditTextPreference android:key="STUN_HOST"

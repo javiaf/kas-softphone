@@ -78,6 +78,7 @@
 	
 	<string-array name="stun_host">
 	  <item>-</item>
+	  <item>193.147.51.24</item>
 	  <item>stun.xten.com</item>
 	  <item>stun.ekiga.net</item>
 	  <item>stun.softjoys.com</item>
