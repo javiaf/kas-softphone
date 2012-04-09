@@ -79,8 +79,8 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			this.mediaSession = MSControlFactory
 					.createMediaSession(mediaPrefereces);
 
-			this.mediaNetPreferences = Video_Preferences
-					.getMediaNetPreferences(context);
+			this.mediaNetPreferences = Connection_Preferences
+					.getConnectionNetPreferences(context);
 			this.keep_alive = (Boolean) mediaNetPreferences
 					.get(Keys_Preferences.MEDIA_NET_KEEP_ALIVE);
 			this.keep_delay = (Long) (mediaNetPreferences

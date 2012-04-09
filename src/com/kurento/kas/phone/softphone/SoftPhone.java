@@ -301,6 +301,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 			dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 			info_video = Video_Preferences
 					.getMediaPreferencesInfo(getApplicationContext());
+			info_video += "\n\n"
+					+ Connection_Preferences
+					.getConnectionNetPreferenceInfo(getApplicationContext());
 			dialog.setContentView(R.layout.info_video);
 			((TextView) dialog.findViewById(R.id.info_video))
 					.setText(info_video);

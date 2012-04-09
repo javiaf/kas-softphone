@@ -31,4 +31,19 @@
 			android:defaultValue="5060" android:singleLine="true"
 			android:inputType="number" />
 	</PreferenceCategory>
+	<PreferenceCategory android:title="Network Preferences">
+	    <CheckBoxPreference android:title="Keep Alive"
+	        android:summary = "If it selected, it used the Keep Alive."
+		    android:key="MEDIA_NET_KEEP_ALIVE" />
+	    <EditTextPreference android:key="MEDIA_NET_KEEP_DELAY"
+			android:title="Keep delay (ms)" android:summary="Select keep delay"
+			android:singleLine="true" />
+	    <ListPreference
+           android:title="Transport"
+           android:summary="Select transport"
+           android:key="MEDIA_NET_TRANSPORT"
+           android:defaultValue="UDP"
+           android:entries="@array/transport"
+           android:entryValues="@array/transport" />     
+	</PreferenceCategory>
 </PreferenceScreen>

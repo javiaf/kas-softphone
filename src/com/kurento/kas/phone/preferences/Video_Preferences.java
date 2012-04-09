@@ -105,42 +105,42 @@ public class Video_Preferences extends PreferenceActivity implements
 
 		generalCategory.addPreference(cameraFacing);
 
-		// ------//
-		// Network Category
-		PreferenceCategory networkCategory = new PreferenceCategory(this);
-		networkCategory.setTitle("Network Preferences");
-		root.addPreference(networkCategory);
-
-		// KeepAliveEnable
-		CheckBoxPreference keepAliveEnable = new CheckBoxPreference(this);
-		keepAliveEnable.setDefaultValue(false);
-		keepAliveEnable.setKey(Keys_Preferences.MEDIA_NET_KEEP_ALIVE);
-		keepAliveEnable.setTitle("keep Alive ");
-		keepAliveEnable.setSummary("If it selected, it used the Keep Alive.");
-		networkCategory.addPreference(keepAliveEnable);
-
-		// KeepAliveTime
-		EditTextPreference keepAliveDelay = new EditTextPreference(this);
-		keepAliveDelay.setDialogTitle("Keep Delay");
-		keepAliveDelay.setKey(Keys_Preferences.MEDIA_NET_KEEP_DELAY);
-		keepAliveDelay.setTitle("Keep delay (ms)");
-		keepAliveDelay.setSummary("Select keep delay");
-		networkCategory.addPreference(keepAliveDelay);
-
-		// Transport
-		CharSequence[] entriesTV = { "TCP", "UDP" };
-		CharSequence[] entryValuesTV = { "TCP", "UDP" };
-		ListPreference listTransportV = new ListPreference(this);
-		listTransportV.setEntries(entriesTV);
-		listTransportV.setEntryValues(entryValuesTV);
-		listTransportV.setDefaultValue("UDP");
-		listTransportV.setDialogTitle("Transport");
-		listTransportV.setKey(Keys_Preferences.MEDIA_NET_TRANSPORT);
-		listTransportV.setTitle("Transport");
-		listTransportV.setSummary("Select transport");
-		networkCategory.addPreference(listTransportV);
-
-		root.addPreference(networkCategory);
+		// // ------//
+		// // Network Category
+		// PreferenceCategory networkCategory = new PreferenceCategory(this);
+		// networkCategory.setTitle("Network Preferences");
+		// root.addPreference(networkCategory);
+		//
+		// // KeepAliveEnable
+		// CheckBoxPreference keepAliveEnable = new CheckBoxPreference(this);
+		// keepAliveEnable.setDefaultValue(false);
+		// keepAliveEnable.setKey(Keys_Preferences.MEDIA_NET_KEEP_ALIVE);
+		// keepAliveEnable.setTitle("keep Alive ");
+		// keepAliveEnable.setSummary("If it selected, it used the Keep Alive.");
+		// networkCategory.addPreference(keepAliveEnable);
+		//
+		// // KeepAliveTime
+		// EditTextPreference keepAliveDelay = new EditTextPreference(this);
+		// keepAliveDelay.setDialogTitle("Keep Delay");
+		// keepAliveDelay.setKey(Keys_Preferences.MEDIA_NET_KEEP_DELAY);
+		// keepAliveDelay.setTitle("Keep delay (ms)");
+		// keepAliveDelay.setSummary("Select keep delay");
+		// networkCategory.addPreference(keepAliveDelay);
+		//
+		// // Transport
+		// CharSequence[] entriesTV = { "TCP", "UDP" };
+		// CharSequence[] entryValuesTV = { "TCP", "UDP" };
+		// ListPreference listTransportV = new ListPreference(this);
+		// listTransportV.setEntries(entriesTV);
+		// listTransportV.setEntryValues(entryValuesTV);
+		// listTransportV.setDefaultValue("UDP");
+		// listTransportV.setDialogTitle("Transport");
+		// listTransportV.setKey(Keys_Preferences.MEDIA_NET_TRANSPORT);
+		// listTransportV.setTitle("Transport");
+		// listTransportV.setSummary("Select transport");
+		// networkCategory.addPreference(listTransportV);
+		//
+		// root.addPreference(networkCategory);
 
 		// ------//
 		// Video Category
@@ -547,23 +547,6 @@ public class Video_Preferences extends PreferenceActivity implements
 		}
 
 		return callDirection;
-	}
-
-	public static Map<String, Object> getMediaNetPreferences(Context context) {
-		Map<String, Object> params = new HashMap<String, Object>();
-
-		SharedPreferences settings = PreferenceManager
-				.getDefaultSharedPreferences(context);
-
-		params.put(Keys_Preferences.MEDIA_NET_KEEP_ALIVE, settings.getBoolean(
-				Keys_Preferences.MEDIA_NET_KEEP_ALIVE, false));
-		params.put(Keys_Preferences.MEDIA_NET_KEEP_DELAY, Long
-				.parseLong(settings.getString(
-						Keys_Preferences.MEDIA_NET_KEEP_DELAY, "10000")));
-		params.put(Keys_Preferences.MEDIA_NET_TRANSPORT,
-				settings.getString(Keys_Preferences.MEDIA_NET_TRANSPORT, "UDP"));
-
-		return params;
 	}
 
 	public static String getMediaPreferencesInfo(Context context) {

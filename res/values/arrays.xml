@@ -85,4 +85,9 @@
 	  <item>stun.voxgratia.org</item>
 	</string-array>
 	
+	<string-array name="transport">
+	    <item>UDP</item>
+	    <item>TCP</item>
+	</string-array>
+	
 </resources>

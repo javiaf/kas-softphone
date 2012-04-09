@@ -100,6 +100,41 @@ public class Connection_Preferences extends PreferenceActivity implements
 		return info;
 	}
 
+	public static String getConnectionNetPreferenceInfo(Context context) {
+		Map<String, Object> params = getConnectionNetPreferences(context);
+		if (params != null) {
+			info = "Connection Net Preference\n"
+					+ "Keep Alive\n"
+					+ (Boolean) params
+							.get(Keys_Preferences.MEDIA_NET_KEEP_ALIVE)
+					+ "\n\nKeep Delay\n"
+					+ (Long) params.get(Keys_Preferences.MEDIA_NET_KEEP_DELAY)
+					+ "\n\nTransport\n"
+					+ (String) params.get(Keys_Preferences.MEDIA_NET_TRANSPORT);
+		} else {
+			info = "Connection net preferences are incorrect";
+		}
+		return info;
+	}
+
+	public static Map<String, Object> getConnectionNetPreferences(
+			Context context) {
+		Map<String, Object> params = new HashMap<String, Object>();
+
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(context);
+
+		params.put(Keys_Preferences.MEDIA_NET_KEEP_ALIVE, settings.getBoolean(
+				Keys_Preferences.MEDIA_NET_KEEP_ALIVE, false));
+		params.put(Keys_Preferences.MEDIA_NET_KEEP_DELAY, Long
+				.parseLong(settings.getString(
+						Keys_Preferences.MEDIA_NET_KEEP_DELAY, "10000")));
+		params.put(Keys_Preferences.MEDIA_NET_TRANSPORT,
+				settings.getString(Keys_Preferences.MEDIA_NET_TRANSPORT, "UDP"));
+
+		return params;
+	}
+
 	private synchronized static void setPreferenceChanged(boolean hasChanged) {
 		preferenceConnectionChanged = hasChanged;
 	}
@@ -130,7 +165,10 @@ public class Connection_Preferences extends PreferenceActivity implements
 				|| key.equals(Keys_Preferences.SIP_MAX_LOCAL_PORT)
 				|| key.equals(Keys_Preferences.SIP_MIN_LOCAL_PORT)
 				|| key.equals(Keys_Preferences.SIP_PROXY_IP)
-				|| key.equals(Keys_Preferences.SIP_PROXY_PORT))
+				|| key.equals(Keys_Preferences.SIP_PROXY_PORT)
+				|| key.equals(Keys_Preferences.MEDIA_NET_KEEP_ALIVE)
+				|| key.equals(Keys_Preferences.MEDIA_NET_KEEP_DELAY)
+				|| key.equals(Keys_Preferences.MEDIA_NET_TRANSPORT))
 			setPreferenceChanged(true);
 		else
 			setPreferenceChanged(false);
