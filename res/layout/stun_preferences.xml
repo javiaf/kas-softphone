@@ -7,9 +7,9 @@
 			android:dialogTitle="Select a Stun host" />
 			
 		<EditTextPreference android:key="STUN_HOST"
-			android:title="@string/stun_host" android:summary="@string/summary_stun_host"/>
+			android:title="@string/stun_host" android:summary="@string/summary_stun_host" android:defaultValue="193.147.51.24"/>
 
 		<EditTextPreference android:key="STUN_HOST_PORT"
-			android:title="@string/stun_host_port" android:summary="@string/summary_stun_host_port" android:inputType="number"/>
+			android:title="@string/stun_host_port" android:summary="@string/summary_stun_host_port" android:inputType="number" android:defaultValue="3478"/>
 	</PreferenceCategory>
 </PreferenceScreen>
