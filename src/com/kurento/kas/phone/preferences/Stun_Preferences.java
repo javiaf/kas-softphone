@@ -51,6 +51,7 @@ public class Stun_Preferences extends PreferenceActivity implements
 
 		String stunHostAux = settings.getString(Keys_Preferences.STUN_LIST,
 				"stun.xten.com");
+		stunPort = "0";
 		if (stunHostAux.equals("-")) {
 			stunHostAux = settings.getString(Keys_Preferences.STUN_HOST, "-");
 			if (!stunHostAux.equals("-")) {
@@ -65,7 +66,10 @@ public class Stun_Preferences extends PreferenceActivity implements
 			stunHost = stunHostAux;
 			stunPort = "3478";
 		}
-
+		if (stunHost.equals("") || stunPort.equals("")) {
+			stunHost = "";
+			stunPort = "0";
+		}
 		params.put(Keys_Preferences.STUN_HOST, stunHost);
 		params.put(Keys_Preferences.STUN_HOST_PORT, stunPort);
 
