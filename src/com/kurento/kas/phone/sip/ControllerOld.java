@@ -129,7 +129,7 @@ public class ControllerOld implements EndPointListener, CallListener, IPhone,
 		UaFactory.setAndroidContext(context);
 
 		SipConfig sipConfig = new SipConfig();
-		sipConfig.setLocalAddress(localAddress.getHostAddress());
+		// sipConfig.setLocalAddress(localAddress.getHostAddress());
 		sipConfig.setLocalPort(localPort);
 		sipConfig.setProxyAddress(proxyIP);
 		sipConfig.setProxyPort(proxyPort);
