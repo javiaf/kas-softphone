@@ -250,6 +250,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 	protected void onDestroy() {
 		try {
 			if (getIsExit()) {
+				unregisterReceiver(mReceiver);
 				if (controller != null)
 					controller.finishUA();
 				isRegister = false;
