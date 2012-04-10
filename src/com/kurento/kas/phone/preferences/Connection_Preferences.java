@@ -135,6 +135,54 @@ public class Connection_Preferences extends PreferenceActivity implements
 		return params;
 	}
 
+	public static Map<String, String> getStunPreferences(Context context) {
+		Map<String, String> params = new HashMap<String, String>();
+		String stunHost, stunPort;
+
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(context);
+
+		Boolean stunEnable = settings.getBoolean(Keys_Preferences.STUN_ENABLE,
+				false);
+
+		if (stunEnable) {
+			stunHost = settings.getString(Keys_Preferences.STUN_LIST,
+					"193.147.51.24");
+			stunPort = "3478";
+		} else {
+			stunHost = "";
+			stunPort = "0";
+		}
+
+		// String stunHostAux = settings.getString(Keys_Preferences.STUN_LIST,
+		// "193.147.51.24");
+		// stunPort = "0";
+		// if (stunHostAux.equals("-")) {
+		// stunHostAux = settings.getString(Keys_Preferences.STUN_HOST, "-");
+		// if (!stunHostAux.equals("-")) {
+		// stunHost = stunHostAux;
+		// stunPort = settings.getString(Keys_Preferences.STUN_HOST_PORT,
+		// "3478");
+		// } else {
+		// stunHost = "";
+		// stunPort = "0";
+		// }
+		// } else {
+		// stunHost = stunHostAux;
+		// stunPort = "3478";
+		// }
+		// if (stunHost.equals("") || stunPort.equals("")) {
+		// stunHost = "";
+		// stunPort = "0";
+		// }
+		Log.d("Connection_Preferences", "StunHost = " + stunHost + ":"
+				+ stunPort);
+		params.put(Keys_Preferences.STUN_HOST, stunHost);
+		params.put(Keys_Preferences.STUN_HOST_PORT, stunPort);
+
+		return params;
+	}
+
 	private synchronized static void setPreferenceChanged(boolean hasChanged) {
 		preferenceConnectionChanged = hasChanged;
 	}
@@ -168,7 +216,9 @@ public class Connection_Preferences extends PreferenceActivity implements
 				|| key.equals(Keys_Preferences.SIP_PROXY_PORT)
 				|| key.equals(Keys_Preferences.MEDIA_NET_KEEP_ALIVE)
 				|| key.equals(Keys_Preferences.MEDIA_NET_KEEP_DELAY)
-				|| key.equals(Keys_Preferences.MEDIA_NET_TRANSPORT))
+				|| key.equals(Keys_Preferences.MEDIA_NET_TRANSPORT)
+				|| key.equals(Keys_Preferences.STUN_ENABLE)
+				|| key.equals(Keys_Preferences.STUN_LIST))
 			setPreferenceChanged(true);
 		else
 			setPreferenceChanged(false);

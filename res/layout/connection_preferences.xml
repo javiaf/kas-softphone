@@ -46,4 +46,14 @@
            android:entries="@array/transport"
            android:entryValues="@array/transport" />     
 	</PreferenceCategory>
+	<PreferenceCategory android:title="Stun Preference">
+	    <CheckBoxPreference android:title="Stun Enable"
+	        android:summary = "If it selected, it used the Stun."
+	        android:defaultValue = "true"
+		    android:key="STUN_ENABLE"/>
+		<ListPreference android:key="STUN_LIST" android:title="Stun list"
+			android:summary="Select a Stun host" android:entries="@array/stun_host"
+			android:entryValues="@array/stun_host" android:defaultValue="193.147.51.24"
+			android:dialogTitle="Select a Stun host" />
+	</PreferenceCategory>
 </PreferenceScreen>

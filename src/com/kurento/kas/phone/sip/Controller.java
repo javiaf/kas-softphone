@@ -29,7 +29,6 @@ import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.network.NetworkIP;
 import com.kurento.kas.phone.preferences.Connection_Preferences;
 import com.kurento.kas.phone.preferences.Keys_Preferences;
-import com.kurento.kas.phone.preferences.Stun_Preferences;
 import com.kurento.kas.phone.preferences.Video_Preferences;
 import com.kurento.kas.phone.shared.Actions;
 import com.kurento.kas.phone.softphone.CallNotifier;
@@ -105,7 +104,8 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 						.get(Keys_Preferences.SIP_MIN_LOCAL_PORT));
 
 			}
-			this.stunParams = Stun_Preferences.getStunPreferences(context);
+			this.stunParams = Connection_Preferences
+					.getStunPreferences(context);
 			this.stunHost = stunParams.get(Keys_Preferences.STUN_HOST);
 			this.stunPort = Integer.valueOf(stunParams
 					.get(Keys_Preferences.STUN_HOST_PORT));

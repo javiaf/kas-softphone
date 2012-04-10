@@ -34,7 +34,6 @@ import com.kurento.kas.phone.historycall.HistoryCall;
 import com.kurento.kas.phone.historycall.ListViewHistoryItem;
 import com.kurento.kas.phone.media.MediaControlOutgoing;
 import com.kurento.kas.phone.preferences.Connection_Preferences;
-import com.kurento.kas.phone.preferences.Stun_Preferences;
 import com.kurento.kas.phone.preferences.Video_Preferences;
 import com.kurento.kas.phone.shared.Actions;
 import com.kurento.kas.phone.sip.Controller;
@@ -48,7 +47,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 	private final int PICK_CONTACT_REQUEST = 2;
 	private final int FIRST_REGISTER_PREFERENCES = 3;
 	private final int FIRST_REGISTER_MEDIA_PREFERENCES = 5;
-	private final int FIRST_REGISTER_STUN_PREFERENCES = 6;
+	private final int FIRST_REGISTER_CONNECTION_PREFERENCES = 6;
 	private final int FINISH_REGISTER_PREFERENCES = 7;
 	private final int HISTORY_CALL = 4;
 
@@ -355,17 +354,17 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 				finish();
 			} else {
 				Intent remotePreferences = new Intent(this,
-						Video_Preferences.class);
+						Connection_Preferences.class);
 				startActivityForResult(remotePreferences,
-						FIRST_REGISTER_MEDIA_PREFERENCES);
+						FIRST_REGISTER_CONNECTION_PREFERENCES);
 			}
 			break;
-		case FIRST_REGISTER_MEDIA_PREFERENCES:
-			Intent stunPreferences = new Intent(this, Stun_Preferences.class);
-			startActivityForResult(stunPreferences,
-					FIRST_REGISTER_STUN_PREFERENCES);
+		case FIRST_REGISTER_CONNECTION_PREFERENCES:
+			Intent remotePreferences = new Intent(this, Video_Preferences.class);
+			startActivityForResult(remotePreferences,
+					FIRST_REGISTER_MEDIA_PREFERENCES);
 			break;
-		case FIRST_REGISTER_STUN_PREFERENCES:
+		case FIRST_REGISTER_MEDIA_PREFERENCES:
 			if (controller == null)
 				createController();
 			break;
@@ -377,8 +376,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 				if (controller != null)
 					controller.mediaHasChanged();
 
-			if (Connection_Preferences.isPreferenceChanged()
-					|| Stun_Preferences.isPreferenceChanged())
+			if (Connection_Preferences.isPreferenceChanged())
 				if (controller != null) {
 					dialogWait = ProgressDialog.show(SoftPhone.this, "",
 							"Please wait for few seconds...", true);
@@ -397,7 +395,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 
 			Video_Preferences.resetChanged();
 			Connection_Preferences.resetChanged();
-			Stun_Preferences.resetChanged();
 			break;
 		case PICK_CONTACT_REQUEST:
 			if (resultCode == RESULT_OK) {
@@ -443,10 +440,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 		case (R.id.menu_video_preferences):
 			Intent remotePreferences = new Intent(this, Video_Preferences.class);
 			startActivityForResult(remotePreferences, SHOW_PREFERENCES);
-			return true;
-		case (R.id.menu_stun_preferences):
-			Intent stunPreferences = new Intent(this, Stun_Preferences.class);
-			startActivityForResult(stunPreferences, SHOW_PREFERENCES);
 			return true;
 		case (R.id.menu_about):
 			final Dialog dialog = new Dialog(this);

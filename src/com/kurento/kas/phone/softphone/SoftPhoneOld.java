@@ -58,7 +58,6 @@ import com.kurento.kas.phone.controlcontacts.ControlContacts;
 import com.kurento.kas.phone.historycall.ListViewHistoryItem;
 import com.kurento.kas.phone.network.NetworkIP;
 import com.kurento.kas.phone.preferences.Connection_Preferences;
-import com.kurento.kas.phone.preferences.Stun_Preferences;
 import com.kurento.kas.phone.preferences.Video_Preferences;
 import com.kurento.kas.phone.sip.Controller;
 
@@ -608,10 +607,6 @@ public class SoftPhoneOld extends Activity implements ServiceUpdateUIListener {
 		case (R.id.menu_video_preferences):
 			Intent remotePreferences = new Intent(this, Video_Preferences.class);
 			startActivityForResult(remotePreferences, SHOW_PREFERENCES);
-			return true;
-		case (R.id.menu_stun_preferences):
-			Intent stunPreferences = new Intent(this, Stun_Preferences.class);
-			startActivityForResult(stunPreferences, SHOW_PREFERENCES);
 			return true;
 		case (R.id.menu_about):
 			final Dialog dialog = new Dialog(this);

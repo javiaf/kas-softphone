@@ -60,6 +60,7 @@ public class Keys_Preferences {
 
 	// Stun
 	public static String STUN_LIST = "STUN_LIST";
+	public static String STUN_ENABLE = "STUN_ENABLE";
 	public static String STUN_HOST = "STUN_HOST";
 	public static String STUN_HOST_PORT = "STUN_HOST_PORT";
 
