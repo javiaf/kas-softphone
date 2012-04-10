@@ -12,12 +12,12 @@
 
 	<string name="txt_conection_preferences">Conection Preferences</string>
 	<string name="txt_local_preferences">Local</string>
-	<string name="preference_local_username">Local SIP URL username</string>
-	<string name="preference_local_username_summary">Local SIP URL username</string>
-	<string name="preference_local_password">Local SIP URL password</string>
-	<string name="preference_local_password_summary">Local SIP URL password</string>
-	<string name="preference_local_domain">Local SIP URL domain</string>
-	<string name="preference_local_domain_summary">Local SIP URL domain</string>
+	<string name="preference_local_username">SIP Username</string>
+	<string name="preference_local_username_summary">SIP Username</string>
+	<string name="preference_local_password">SIP Password</string>
+	<string name="preference_local_password_summary">SIP Password</string>
+	<string name="preference_local_domain">SIP Domain</string>
+	<string name="preference_local_domain_summary">SIP Domain</string>
 	<string name="preference_sip_local_port_range">SIP local port range</string>
 	<string name="preference_sip_local_port_range_summary">Select SIP local port range</string>
 	<string name="preference_sip_min_local_port">SIP min local port</string>
