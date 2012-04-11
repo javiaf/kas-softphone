@@ -30,7 +30,7 @@ import android.widget.Toast;
 import com.kurento.kas.phone.preferences.Keys_Preferences;
 
 public class Register extends Activity {
-	private static final String LOG_TAG = "Register";
+	private static final String LOG_TAG = Register.class.getName();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

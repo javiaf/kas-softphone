@@ -56,7 +56,7 @@ import com.kurento.kas.phone.softphone.SoftPhoneService;
 
 public class MediaControlIncoming extends Activity implements
 		ServiceUpdateUIListener {
-	private static final String LOG_TAG = "MediaControlIncoming";
+	private static final String LOG_TAG = MediaControlIncoming.class.getName();
 
 	private NotificationManager mNotificationMgr;
 	private final static int NOTIF_CALLING_IN = 4;

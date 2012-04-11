@@ -62,7 +62,7 @@ import com.kurento.kas.phone.softphone.R;
 import com.kurento.kas.phone.softphone.ServiceUpdateUIListener;
 
 public class VideoCall extends Activity implements ServiceUpdateUIListener {
-	private static final String LOG_TAG = "VideoCall";
+	private static final String LOG_TAG = VideoCall.class.getName();
 	private static final int SHOW_PREFERENCES = 1;
 	private PowerManager.WakeLock wl;
 	private boolean hang = false;

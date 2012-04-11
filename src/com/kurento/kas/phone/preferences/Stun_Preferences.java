@@ -98,7 +98,7 @@ public class Stun_Preferences extends PreferenceActivity implements
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
-		Log.d(this.getClass().getName(), "Stun Preferecnces Changed: "
+		Log.d(this.getClass().getName(), "Stun Preferences Changed: "
 				+ sharedPreferences);
 		setPreferenceChanged(true);
 	}

@@ -51,7 +51,7 @@ import com.kurento.kas.phone.softphone.R;
 public class HistoryCall extends ListActivity {
 	/** Called when the activity is first created. */
 	private ListViewAdapter listViewAdapter;
-	private static final String LOG_TAG = "HistoryCall";
+	private static final String LOG_TAG = HistoryCall.class.getName();
 	private static final String DB = "DBHistoryCall";
 
 	private SQLiteDatabase openOrCreateBD() {

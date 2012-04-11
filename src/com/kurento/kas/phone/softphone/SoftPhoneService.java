@@ -36,7 +36,7 @@ import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.videocall.VideoCallService;
 
 public class SoftPhoneService extends Service implements SoftphoneCallListener {
-	private static final String LOG_TAG = "SoftPhoneService";
+	private static final String LOG_TAG = SoftPhoneService.class.getName();
 
 	private NotificationManager mNotificationMgr;
 	private final static int NOTIF_SOFTPHONE = 1;

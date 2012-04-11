@@ -37,7 +37,7 @@ import com.kurento.kas.phone.softphone.SoftphoneCallListener;
 
 public class Controller implements EndPointListener, CallListener, IPhone,
 		CallNotifier {
-	public final static String LOG = "Controller";
+	public final static String LOG = Controller.class.getName();
 
 	private Context context;
 	private UaStun ua = null;
@@ -162,9 +162,9 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 
 	public String getConnectionType() {
 		try {
-			return ua.getConnectionType().toString();
+			return "Stun:\n"+ua.getConnectionType().toString();
 		} catch (Exception e) {
-			return "Not info Stun";
+			return "No STUN info";
 		}
 	}
 

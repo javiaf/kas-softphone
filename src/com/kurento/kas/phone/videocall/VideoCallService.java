@@ -47,7 +47,7 @@ import com.kurento.kas.phone.softphone.ServiceUpdateUIListener;
 import com.kurento.kas.phone.softphone.SoftPhone;
 
 public class VideoCallService extends Service {
-	private final String LOG_TAG = "VideoCallService";
+	private final String LOG_TAG = VideoCallService.class.getName();
 
 	MediaComponentAndroid audioPlayerComponent = null;
 	MediaComponentAndroid audioRecorderComponent = null;

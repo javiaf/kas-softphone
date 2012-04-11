@@ -34,7 +34,7 @@ import android.util.Log;
 
 
 public class ControlContacts {
-	private static final String LOG_TAG = "ControlContacts";
+	private static final String LOG_TAG = ControlContacts.class.getName();
 
 	private Context c;
 

@@ -28,6 +28,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kurento.commons.sip.agent.UaImpl;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.controlcontacts.ControlContacts;
 import com.kurento.kas.phone.historycall.HistoryCall;
@@ -40,7 +41,7 @@ import com.kurento.kas.phone.sip.Controller;
 
 public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 		OnClickListener {
-	private static final String LOG_TAG = "SoftPhone";
+	private static final String LOG_TAG = UaImpl.class.getName();
 
 	private final int MEDIA_CONTROL_OUTGOING = 0;
 	private final int SHOW_PREFERENCES = 1;
@@ -155,7 +156,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 
 	private void createController() {
 		dialogWait = ProgressDialog.show(SoftPhone.this, "",
-				"Please wait for few seconds...", true);
+				"Please wait ...", true);
 
 		new Thread(new Runnable() {
 			public void run() {

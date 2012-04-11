@@ -51,7 +51,7 @@ import com.kurento.kas.phone.softphone.R;
 import com.kurento.kas.phone.softphone.SoftPhone;
 
 public class MediaControlOutgoing extends Activity {
-	private static final String LOG_TAG = "MediaControlOutgoing";
+	private static final String LOG_TAG = MediaControlOutgoing.class.getName();
 
 	private NotificationManager mNotificationMgr;
 	private final static int NOTIF_CALLING_OUT = 3;
