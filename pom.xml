@@ -175,6 +175,12 @@
 					<sign>
 						<debug>${sign.develop}</debug>
 					</sign>
+					<dex>                                
+      					<jvmArguments>
+        					<jvmArgument>-Xms1024m</jvmArgument>                                        
+        					<jvmArgument>-Xmx1048m</jvmArgument>
+      					</jvmArguments>                        
+    				</dex>
 				</configuration>
 				<extensions>true</extensions>
 			</plugin>
