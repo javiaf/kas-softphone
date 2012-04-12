@@ -7,3 +7,4 @@ bin/
 kas-mscontrol_src/
 kas-media_src/
 /project.properties
+gen
