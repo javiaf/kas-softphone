@@ -185,15 +185,19 @@
 				</configuration>
 				<extensions>true</extensions>
 			</plugin>
-			<!-- 
+			
+			<!-- This plugin is used to configure eclipse source code level
+				It does not generates code, as there is no J2SE code in the project  -->
 			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+        		<artifactId>maven-compiler-plugin</artifactId>
+        		<version>2.3.2</version>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-			 -->
+			 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
