@@ -445,7 +445,7 @@ public class Video_Preferences extends PreferenceActivity implements
 				.parseInt(settings.getString(
 						Keys_Preferences.MEDIA_VIDEO_QUEUE_SIZE, "2")));
 
-		Map<String, String> stunParams = Stun_Preferences
+		Map<String, String> stunParams = Connection_Preferences
 				.getStunPreferences(context);
 		params.put(MediaSessionAndroid.STUN_HOST,
 				stunParams.get(Keys_Preferences.STUN_HOST));
