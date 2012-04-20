@@ -221,7 +221,8 @@ public class VideoCallService extends Service {
 		@Override
 		public void handleMessage(Message msg) {
 			Log.d(LOG_TAG, "Message = " + msg.getData());
-			UI_UPDATE_LISTENER_VIDEOCALL.update(msg);
+			if (UI_UPDATE_LISTENER_VIDEOCALL != null)
+				UI_UPDATE_LISTENER_VIDEOCALL.update(msg);
 		}
 	};
 
