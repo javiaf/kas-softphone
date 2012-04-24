@@ -385,10 +385,23 @@ public class Video_Preferences extends PreferenceActivity implements
 
 		params.put(MediaComponentAndroid.CAMERA_FACING, cameraFacing);
 
-		params.put(MediaSessionAndroid.MAX_BANDWIDTH, Integer.parseInt(settings
-				.getString(Keys_Preferences.MEDIA_GENERAL_MAX_BW, "0")));
-		params.put(MediaSessionAndroid.MAX_DELAY, Integer.parseInt(settings
-				.getString(Keys_Preferences.MEDIA_GENERAL_MAX_DELAY, "200")));
+		Integer max_bandwidth = null;
+		try {
+			max_bandwidth = Integer.parseInt(settings.getString(
+					Keys_Preferences.MEDIA_GENERAL_MAX_BW, "0"));
+		} catch (NumberFormatException e) {
+			max_bandwidth = null;
+		}
+		params.put(MediaSessionAndroid.MAX_BANDWIDTH, max_bandwidth);
+
+		Integer max_delay = null;
+		try {
+			max_delay = Integer.parseInt(settings.getString(
+					Keys_Preferences.MEDIA_GENERAL_MAX_DELAY, "200"));
+		} catch (NumberFormatException e) {
+			max_delay = null;
+		}
+		params.put(MediaSessionAndroid.MAX_DELAY, max_delay);
 
 		params.put(MediaSessionAndroid.STREAMS_MODES,
 				getCallDirectionMapFromSettings(context));
@@ -405,11 +418,11 @@ public class Video_Preferences extends PreferenceActivity implements
 		PortRange audioPortRange;
 		try {
 			int minAudioPort = Integer.parseInt(settings.getString(
-					Keys_Preferences.MEDIA_MIN_AUDIO_LOCAL_PORT, "0"));
+					Keys_Preferences.MEDIA_MIN_AUDIO_LOCAL_PORT, "1"));
 			int maxAudioPort = Integer.parseInt(settings.getString(
-					Keys_Preferences.MEDIA_MAX_AUDIO_LOCAL_PORT, "0"));
+					Keys_Preferences.MEDIA_MAX_AUDIO_LOCAL_PORT, "1"));
 			audioPortRange = new PortRange(minAudioPort, maxAudioPort);
-		} catch (Exception e) {
+		} catch (NumberFormatException e) {
 			audioPortRange = null;
 		}
 		params.put(MediaSessionAndroid.AUDIO_LOCAL_PORT_RANGE, audioPortRange);
@@ -440,14 +453,33 @@ public class Video_Preferences extends PreferenceActivity implements
 		params.put(MediaSessionAndroid.FRAME_WIDTH, width);
 		params.put(MediaSessionAndroid.FRAME_HEIGHT, height);
 
-		params.put(MediaSessionAndroid.MAX_FRAME_RATE, Integer
-				.parseInt(settings.getString(
-						Keys_Preferences.MEDIA_VIDEO_MAX_FR, "15")));
-		params.put(MediaSessionAndroid.GOP_SIZE, Integer.parseInt(settings
-				.getString(Keys_Preferences.MEDIA_VIDEO_GOP_SIZE, "6")));
-		params.put(MediaSessionAndroid.FRAMES_QUEUE_SIZE, Integer
-				.parseInt(settings.getString(
-						Keys_Preferences.MEDIA_VIDEO_QUEUE_SIZE, "2")));
+		Integer max_frame_rate = null;
+		try {
+			max_frame_rate = Integer.parseInt(settings.getString(
+					Keys_Preferences.MEDIA_VIDEO_MAX_FR, "15"));
+		} catch (NumberFormatException e) {
+			max_frame_rate = null;
+		}
+		params.put(MediaSessionAndroid.MAX_FRAME_RATE, max_frame_rate);
+
+		Integer gop_size = null;
+		try {
+			gop_size = Integer.parseInt(settings.getString(
+					Keys_Preferences.MEDIA_VIDEO_GOP_SIZE, "6"));
+		} catch (NumberFormatException e) {
+			gop_size = null;
+		}
+		params.put(MediaSessionAndroid.GOP_SIZE, gop_size);
+		
+		Integer frame_queue_size = null;
+		try{
+			frame_queue_size = Integer
+					.parseInt(settings.getString(
+							Keys_Preferences.MEDIA_VIDEO_QUEUE_SIZE, "2"));
+		}catch (NumberFormatException e) {
+			frame_queue_size = null;
+		}
+		params.put(MediaSessionAndroid.FRAMES_QUEUE_SIZE, frame_queue_size);
 
 		Map<String, String> stunParams = Connection_Preferences
 				.getStunPreferences(context);
