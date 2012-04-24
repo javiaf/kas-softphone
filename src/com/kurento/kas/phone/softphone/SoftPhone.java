@@ -28,7 +28,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kurento.commons.sip.agent.UaImpl;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.controlcontacts.ControlContacts;
 import com.kurento.kas.phone.historycall.HistoryCall;
@@ -41,7 +40,7 @@ import com.kurento.kas.phone.sip.Controller;
 
 public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 		OnClickListener {
-	private static final String LOG_TAG = UaImpl.class.getName();
+	private static final String LOG_TAG = SoftPhone.class.getName();
 
 	private final int MEDIA_CONTROL_OUTGOING = 0;
 	private final int SHOW_PREFERENCES = 1;
@@ -85,6 +84,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 				case ConnectivityManager.TYPE_WIFI:
 					if (ni.getState().equals(NetworkInfo.State.CONNECTED)) {
 						wifi.setBackgroundResource(R.drawable.wifi_on_120);
+						if (controller != null && controller.getUa() == null)
+							controller.connectionHasChanged();
+						controller.mediaHasChanged();
 					} else {
 						wifi.setBackgroundResource(R.drawable.wifi_off_120);
 						connection
@@ -94,6 +96,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 				case ConnectivityManager.TYPE_MOBILE:
 					if (ni.getState().equals(NetworkInfo.State.CONNECTED)) {
 						_3g.setBackgroundResource(R.drawable.icon_3g_on_120);
+						if (controller != null && controller.getUa() == null)
+							controller.connectionHasChanged();
+						controller.mediaHasChanged();
 					} else {
 						_3g.setBackgroundResource(R.drawable.icon_3g_off_120);
 						connection
@@ -155,8 +160,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 	}
 
 	private void createController() {
-		dialogWait = ProgressDialog.show(SoftPhone.this, "",
-				"Please wait ...", true);
+		dialogWait = ProgressDialog.show(SoftPhone.this, "", "Please wait ...",
+				true);
 
 		new Thread(new Runnable() {
 			public void run() {
@@ -304,7 +309,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 					.getMediaPreferencesInfo(getApplicationContext());
 			info_video += "\n\n"
 					+ Connection_Preferences
-					.getConnectionNetPreferenceInfo(getApplicationContext());
+							.getConnectionNetPreferenceInfo(getApplicationContext());
 			dialog.setContentView(R.layout.info_video);
 			((TextView) dialog.findViewById(R.id.info_video))
 					.setText(info_video);

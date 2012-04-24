@@ -51,6 +51,7 @@ import com.kurento.kas.mscontrol.mediacomponent.MediaComponentAndroid;
 import com.kurento.kas.mscontrol.networkconnection.NetIF;
 import com.kurento.kas.mscontrol.networkconnection.PortRange;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
+import com.kurento.kas.phone.network.NetworkIP;
 
 public class Video_Preferences extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener {
@@ -358,9 +359,12 @@ public class Video_Preferences extends PreferenceActivity implements
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(context);
 
+		InetAddress ip = NetworkIP.getLocalAddress();
 		try {
-			params.put(MediaSessionAndroid.LOCAL_ADDRESS,
-					InetAddress.getLocalHost());
+			if (ip == null)
+				ip = InetAddress.getLocalHost();
+
+			params.put(MediaSessionAndroid.LOCAL_ADDRESS, ip);
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
 		}
@@ -456,15 +460,17 @@ public class Video_Preferences extends PreferenceActivity implements
 				.getSystemService(CONNECTIVITY_SERVICE);
 		NetworkInfo ni = connManager.getActiveNetworkInfo();
 		NetIF netIF = null;
-		ni = connManager.getActiveNetworkInfo();
-		String conType = ni.getTypeName();
-		if ("WIFI".equalsIgnoreCase(conType)) {
-			netIF = NetIF.WIFI;
-		} else if ("MOBILE".equalsIgnoreCase(conType)) {
-			netIF = NetIF.MOBILE;
-		}
-		params.put(MediaSessionAndroid.NET_IF, netIF);
-
+		if (ni != null) {
+			ni = connManager.getActiveNetworkInfo();
+			String conType = ni.getTypeName();
+			if ("WIFI".equalsIgnoreCase(conType)) {
+				netIF = NetIF.WIFI;
+			} else if ("MOBILE".equalsIgnoreCase(conType)) {
+				netIF = NetIF.MOBILE;
+			}
+			params.put(MediaSessionAndroid.NET_IF, netIF);
+		} else
+			params.put(MediaSessionAndroid.NET_IF, null);
 		return params;
 
 	}
