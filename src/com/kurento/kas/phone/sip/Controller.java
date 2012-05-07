@@ -66,6 +66,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 	public Controller(Context context) {
 		this.context = context;
 		reconfigureController();
+		networkChanged();
 	}
 
 	public void reconfigureController() {
@@ -143,8 +144,13 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		register();
+		try {
+			endPoint = EndPointFactory.getInstance(username, domain, password,
+					expires, ua, this, context);
+		} catch (Exception e) {
+			Log.e(LOG, e.getMessage(), e);
+			return;
+		}
 		setIsCall(false);
 	}
 
@@ -162,7 +168,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 
 	public String getConnectionType() {
 		try {
-			return "Stun:\n"+ua.getConnectionType().toString();
+			return "Stun:\n" + ua.getConnectionType().toString();
 		} catch (Exception e) {
 			return "No STUN info";
 		}
@@ -180,6 +186,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			e.printStackTrace();
 		}
 		reconfigureController();
+		networkChanged();
 	}
 
 	public void mediaHasChanged() {
@@ -191,6 +198,11 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 		} catch (MsControlException e) {
 			Log.e(LOG, e.getMessage(), e);
 		}
+	}
+
+	public void networkChanged() {
+		if (ua != null)
+			ua.reconfigure();
 	}
 
 	public MediaSessionAndroid getMediaSession() {
@@ -288,8 +300,9 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			setIsCall(true);
 			Log.d(LOG, "Setting currentCall");
 			if (callListener != null) {
-				ApplicationContext.contextTable.put("callDirection",
-						currentCall.getMediaTypesModes());
+				// ApplicationContext.contextTable.put("callDirection",
+				// currentCall.getMediaTypesModes());
+
 				ApplicationContext.contextTable.put("audioJoinable",
 						currentCall.getJoinable(StreamType.audio));
 				ApplicationContext.contextTable.put("videoJoinable",

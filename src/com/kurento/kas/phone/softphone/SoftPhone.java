@@ -86,6 +86,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 						wifi.setBackgroundResource(R.drawable.wifi_on_120);
 						if (controller != null && controller.getUa() == null)
 							controller.connectionHasChanged();
+						else if (controller != null)
+							controller.networkChanged();
 						controller.mediaHasChanged();
 					} else {
 						wifi.setBackgroundResource(R.drawable.wifi_off_120);
@@ -98,6 +100,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 						_3g.setBackgroundResource(R.drawable.icon_3g_on_120);
 						if (controller != null && controller.getUa() == null)
 							controller.connectionHasChanged();
+						else if (controller != null)
+							controller.networkChanged();
 						controller.mediaHasChanged();
 					} else {
 						_3g.setBackgroundResource(R.drawable.icon_3g_off_120);
