@@ -1,6 +1,7 @@
 package com.kurento.kas.phone.sip;
 
 import java.net.InetAddress;
+import java.util.Date;
 import java.util.Map;
 
 import android.content.Context;
@@ -23,6 +24,8 @@ import com.kurento.commons.ua.event.CallEvent;
 import com.kurento.commons.ua.event.CallEventEnum;
 import com.kurento.commons.ua.event.EndPointEvent;
 import com.kurento.commons.ua.exception.ServerInternalErrorException;
+import com.kurento.commons.ua.timer.KurentoUaTimer;
+import com.kurento.commons.ua.timer.KurentoUaTimerTask;
 import com.kurento.kas.mscontrol.MSControlFactory;
 import com.kurento.kas.mscontrol.MediaSessionAndroid;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
@@ -36,7 +39,7 @@ import com.kurento.kas.phone.softphone.IPhone;
 import com.kurento.kas.phone.softphone.SoftphoneCallListener;
 
 public class Controller implements EndPointListener, CallListener, IPhone,
-		CallNotifier {
+		CallNotifier, KurentoUaTimer {
 	public final static String LOG = Controller.class.getName();
 
 	private Context context;
@@ -392,4 +395,57 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			context.sendBroadcast(i);
 		}
 	}
+
+	// Implement KurentoTimerUA
+
+	@Override
+	public void cancel(KurentoUaTimerTask task) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void purge() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void schedule(KurentoUaTimerTask task, Date when, long period) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void schedule(KurentoUaTimerTask task, long delay, long period) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void schedule(KurentoUaTimerTask task, Date when) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void schedule(KurentoUaTimerTask task, long delay) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void scheduleAtFixedRate(KurentoUaTimerTask task, long delay,
+			long period) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void scheduleAtFixedRate(KurentoUaTimerTask task, Date when,
+			long period) {
+		// TODO Auto-generated method stub
+
+	}
+
 }
