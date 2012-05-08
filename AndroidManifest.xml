@@ -74,7 +74,7 @@
 			android:name="com.kurento.kas.phone.softphone.SoftPhoneService" />
 			
 		<service android:enabled="true"
-			android:name="com.kurento.commons.sip.android.RegisterService" />	
+			android:name="com.kurento.kas.phone.sip.RegisterService" />	
 			
 		<service android:enabled="true"
 			android:name="com.kurento.kas.phone.videocall.VideoCallService" />
