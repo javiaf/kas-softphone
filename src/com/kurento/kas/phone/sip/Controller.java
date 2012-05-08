@@ -117,8 +117,8 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			sipConfig.setLocalPort(localPort);
 			sipConfig.setProxyAddress(ipServer);
 			sipConfig.setProxyPort(portServer);
-			sipConfig.setStunAddress(stunHost);
-			sipConfig.setStunPort(stunPort);
+			sipConfig.setStunServerAddress(stunHost);
+			sipConfig.setStunServerPort(stunPort);
 			sipConfig.setEnableKeepAlive(keep_alive);
 			sipConfig.setKeepAlivePeriod(keep_delay);
 			sipConfig.setTransport(transport);
