@@ -129,6 +129,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			sipConfig.setEnableKeepAlive(keep_alive);
 			sipConfig.setKeepAlivePeriod(keep_delay);
 			sipConfig.setTransport(transport);
+			sipConfig.setTimer(this);
 
 			UaFactory.setMediaSession(mediaSession);
 		} catch (MsControlException e) {
@@ -152,7 +153,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 		}
 		try {
 			endPoint = EndPointFactory.getInstance(username, domain, password,
-					expires, ua, this, this);
+					expires, ua, this);
 		} catch (Exception e) {
 			Log.e(LOG, e.getMessage(), e);
 			return;
