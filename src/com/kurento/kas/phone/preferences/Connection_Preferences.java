@@ -144,6 +144,24 @@ public class Connection_Preferences extends PreferenceActivity implements
 		return info;
 	}
 
+	// TODO Add throw exception when params is null
+	public static void setConnectionNetPreferences(Context context,
+			Map<String, Object> params) {
+
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = settings.edit();
+
+		editor.putBoolean(Keys_Preferences.MEDIA_NET_KEEP_ALIVE,
+				(Boolean) params.get(Keys_Preferences.MEDIA_NET_KEEP_ALIVE));
+		editor.putString(Keys_Preferences.MEDIA_NET_KEEP_DELAY,
+				(String) params.get(Keys_Preferences.MEDIA_NET_KEEP_DELAY));
+		editor.putString(Keys_Preferences.MEDIA_NET_TRANSPORT,
+				(String) params.get(Keys_Preferences.MEDIA_NET_TRANSPORT));
+
+		editor.commit();
+	}
+
 	public static Map<String, Object> getConnectionNetPreferences(
 			Context context) {
 		Map<String, Object> params = new HashMap<String, Object>();
