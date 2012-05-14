@@ -47,6 +47,33 @@ public class Connection_Preferences extends PreferenceActivity implements
 				.registerOnSharedPreferenceChangeListener(this);
 	}
 
+	// TODO Add throw exception when params is null
+	public static void setConnectionPreferences(Context context,
+			Map<String, String> params) {
+
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = settings.edit();
+
+		editor.putString(Keys_Preferences.SIP_LOCAL_USERNAME,
+				params.get(Keys_Preferences.SIP_LOCAL_USERNAME));
+		editor.putString(Keys_Preferences.SIP_LOCAL_PASSWORD,
+				params.get(Keys_Preferences.SIP_LOCAL_PASSWORD));
+		editor.putString(Keys_Preferences.SIP_LOCAL_DOMAIN,
+				params.get(Keys_Preferences.SIP_LOCAL_DOMAIN));
+		editor.putString(Keys_Preferences.SIP_PROXY_IP,
+				params.get(Keys_Preferences.SIP_PROXY_IP));
+		editor.putString(Keys_Preferences.SIP_PROXY_PORT,
+				params.get(Keys_Preferences.SIP_PROXY_PORT));
+		editor.putString(Keys_Preferences.SIP_MIN_LOCAL_PORT,
+				params.get(Keys_Preferences.SIP_MIN_LOCAL_PORT));
+		editor.putString(Keys_Preferences.SIP_MAX_LOCAL_PORT,
+				params.get(Keys_Preferences.SIP_MAX_LOCAL_PORT));
+
+		editor.commit();
+
+	}
+
 	public static Map<String, String> getConnectionPreferences(Context context) {
 		Map<String, String> params = new HashMap<String, String>();
 		String username, password, domain, ip, port, min_port, max_port;
