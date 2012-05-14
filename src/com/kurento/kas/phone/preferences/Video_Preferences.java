@@ -422,7 +422,8 @@ public class Video_Preferences extends PreferenceActivity implements
 			int maxAudioPort = Integer.parseInt(settings.getString(
 					Keys_Preferences.MEDIA_MAX_AUDIO_LOCAL_PORT, "0"));
 			audioPortRange = new PortRange(minAudioPort, maxAudioPort);
-		} catch (NumberFormatException e) {
+		} catch (Exception e) {
+			// TODO: show exception information in GUI.
 			audioPortRange = null;
 		}
 		params.put(MediaSessionAndroid.AUDIO_LOCAL_PORT_RANGE, audioPortRange);
