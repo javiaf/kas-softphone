@@ -313,6 +313,9 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			Log.d(LOG, "Call Terminate");
 			if (callListener != null)
 				callListener.callTerminate();
+			Intent iOutgoingClose = new Intent();
+			iOutgoingClose.setAction(Actions.OUTGOING_CALL_CLOSE);
+			context.sendBroadcast(iOutgoingClose);
 		} else if (CallEvent.CALL_REJECT.equals(eventType)) {
 			setIsCall(false);
 			Log.d(LOG, "Call Reject");
