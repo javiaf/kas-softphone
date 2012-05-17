@@ -180,6 +180,18 @@ public class Connection_Preferences extends PreferenceActivity implements
 		return params;
 	}
 
+	// TODO Add throw exception when params is null
+	public static void setStunPreferences(Context context, Boolean activate) {
+
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = settings.edit();
+
+		editor.putBoolean(Keys_Preferences.STUN_ENABLE, activate);
+
+		editor.commit();
+	}
+
 	public static Map<String, String> getStunPreferences(Context context) {
 		Map<String, String> params = new HashMap<String, String>();
 		String stunHost, stunPort;
