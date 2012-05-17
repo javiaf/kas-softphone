@@ -464,7 +464,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 				+ ". Period: " + period);
 		if ((task = taskTable.get(kurentoTask)) == null) {
 			Log.d(LOG, "New kurentoTask");
-			task = new AlarmTask(kurentoTask, delay, period, context);
+			task = new AlarmTask(kurentoTask, 0, period, context);
 			taskTable.put(kurentoTask, task);
 		}
 		task.run();
