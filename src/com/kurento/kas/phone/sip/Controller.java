@@ -41,6 +41,7 @@ import com.kurento.kas.phone.shared.Actions;
 import com.kurento.kas.phone.softphone.CallNotifier;
 import com.kurento.kas.phone.softphone.IPhone;
 import com.kurento.kas.phone.softphone.SoftphoneCallListener;
+import com.kurento.kas.phone.testutils.ControllerController;
 
 public class Controller implements EndPointListener, CallListener, IPhone,
 		CallNotifier, KurentoUaTimer {
@@ -70,8 +71,19 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 	private Parameters mediaPrefereces;
 	private Map<String, Object> mediaNetPreferences;
 
+	// Only use it to do tests
+	private ControllerController controlController;
+
 	public Controller(Context context) {
 		this.context = context;
+		reconfigureController();
+		networkChanged();
+	}
+
+	// Only use it to do tests
+	public Controller(Context context, ControllerController control) {
+		this.context = context;
+		controlController = control;
 		reconfigureController();
 		networkChanged();
 	}
@@ -290,6 +302,10 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 		CallEventEnum eventType = event.getEventType();
 		Log.d(LOG, "onEvent  SipCallEvent: " + eventType.toString());
 
+		// Only use it to do tests
+		if (controlController != null)
+			controlController.onEvent(event);
+
 		if (CallEvent.CALL_SETUP.equals(eventType)) {
 			currentCall = event.getSource();
 			setIsCall(true);
@@ -350,6 +366,10 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 		Log.d(LOG, "OnEndPointEvent " + event.getEventType().toString());
 		Intent i = new Intent();
 
+		// Only use it to do tests
+		if (controlController != null)
+			controlController.onEvent(event);
+
 		if (event.getEventType().equals(EndPointEvent.REGISTER_USER_SUCESSFUL)) {
 			ApplicationContext.contextTable.put("isRegister", true);
 			i.setAction(Actions.REGISTER_USER_SUCESSFUL);
@@ -389,6 +409,11 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			i.setAction(Actions.UNREGISTER_USER_FAIL);
 			context.sendBroadcast(i);
 		}
+	}
+
+	// Only use it to do tests
+	public void setControlController(ControllerController control) {
+		controlController = control;
 	}
 
 	// Implement KurentoTimerUA
