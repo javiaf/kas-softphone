@@ -61,6 +61,8 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 	private SoftphoneCallListener callListener;
 
 	private InetAddress localAddress;
+	// Only use it to do test
+	private String localAddressS = null;
 	private String username, password, domain, ipServer, stunHost, transport;
 	private int portServer, localPort, stunPort;
 	private boolean keep_alive;
@@ -74,16 +76,12 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 	// Only use it to do tests
 	private ControllerController controlController;
 
+	// You must call configureController after
 	public Controller(Context context) {
 		this.context = context;
-		reconfigureController();
-		networkChanged();
 	}
 
-	// Only use it to do tests
-	public Controller(Context context, ControllerController control) {
-		this.context = context;
-		controlController = control;
+	public void configureController() {
 		reconfigureController();
 		networkChanged();
 	}
@@ -133,6 +131,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			Log.d(LOG, "All params its Ok");
 			sipConfig = new SipConfig();
 
+			sipConfig.setLocalAddress(localAddressS);
 			sipConfig.setLocalPort(localPort);
 			sipConfig.setProxyAddress(ipServer);
 			sipConfig.setProxyPort(portServer);
@@ -414,6 +413,11 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 	// Only use it to do tests
 	public void setControlController(ControllerController control) {
 		controlController = control;
+	}
+
+	// Only use it to do test
+	public void setLocalAddress(String localAddressTest){
+		this.localAddressS = localAddressTest;
 	}
 
 	// Implement KurentoTimerUA

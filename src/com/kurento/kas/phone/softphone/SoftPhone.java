@@ -171,6 +171,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 			public void run() {
 				try {
 					controller = new Controller(getApplicationContext());
+					controller.configureController();
 					ApplicationContext.contextTable.put("controller",
 							controller);
 					Log.d(LOG_TAG, "controller completed");
