@@ -26,4 +26,8 @@ public class Actions {
 	public final static String CALL_REJECT = CallEvent.CALL_REJECT.toString();
 	public final static String CALL_ERROR = CallEvent.CALL_ERROR.toString();
 	public final static String CALL_CANCEL = CallEvent.CALL_CANCEL.toString();
+	public final static String MEDIA_NOT_SUPPORTED = CallEvent.MEDIA_NOT_SUPPORTED
+			.toString();
+	public final static String USER_NOT_FOUND = CallEvent.USER_NOT_FOUND
+			.toString();
 }
