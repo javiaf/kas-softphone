@@ -458,7 +458,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 					};
 					if (!isOccult) {
 						a = new TranslateAnimation(100, 0, 0, 0);
-						a.setDuration(1000L);
+						a.setDuration(50L);
 						a.setInterpolator(new AccelerateDecelerateInterpolator());
 						t.setAnimation(a);
 						t.startAnimation(a);
@@ -488,7 +488,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 					} else {
 						isOccult = false;
 						a = new TranslateAnimation(0, 100, 0, 0);
-						a.setDuration(1000L);
+						a.setDuration(50L);
 
 						a.setInterpolator(new AccelerateDecelerateInterpolator());
 						t.setAnimation(a);
