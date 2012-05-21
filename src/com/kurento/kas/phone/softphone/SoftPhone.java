@@ -560,8 +560,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 				Log.e(LOG_TAG, e.getMessage(), e);
 			}
 		} else
-			// notRegister();
-			Log.e(LOG_TAG, "Controller is null, You should be register");
+			Toast.makeText(this, "You must be register", Toast.LENGTH_SHORT)
+					.show();
 	}
 
 	@Override
