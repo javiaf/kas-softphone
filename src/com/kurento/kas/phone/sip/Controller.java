@@ -56,7 +56,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 	private Call incomingCall;
 	private int expires = 3600;
 
-	private Boolean isCall;
+	private Boolean isCall = false;
 
 	private SoftphoneCallListener callListener;
 
