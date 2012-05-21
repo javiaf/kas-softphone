@@ -176,7 +176,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 		this.isCall = isCall;
 	}
 
-	private synchronized Boolean getIsCall() {
+	public synchronized Boolean getIsCall() {
 		return this.isCall;
 	}
 
