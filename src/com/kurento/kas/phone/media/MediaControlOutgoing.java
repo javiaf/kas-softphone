@@ -31,8 +31,10 @@ import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -63,7 +65,10 @@ public class MediaControlOutgoing extends Activity {
 	private String notificationTitle = "Calling ...";
 	private String notificationTitleSoft = "KurentoPhone";
 
+	private Handler mHandler = new Handler();
+
 	private Boolean isCanceled = false;
+	private Boolean isRejectOrError = false;
 
 	MediaPlayer mPlayer;
 
@@ -73,18 +78,38 @@ public class MediaControlOutgoing extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
+			TextView outgoing_call = (TextView) findViewById(R.id.outgoing_call);
 			if (Actions.OUTGOING_CALL_CLOSE.equals(action)) {
-				finish();
+				if (!isRejectOrError) {
+					outgoing_call.setTextColor(Color.RED);
+					outgoing_call.setText("Call Finish");
+					outgoing_call.setTextSize(20);
+					finishHandler();
+				}
 			} else if (Actions.CALL_REJECT.equals(action)) {
-				// TODO Modify for to show the information
-				// outgoing_call.setTextColor(Color.RED);
-				// outgoing_call.setText("Busy line");
-				finish();
+				outgoing_call.setTextColor(Color.RED);
+				outgoing_call.setText("Busy line");
+				outgoing_call.setTextSize(20);
+				isRejectOrError = true;
+				finishHandler();
 			} else if (Actions.CALL_ERROR.equals(action)) {
-				// TODO Modify for to show the information
-				// outgoing_call.setBackgroundColor(Color.RED);
-				// outgoing_call.setText("Call error");
-				finish();
+				outgoing_call.setTextColor(Color.RED);
+				outgoing_call.setText("Call Error");
+				outgoing_call.setTextSize(20);
+				isRejectOrError = true;
+				finishHandler();
+			} else if (Actions.MEDIA_NOT_SUPPORTED.equals(action)) {
+				outgoing_call.setTextColor(Color.RED);
+				outgoing_call.setText("Media Not Supported");
+				outgoing_call.setTextSize(20);
+				isRejectOrError = true;
+				finishHandler();
+			} else if (Actions.USER_NOT_FOUND.equals(action)) {
+				outgoing_call.setTextColor(Color.RED);
+				outgoing_call.setText("User Not Found");
+				outgoing_call.setTextSize(20);
+				isRejectOrError = true;
+				finishHandler();
 			}
 		}
 	};
@@ -226,13 +251,15 @@ public class MediaControlOutgoing extends Activity {
 			intentFilter.addAction(Actions.CALL_REJECT);
 			intentFilter.addAction(Actions.CALL_ERROR);
 			intentFilter.addAction(Actions.OUTGOING_CALL_CLOSE);
+			intentFilter.addAction(Actions.MEDIA_NOT_SUPPORTED);
+			intentFilter.addAction(Actions.USER_NOT_FOUND);
 		}
 		registerReceiver(mReceiver, intentFilter);
 		isCanceled = false;
 
 		mPlayer.setLooping(true);
 		mPlayer.start();
-		
+
 		final DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 
@@ -302,6 +329,16 @@ public class MediaControlOutgoing extends Activity {
 		Log.d(LOG_TAG, "onDestroy");
 		unregisterReceiver(mReceiver);
 		super.onDestroy();
+	}
+
+	private void finishHandler() {
+		if (mPlayer != null)
+			mPlayer.stop();
+		mHandler.postDelayed(new Runnable() {
+			public void run() {
+				finish();
+			}
+		}, 2500);
 	}
 
 }

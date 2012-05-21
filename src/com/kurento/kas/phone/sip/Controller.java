@@ -354,7 +354,18 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			// if (callListener != null)
 			// callListener.callReject();
 		} else if (CallEvent.MEDIA_NOT_SUPPORTED.equals(eventType)) {
+			Log.d(LOG, "Media Not Supported");
+			setIsCall(false);
+			Intent iOutgoingClose = new Intent();
+			iOutgoingClose.setAction(Actions.MEDIA_NOT_SUPPORTED);
+			context.sendBroadcast(iOutgoingClose);
 
+		} else if (CallEvent.USER_NOT_FOUND.equals(eventType)) {
+			Log.d(LOG, "User Not Found");
+			setIsCall(false);
+			Intent iOutgoingClose = new Intent();
+			iOutgoingClose.setAction(Actions.USER_NOT_FOUND);
+			context.sendBroadcast(iOutgoingClose);
 		} else if (CallEvent.MEDIA_RESOURCE_NOT_AVAILABLE.equals(eventType)) {
 
 		}
@@ -416,7 +427,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 	}
 
 	// Only use it to do test
-	public void setLocalAddress(String localAddressTest){
+	public void setLocalAddress(String localAddressTest) {
 		this.localAddressS = localAddressTest;
 	}
 
