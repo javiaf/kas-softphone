@@ -471,6 +471,29 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 			dialog.show();
 
 			return true;
+		case (R.id.menu_register):
+			if (controller != null) {
+				dialogWait = ProgressDialog.show(SoftPhone.this, "",
+						"Please wait ...", true);
+
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							controller.connectionHasChanged();
+							ApplicationContext.contextTable.put("controller",
+									controller);
+							Log.d(LOG_TAG, "controller completed");
+							if (dialogWait != null)
+								dialogWait.dismiss();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}).start();
+			} else {
+				createController();
+			}
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}

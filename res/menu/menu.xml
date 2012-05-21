@@ -10,6 +10,8 @@
 				android:title="@string/txt_video_preferences" android:id="@+id/menu_video_preferences"></item>
 		</menu>
 	</item>
+	<item android:icon="@drawable/ic_menu_register" android:title="@string/txt_menu_register"
+		android:id="@+id/menu_register"></item>
 
 	<item android:icon="@drawable/ic_menu_exit" android:title="@string/txt_exit"
 		android:id="@+id/menu_exit"></item>
