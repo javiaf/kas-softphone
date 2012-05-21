@@ -131,7 +131,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			Log.d(LOG, "All params its Ok");
 			sipConfig = new SipConfig();
 
-			sipConfig.setLocalAddress(localAddressS);
+			// sipConfig.setLocalAddress(localAddressS);
 			sipConfig.setLocalPort(localPort);
 			sipConfig.setProxyAddress(ipServer);
 			sipConfig.setProxyPort(portServer);
