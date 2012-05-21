@@ -99,8 +99,12 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		callDirectionMap = (Map<MediaType, Mode>) ApplicationContext.contextTable
 				.get("callDirection");
 
-		cameraFacing = (Integer) ApplicationContext.contextTable
-				.get("cameraFacing");
+		try {
+			cameraFacing = (Integer) ApplicationContext.contextTable
+					.get("cameraFacing");
+		} catch (Exception e) {
+			cameraFacing = 0;
+		}
 
 		Mode videoMode = callDirectionMap.get(MediaType.VIDEO);
 
