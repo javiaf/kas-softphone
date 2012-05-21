@@ -19,9 +19,11 @@ package com.kurento.kas.phone.videocall;
 import java.util.Map;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Message;
@@ -36,6 +38,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
@@ -43,6 +46,7 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.TableLayout;
+import android.widget.TextView;
 
 import com.kurento.commons.media.format.enums.MediaType;
 import com.kurento.commons.media.format.enums.Mode;
@@ -56,7 +60,9 @@ import com.kurento.kas.mscontrol.MSControlFactory;
 import com.kurento.kas.mscontrol.MediaSessionAndroid;
 import com.kurento.kas.mscontrol.mediacomponent.MediaComponentAndroid;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
+import com.kurento.kas.phone.preferences.Connection_Preferences;
 import com.kurento.kas.phone.preferences.VideoCall_Preferences;
+import com.kurento.kas.phone.preferences.Video_Preferences;
 import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.softphone.R;
 import com.kurento.kas.phone.softphone.ServiceUpdateUIListener;
@@ -575,6 +581,23 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			Intent videoCallPreferences = new Intent(this,
 					VideoCall_Preferences.class);
 			startActivityForResult(videoCallPreferences, SHOW_PREFERENCES);
+			return true;
+		case (R.id.menu_videocall_info):
+			Dialog dialog = new Dialog(this);
+			dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+			dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+			String info_video = Video_Preferences
+					.getMediaPreferencesInfo(getApplicationContext());
+			info_video += "\n\n"
+					+ Connection_Preferences
+							.getConnectionNetPreferenceInfo(getApplicationContext());
+			dialog.setContentView(R.layout.info_video);
+
+			((TextView) dialog.findViewById(R.id.info_video))
+					.setText(info_video);
+
+			dialog.show();
+
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

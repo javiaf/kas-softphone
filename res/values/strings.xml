@@ -26,6 +26,7 @@
 	<string name="preference_sip_max_local_port_summary">Select SIP max local port</string>
 
 	<string name="txt_videocall_preferences">VideoCall Preferences</string>
+	<string name="txt_info_videocall">Media Info</string>
 
 	<string name="txt_remote_preferences">Remote</string>
 	<string name="preference_remote_username">Remote SIP URL username</string>
