@@ -23,18 +23,22 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
-import android.os.Vibrator;
 import android.os.PowerManager.WakeLock;
+import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -48,6 +52,7 @@ import android.widget.TextView;
 
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.controlcontacts.ControlContacts;
+import com.kurento.kas.phone.shared.Actions;
 import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.softphone.R;
 import com.kurento.kas.phone.softphone.ServiceUpdateUIListener;
@@ -68,6 +73,8 @@ public class MediaControlIncoming extends Activity implements
 	private String notificationTitle = "Calling ...";
 	private String notificationTitleSoft = "KurentoPhone";
 
+	private Handler mHandler = new Handler();
+
 	private Boolean isAccepted = false;
 	private Boolean isRejected = false;
 
@@ -80,6 +87,22 @@ public class MediaControlIncoming extends Activity implements
 	Controller controller = (Controller) ApplicationContext.contextTable
 			.get("controller");
 
+	private IntentFilter intentFilter;
+	private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			TextView incoming_call = (TextView) findViewById(R.id.incoming_call);
+			if (Actions.CALL_CANCEL.equals(action)) {
+				incoming_call.setTextColor(Color.RED);
+				incoming_call.setText("Call Canceled");
+				incoming_call.setTextSize(20);
+				finishHandler();
+			}
+		}
+	};
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -90,7 +113,7 @@ public class MediaControlIncoming extends Activity implements
 		mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK
 				| PowerManager.ACQUIRE_CAUSES_WAKEUP, "K-Phone");
 		mWakeLock.acquire();
-		
+
 		getWindow().addFlags(
 				WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
 						| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -191,7 +214,7 @@ public class MediaControlIncoming extends Activity implements
 				ApplicationContext.contextTable.put("db", db);
 			}
 		}
-
+		intentFilter = new IntentFilter();
 		super.onCreate(savedInstanceState);
 	}
 
@@ -230,6 +253,10 @@ public class MediaControlIncoming extends Activity implements
 	protected void onResume() {
 		super.onResume();
 		Log.d(LOG_TAG, "onResume");
+		if (intentFilter != null) {
+			intentFilter.addAction(Actions.CALL_CANCEL);
+		}
+		registerReceiver(mReceiver, intentFilter);
 
 		isAccepted = false;
 		isRejected = false;
@@ -341,7 +368,7 @@ public class MediaControlIncoming extends Activity implements
 
 	@Override
 	protected void onDestroy() {
-
+		unregisterReceiver(mReceiver);
 		vibrator.cancel();
 		if (mPlayer != null)
 			mPlayer.stop();
@@ -373,6 +400,18 @@ public class MediaControlIncoming extends Activity implements
 			}
 		}
 
+	}
+
+	private void finishHandler() {
+		if (mPlayer != null)
+			mPlayer.stop();
+		if (vibrator != null)
+			vibrator.cancel();
+		mHandler.postDelayed(new Runnable() {
+			public void run() {
+				finish();
+			}
+		}, 2500);
 	}
 
 }
