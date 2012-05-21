@@ -340,23 +340,34 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 		switch (requestCode) {
 		case HISTORY_CALL:
 			if (resultCode == RESULT_OK) {
-				String type = data.getStringExtra("type");
-				String uri = "";
-				if (type.equals("new")) {
-					uri = data.getStringExtra("contact");
-					searchCallContact(uri);
-				} else if (type.equals("history")) {
-					@SuppressWarnings("unchecked")
-					ArrayList<ListViewHistoryItem> items = (ArrayList<ListViewHistoryItem>) ApplicationContext.contextTable
-							.get("itemsHistory");
-					int id = data.getIntExtra("positionContact", -1);
-					if (id != -1) {
-						uri = items.get(id).getUri();
-						searchCallContact(uri);
+				if (controller != null) {
+					if (!controller.getIsCall()) {
+						String type = data.getStringExtra("type");
+						String uri = "";
+						if (type.equals("new")) {
+							uri = data.getStringExtra("contact");
+							searchCallContact(uri);
+						} else if (type.equals("history")) {
+							@SuppressWarnings("unchecked")
+							ArrayList<ListViewHistoryItem> items = (ArrayList<ListViewHistoryItem>) ApplicationContext.contextTable
+									.get("itemsHistory");
+							int id = data.getIntExtra("positionContact", -1);
+							if (id != -1) {
+								uri = items.get(id).getUri();
+								searchCallContact(uri);
+							}
+						} else if (type.equals("openContacts")) {
+							Log.d(LOG_TAG, "OPEN CONTACTS");
+							openContacts();
+						}
+					} else {
+						try {
+							Toast.makeText(this, "Another call in progress",
+									Toast.LENGTH_SHORT).show();
+						} catch (Exception e) {
+							Log.e(LOG_TAG, e.getMessage(), e);
+						}
 					}
-				} else if (type.equals("openContacts")) {
-					Log.d(LOG_TAG, "OPEN CONTACTS");
-					openContacts();
 				}
 			}
 			break;
