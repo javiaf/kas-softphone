@@ -143,7 +143,12 @@ public class MediaControlIncoming extends Activity implements
 		else
 			ApplicationContext.contextTable.put("extrasIn", extras);
 
-		String uri = (String) extras.getSerializable("Uri");
+		String uri = "empty";
+		try {
+			uri = (String) extras.getSerializable("Uri");
+		} catch (Exception e) {
+			uri = "empty";
+		}
 
 		TextView text = (TextView) findViewById(R.id.incoming_sip);
 		text.setText(uri);
