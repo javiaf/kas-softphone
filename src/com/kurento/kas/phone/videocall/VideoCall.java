@@ -36,8 +36,10 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -50,7 +52,6 @@ import android.widget.TextView;
 
 import com.kurento.commons.media.format.enums.MediaType;
 import com.kurento.commons.media.format.enums.Mode;
-import com.kurento.commons.mscontrol.MediaSession;
 import com.kurento.commons.mscontrol.MsControlException;
 import com.kurento.commons.mscontrol.Parameters;
 import com.kurento.commons.mscontrol.join.Joinable;
@@ -58,6 +59,7 @@ import com.kurento.commons.mscontrol.join.Joinable.Direction;
 import com.kurento.commons.mscontrol.mediacomponent.MediaComponent;
 import com.kurento.kas.mscontrol.MSControlFactory;
 import com.kurento.kas.mscontrol.MediaSessionAndroid;
+import com.kurento.kas.mscontrol.mediacomponent.AndroidAction;
 import com.kurento.kas.mscontrol.mediacomponent.MediaComponentAndroid;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.preferences.Connection_Preferences;
@@ -75,10 +77,12 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private Map<MediaType, Mode> callDirectionMap;
 	private int cameraFacing = 0;
 
-	MediaComponent videoPlayerComponent = null;
+	MediaComponentAndroid videoPlayerComponent = null;
 	MediaComponent videoRecorderComponent = null;
 	private Boolean isOccult = true;
 	WakeLock mWakeLock = null;
+
+	View videoCaptureSurface;
 
 	Boolean isStarted = true;
 
@@ -125,7 +129,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				.get("controller");
 
 		if (controller != null) {
-			MediaSession mediaSession = controller.getMediaSession();
+			MediaSessionAndroid mediaSession = controller.getMediaSession();
 
 			DisplayMetrics dm = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -135,9 +139,10 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				if ((videoMode != null)
 						&& (Mode.SENDONLY.equals(videoMode) || Mode.SENDRECV
 								.equals(videoMode))) {
+					videoCaptureSurface = (View) findViewById(R.id.video_capture_surface);
 					Parameters params = MSControlFactory.createParameters();
 					params.put(MediaComponentAndroid.PREVIEW_SURFACE,
-							(View) findViewById(R.id.video_capture_surface));
+							videoCaptureSurface);
 					params.put(MediaComponentAndroid.DISPLAY_ORIENTATION,
 							Orientation);
 					params.put(MediaComponentAndroid.CAMERA_FACING,
@@ -315,7 +320,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 						}
 						Log.d(LOG_TAG, "videoPlayercomonent is null, it's Ok");
 						if (controller != null) {
-							MediaSession mediaSession = controller
+							MediaSessionAndroid mediaSession = controller
 									.getMediaSession();
 
 							Log.d(LOG_TAG, "Create MediaSession");
@@ -517,6 +522,23 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 					}
 				}
 			});
+
+			if (videoCaptureSurface != null) {
+				videoCaptureSurface.setOnTouchListener(new OnTouchListener() {
+
+					@Override
+					public boolean onTouch(View v, MotionEvent event) {
+						if (videoPlayerComponent != null)
+							try {
+								videoPlayerComponent
+										.onAction(AndroidAction.CAMERA_AUTOFOCUS);
+							} catch (MsControlException e) {
+								Log.e(LOG_TAG, e.getMessage(), e);
+							}
+						return false;
+					}
+				});
+			}
 
 			Log.e(LOG_TAG, "onResume OK");
 		}
