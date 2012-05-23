@@ -74,7 +74,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private static final int SHOW_PREFERENCES = 1;
 	private PowerManager.WakeLock wl;
 	private boolean hang = false;
-	private Map<MediaType, Mode> callDirectionMap;
+	private Map<MediaType, Mode> callDirectionMap, mediaTypesModes;
 	private int cameraFacing = 0;
 
 	MediaComponentAndroid videoPlayerComponent = null;
@@ -102,6 +102,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 		callDirectionMap = (Map<MediaType, Mode>) ApplicationContext.contextTable
 				.get("callDirection");
+		mediaTypesModes = (Map<MediaType, Mode>) ApplicationContext.contextTable
+				.get("mediaTypesModes");
 
 		try {
 			cameraFacing = (Integer) ApplicationContext.contextTable
@@ -110,7 +112,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			cameraFacing = 0;
 		}
 
-		Mode videoMode = callDirectionMap.get(MediaType.VIDEO);
+		Mode videoMode = mediaTypesModes.get(MediaType.VIDEO);
 
 		if ((videoMode != null) && (Mode.RECVONLY.equals(videoMode)))
 			setContentView(R.layout.videocall_receive);
@@ -118,8 +120,9 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			setContentView(R.layout.videocall_send);
 		else if ((videoMode != null) && (Mode.SENDRECV.equals(videoMode)))
 			setContentView(R.layout.videocall);
-		else
+		else {
 			setContentView(R.layout.onlycall);
+		}
 
 		VideoCallService.setUpdateListener(this);
 		hang = false;
