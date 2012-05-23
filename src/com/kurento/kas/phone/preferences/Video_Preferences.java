@@ -96,6 +96,16 @@ public class Video_Preferences extends PreferenceActivity implements
 
 		generalCategory.addPreference(editTextMaxDelay);
 
+		// Max delay
+		CheckBoxPreference syncMediaStreams = new CheckBoxPreference(this);
+		syncMediaStreams.setDefaultValue(false);
+		syncMediaStreams
+				.setKey(Keys_Preferences.MEDIA_GENERAL_SYNC_MEDIA_STREAMS);
+		syncMediaStreams.setTitle("Received media streams synchronization");
+		syncMediaStreams.setSummary("Synchronize received media streams.");
+
+		generalCategory.addPreference(syncMediaStreams);
+
 		// Camera Facing
 		CheckBoxPreference cameraFacing = new CheckBoxPreference(this);
 		cameraFacing.setDefaultValue(false);
@@ -402,6 +412,11 @@ public class Video_Preferences extends PreferenceActivity implements
 			max_delay = null;
 		}
 		params.put(MediaSessionAndroid.MAX_DELAY, max_delay);
+
+		Boolean syncMediaStreams = settings.getBoolean(
+					Keys_Preferences.MEDIA_GENERAL_SYNC_MEDIA_STREAMS, false);
+		params.put(MediaSessionAndroid.SYNCHRONIZE_MEDIA_STREAMS,
+				syncMediaStreams);
 
 		params.put(MediaSessionAndroid.STREAMS_MODES,
 				getCallDirectionMapFromSettings(context));

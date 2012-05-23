@@ -25,6 +25,7 @@ public class Keys_Preferences {
 	// General Category
 	public static String MEDIA_GENERAL_MAX_BW = "MEDIA_GENERAL_MAX_BW";
 	public static String MEDIA_GENERAL_MAX_DELAY = "MEDIA_GENERAL_MAX_DELAY";
+	public static String MEDIA_GENERAL_SYNC_MEDIA_STREAMS = "MEDIA_GENERAL_SYNC_MEDIA_STREAMS";
 	public static String MEDIA_GENERAL_FRONT_CAMERA = "MEDIA_GENERAL_FRONT_CAMERA";
 
 	// Network Category
