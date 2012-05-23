@@ -317,6 +317,8 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 						currentCall.getJoinable(StreamType.audio));
 				ApplicationContext.contextTable.put("videoJoinable",
 						currentCall.getJoinable(StreamType.video));
+				ApplicationContext.contextTable.put("mediaTypesModes",
+						currentCall.getMediaTypesModes());
 
 				callListener.callSetup();
 				Intent iOutgoingClose = new Intent();
