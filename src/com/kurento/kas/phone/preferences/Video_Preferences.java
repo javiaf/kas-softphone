@@ -363,6 +363,80 @@ public class Video_Preferences extends PreferenceActivity implements
 		return root;
 	}
 
+	public static void setMediaPreferences(Context context,
+			Map<String, Object> params) {
+
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = settings.edit();
+
+		editor.putBoolean(Keys_Preferences.MEDIA_GENERAL_FRONT_CAMERA,
+				(Boolean) params
+						.get(Keys_Preferences.MEDIA_GENERAL_FRONT_CAMERA));
+
+		editor.putString(Keys_Preferences.MEDIA_GENERAL_MAX_BW,
+				(String) params.get(Keys_Preferences.MEDIA_GENERAL_MAX_BW));
+		editor.putString(Keys_Preferences.MEDIA_GENERAL_MAX_DELAY,
+				(String) params.get(Keys_Preferences.MEDIA_GENERAL_MAX_DELAY));
+		editor.putBoolean(Keys_Preferences.MEDIA_GENERAL_SYNC_MEDIA_STREAMS,
+				(Boolean) params
+						.get(Keys_Preferences.MEDIA_GENERAL_SYNC_MEDIA_STREAMS));
+		editor.putString(Keys_Preferences.MEDIA_VIDEO_CALL_DIRECTION,
+				(String) params
+						.get(Keys_Preferences.MEDIA_VIDEO_CALL_DIRECTION));
+		editor.putString(Keys_Preferences.MEDIA_AUDIO_CALL_DIRECTION,
+				(String) params
+						.get(Keys_Preferences.MEDIA_AUDIO_CALL_DIRECTION));
+
+		// Set Audio Codec
+		editor.putBoolean(Keys_Preferences.MEDIA_AUDIO_AMR_CODEC,
+				(Boolean) params.get(Keys_Preferences.MEDIA_AUDIO_AMR_CODEC));
+		editor.putBoolean(Keys_Preferences.MEDIA_AUDIO_AAC_CODEC,
+				(Boolean) params.get(Keys_Preferences.MEDIA_AUDIO_AAC_CODEC));
+		editor.putBoolean(Keys_Preferences.MEDIA_AUDIO_MP2_CODEC,
+				(Boolean) params.get(Keys_Preferences.MEDIA_AUDIO_MP2_CODEC));
+		editor.putBoolean(Keys_Preferences.MEDIA_AUDIO_PCMA_CODEC,
+				(Boolean) params.get(Keys_Preferences.MEDIA_AUDIO_PCMA_CODEC));
+		editor.putBoolean(Keys_Preferences.MEDIA_AUDIO_PCMU_CODEC,
+				(Boolean) params.get(Keys_Preferences.MEDIA_AUDIO_PCMU_CODEC));
+
+		// Set Video Codec
+		editor.putBoolean(Keys_Preferences.MEDIA_VIDEO_H263_CODEC,
+				(Boolean) params.get(Keys_Preferences.MEDIA_VIDEO_H263_CODEC));
+		editor.putBoolean(Keys_Preferences.MEDIA_VIDEO_H264_CODEC,
+				(Boolean) params.get(Keys_Preferences.MEDIA_VIDEO_H264_CODEC));
+		editor.putBoolean(Keys_Preferences.MEDIA_VIDEO_MPEG4_CODEC,
+				(Boolean) params.get(Keys_Preferences.MEDIA_VIDEO_MPEG4_CODEC));
+
+		editor.putString(Keys_Preferences.MEDIA_MIN_AUDIO_LOCAL_PORT,
+				(String) params
+						.get(Keys_Preferences.MEDIA_MIN_AUDIO_LOCAL_PORT));
+		editor.putString(Keys_Preferences.MEDIA_MAX_AUDIO_LOCAL_PORT,
+				(String) params
+						.get(Keys_Preferences.MEDIA_MAX_AUDIO_LOCAL_PORT));
+
+		editor.putString(Keys_Preferences.MEDIA_MIN_VIDEO_LOCAL_PORT,
+				(String) params
+						.get(Keys_Preferences.MEDIA_MIN_VIDEO_LOCAL_PORT));
+		editor.putString(Keys_Preferences.MEDIA_MAX_VIDEO_LOCAL_PORT,
+				(String) params
+						.get(Keys_Preferences.MEDIA_MAX_VIDEO_LOCAL_PORT));
+
+		editor.putString(Keys_Preferences.MEDIA_VIDEO_SIZE,
+				(String) params.get(Keys_Preferences.MEDIA_VIDEO_SIZE));
+
+		editor.putString(Keys_Preferences.MEDIA_VIDEO_MAX_FR,
+				(String) params.get(Keys_Preferences.MEDIA_VIDEO_MAX_FR));
+
+		editor.putString(Keys_Preferences.MEDIA_VIDEO_GOP_SIZE,
+				(String) params.get(Keys_Preferences.MEDIA_VIDEO_GOP_SIZE));
+
+		editor.putString(Keys_Preferences.MEDIA_VIDEO_QUEUE_SIZE,
+				(String) params.get(Keys_Preferences.MEDIA_VIDEO_QUEUE_SIZE));
+		editor.commit();
+
+	}
+
 	public static Parameters getMediaPreferences(Context context) {
 		Parameters params = MSControlFactory.createParameters();
 
@@ -414,7 +488,7 @@ public class Video_Preferences extends PreferenceActivity implements
 		params.put(MediaSessionAndroid.MAX_DELAY, max_delay);
 
 		Boolean syncMediaStreams = settings.getBoolean(
-					Keys_Preferences.MEDIA_GENERAL_SYNC_MEDIA_STREAMS, false);
+				Keys_Preferences.MEDIA_GENERAL_SYNC_MEDIA_STREAMS, false);
 		params.put(MediaSessionAndroid.SYNCHRONIZE_MEDIA_STREAMS,
 				syncMediaStreams);
 
@@ -486,13 +560,12 @@ public class Video_Preferences extends PreferenceActivity implements
 			gop_size = null;
 		}
 		params.put(MediaSessionAndroid.GOP_SIZE, gop_size);
-		
+
 		Integer frame_queue_size = null;
-		try{
-			frame_queue_size = Integer
-					.parseInt(settings.getString(
-							Keys_Preferences.MEDIA_VIDEO_QUEUE_SIZE, "2"));
-		}catch (NumberFormatException e) {
+		try {
+			frame_queue_size = Integer.parseInt(settings.getString(
+					Keys_Preferences.MEDIA_VIDEO_QUEUE_SIZE, "2"));
+		} catch (NumberFormatException e) {
 			frame_queue_size = null;
 		}
 		params.put(MediaSessionAndroid.FRAMES_QUEUE_SIZE, frame_queue_size);
