@@ -37,6 +37,7 @@ import com.kurento.kas.phone.preferences.Connection_Preferences;
 import com.kurento.kas.phone.preferences.Video_Preferences;
 import com.kurento.kas.phone.shared.Actions;
 import com.kurento.kas.phone.sip.Controller;
+import com.kurento.kas.phone.testutils.SoftphoneController;
 
 public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 		OnClickListener {
@@ -65,6 +66,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 
 	private ControlContacts controlcontacts = new ControlContacts(this);
 
+	private static SoftphoneController softphoneController;
+
 	private IntentFilter intentFilter;
 	private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
@@ -73,9 +76,14 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 			String action = intent.getAction();
 			Log.d(LOG_TAG, "Action = " + action);
 			if (Actions.REGISTER_USER_SUCESSFUL.equals(action)) {
+				Log.d(LOG_TAG, "softphoneController : " + softphoneController);
+				if (softphoneController != null)
+					softphoneController.onEvent(action);
 				connection.setBackgroundResource(R.drawable.connect_icon);
 			} else if (Actions.REGISTER_USER_FAIL.equals(action)
 					|| Actions.UNREGISTER_USER_SUCESSFUL.equals(action)) {
+				if (softphoneController != null)
+					softphoneController.onEvent(action);
 				connection.setBackgroundResource(R.drawable.disconnect_icon);
 			} else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
 				NetworkInfo ni = intent.getExtras()
@@ -569,4 +577,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 
 	}
 
+	public static void setSoftphoneController(SoftphoneController sController) {
+		softphoneController = sController;
+	}
 }
