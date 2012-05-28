@@ -112,7 +112,9 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			cameraFacing = 0;
 		}
 
-		Mode videoMode = mediaTypesModes.get(MediaType.VIDEO);
+		Mode videoMode = null;
+		if (mediaTypesModes != null)
+			videoMode = mediaTypesModes.get(MediaType.VIDEO);
 
 		if ((videoMode != null) && (Mode.RECVONLY.equals(videoMode)))
 			setContentView(R.layout.videocall_receive);
