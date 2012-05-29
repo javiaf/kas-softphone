@@ -14,9 +14,9 @@ import android.util.Log;
 import com.kurento.commons.mscontrol.MsControlException;
 import com.kurento.commons.mscontrol.Parameters;
 import com.kurento.commons.mscontrol.join.JoinableStream.StreamType;
-import com.kurento.commons.sip.agent.EndPointFactory;
 import com.kurento.commons.sip.agent.SipEndPointImpl;
 import com.kurento.commons.sip.agent.UaFactory;
+import com.kurento.commons.sip.agent.UaImpl;
 import com.kurento.commons.sip.util.SipConfig;
 import com.kurento.commons.ua.Call;
 import com.kurento.commons.ua.CallListener;
@@ -165,8 +165,12 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			e.printStackTrace();
 		}
 		try {
-			endPoint = EndPointFactory.getInstance(username, domain, password,
-					expires, ua, this);
+			Map<String, Object> extra = new HashMap<String, Object>();
+			extra.put(UaImpl.SIP_EXPIRES, expires);
+			extra.put(UaImpl.SIP_PASWORD, password);
+			endPoint = ua.registerEndpoint(username, domain, this, extra);
+			// EndPointFactory.getInstance(username, domain, password,
+			// expires, ua, this);
 		} catch (Exception e) {
 			Log.e(LOG, e.getMessage(), e);
 			return;
