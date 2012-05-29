@@ -67,6 +67,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 	private ControlContacts controlcontacts = new ControlContacts(this);
 
 	private static SoftphoneController softphoneController;
+	private static String localAddressTest = null;
 
 	private IntentFilter intentFilter;
 	private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -179,6 +180,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 			public void run() {
 				try {
 					controller = new Controller(getApplicationContext());
+					// Only for test
+					if (localAddressTest != null)
+						controller.setLocalAddress(localAddressTest);
 					controller.configureController();
 					ApplicationContext.contextTable.put("controller",
 							controller);
@@ -336,6 +340,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 			}
 			break;
 		case R.id.call:
+			Log.d(LOG_TAG, "Call is pushed ");
 			Intent history_call = new Intent(SoftPhone.this, HistoryCall.class);
 			startActivityForResult(history_call, HISTORY_CALL);
 			break;
@@ -544,7 +549,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 		startActivityForResult(intentContacts, PICK_CONTACT_REQUEST);
 	}
 
-	private void call(String remoteURI, Integer id) {
+	public void call(String remoteURI, Integer id) {
 		if (controller != null && controller.getUa() != null) {
 			try {
 				Intent mediaIntent = new Intent(SoftPhone.this,
@@ -577,7 +582,10 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 
 	}
 
-	public static void setSoftphoneController(SoftphoneController sController) {
+	public static void setSoftphoneController(SoftphoneController sController,
+			String localAddress) {
 		softphoneController = sController;
+		localAddressTest = localAddress;
+
 	}
 }
