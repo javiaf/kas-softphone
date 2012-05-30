@@ -226,7 +226,11 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 
 	public void networkChanged() {
 		if (ua != null)
-			ua.reconfigure();
+			try {
+				ua.reconfigure();
+			} catch (ServerInternalErrorException e) {
+				e.printStackTrace();
+			}
 	}
 
 	public MediaSessionAndroid getMediaSession() {
