@@ -153,6 +153,10 @@ public class SoftPhoneService extends Service implements SoftphoneCallListener {
 		iOutgoingClose.setAction(Actions.OUTGOING_CALL_CLOSE);
 		sendBroadcast(iOutgoingClose);
 
+		Intent iIncomingCall = new Intent();
+		iIncomingCall.setAction(Actions.CALL_SETUP);
+		sendBroadcast(iIncomingCall);
+
 	}
 
 	@Override
