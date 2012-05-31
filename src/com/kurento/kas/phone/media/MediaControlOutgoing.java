@@ -119,6 +119,17 @@ public class MediaControlOutgoing extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.control_call_outgoingcall);
 
+		intentFilter = new IntentFilter();
+
+		if (intentFilter != null) {
+			intentFilter.addAction(Actions.CALL_REJECT);
+			intentFilter.addAction(Actions.CALL_ERROR);
+			intentFilter.addAction(Actions.OUTGOING_CALL_CLOSE);
+			intentFilter.addAction(Actions.MEDIA_NOT_SUPPORTED);
+			intentFilter.addAction(Actions.USER_NOT_FOUND);
+		}
+		registerReceiver(mReceiver, intentFilter);
+
 		mNotificationMgr = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -142,7 +153,7 @@ public class MediaControlOutgoing extends Activity {
 		else
 			ApplicationContext.contextTable.put("extrasOut", extras);
 
-		String uri = (String) extras.getSerializable("Uri");
+		final String uri = (String) extras.getSerializable("Uri");
 		Integer id = (Integer) extras.getSerializable("Id");
 
 		TextView text = (TextView) findViewById(R.id.outgoing_sip);
@@ -205,7 +216,20 @@ public class MediaControlOutgoing extends Activity {
 		// Play sound
 		mPlayer = MediaPlayer.create(this, R.raw.tone_call);
 
-		intentFilter = new IntentFilter();
+		final Controller controller = (Controller) ApplicationContext.contextTable
+				.get("controller");
+
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					controller.call(uri);
+				} catch (Exception e) {
+					Log.e(LOG_TAG, "Not call " + e.getMessage(), e);
+				}
+			}
+		}).start();
+
 	}
 
 	@Override
@@ -247,14 +271,6 @@ public class MediaControlOutgoing extends Activity {
 	protected void onResume() {
 		super.onResume();
 
-		if (intentFilter != null) {
-			intentFilter.addAction(Actions.CALL_REJECT);
-			intentFilter.addAction(Actions.CALL_ERROR);
-			intentFilter.addAction(Actions.OUTGOING_CALL_CLOSE);
-			intentFilter.addAction(Actions.MEDIA_NOT_SUPPORTED);
-			intentFilter.addAction(Actions.USER_NOT_FOUND);
-		}
-		registerReceiver(mReceiver, intentFilter);
 		isCanceled = false;
 
 		mPlayer.setLooping(true);
