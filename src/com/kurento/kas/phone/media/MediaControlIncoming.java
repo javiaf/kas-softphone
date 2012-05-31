@@ -20,9 +20,11 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -78,6 +80,8 @@ public class MediaControlIncoming extends Activity implements
 	private Boolean isAccepted = false;
 	private Boolean isRejected = false;
 
+	private Dialog dialogWait;
+
 	WakeLock mWakeLock = null;
 
 	MediaPlayer mPlayer;
@@ -99,6 +103,10 @@ public class MediaControlIncoming extends Activity implements
 				incoming_call.setText("Call Canceled");
 				incoming_call.setTextSize(20);
 				finishHandler();
+			} else if (Actions.CALL_SETUP.equals(action)) {
+				if (dialogWait != null)
+					dialogWait.dismiss();
+				finish();
 			}
 		}
 	};
@@ -107,6 +115,14 @@ public class MediaControlIncoming extends Activity implements
 	protected void onCreate(Bundle savedInstanceState) {
 
 		setContentView(R.layout.control_call_incomingcall);
+
+		intentFilter = new IntentFilter();
+		if (intentFilter != null) {
+			intentFilter.addAction(Actions.CALL_CANCEL);
+			intentFilter.addAction(Actions.CALL_SETUP);
+		}
+		registerReceiver(mReceiver, intentFilter);
+
 		Log.d(LOG_TAG, "Media Control Incoming Created");
 
 		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -219,7 +235,7 @@ public class MediaControlIncoming extends Activity implements
 				ApplicationContext.contextTable.put("db", db);
 			}
 		}
-		intentFilter = new IntentFilter();
+
 		super.onCreate(savedInstanceState);
 	}
 
@@ -258,10 +274,6 @@ public class MediaControlIncoming extends Activity implements
 	protected void onResume() {
 		super.onResume();
 		Log.d(LOG_TAG, "onResume");
-		if (intentFilter != null) {
-			intentFilter.addAction(Actions.CALL_CANCEL);
-		}
-		registerReceiver(mReceiver, intentFilter);
 
 		isAccepted = false;
 		isRejected = false;
@@ -295,6 +307,9 @@ public class MediaControlIncoming extends Activity implements
 							if (controller != null) {
 								try {
 									controller.aceptCall();
+									dialogWait = ProgressDialog.show(
+											MediaControlIncoming.this, "",
+											"Establishing call ...", true);
 									ApplicationContext.contextTable
 											.remove("incomingCall");
 								} catch (Exception e) {
@@ -302,7 +317,6 @@ public class MediaControlIncoming extends Activity implements
 								}
 							}
 							isAccepted = true;
-							finish();
 						}
 					}
 				}
