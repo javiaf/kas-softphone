@@ -162,7 +162,8 @@ public class HistoryCall extends ListActivity {
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if ((event.getAction() == KeyEvent.ACTION_DOWN)
 						&& (keyCode == KeyEvent.KEYCODE_ENTER)) {
-					String remoteURI = textRemoteUri.getText().toString();
+					String remoteURI = textRemoteUri.getText().toString()
+							.replace(" ", "");
 					Intent resultIntent = new Intent();
 					resultIntent.putExtra("contact", remoteURI);
 					resultIntent.putExtra("type", "new");

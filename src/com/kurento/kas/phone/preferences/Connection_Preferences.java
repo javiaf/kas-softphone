@@ -97,11 +97,13 @@ public class Connection_Preferences extends PreferenceActivity implements
 				|| port.equals(""))
 			return null;
 
-		params.put(Keys_Preferences.SIP_LOCAL_USERNAME, username);
-		params.put(Keys_Preferences.SIP_LOCAL_PASSWORD, password);
-		params.put(Keys_Preferences.SIP_LOCAL_DOMAIN, domain);
+		params.put(Keys_Preferences.SIP_LOCAL_USERNAME,
+				username.replace(" ", ""));
+		params.put(Keys_Preferences.SIP_LOCAL_PASSWORD,
+				password.replace(" ", ""));
+		params.put(Keys_Preferences.SIP_LOCAL_DOMAIN, domain.replace(" ", ""));
 
-		params.put(Keys_Preferences.SIP_PROXY_IP, ip);
+		params.put(Keys_Preferences.SIP_PROXY_IP, ip.replace(" ", ""));
 		params.put(Keys_Preferences.SIP_PROXY_PORT, port);
 
 		params.put(Keys_Preferences.SIP_MIN_LOCAL_PORT, min_port);
