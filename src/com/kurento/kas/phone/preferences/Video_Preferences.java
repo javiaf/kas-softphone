@@ -169,11 +169,11 @@ public class Video_Preferences extends PreferenceActivity implements
 
 		// Codecs
 		CheckBoxPreference nextVideoCodecPref = new CheckBoxPreference(this);
-		nextVideoCodecPref.setDefaultValue(true);
 		nextVideoCodecPref.setKey(Keys_Preferences.MEDIA_VIDEO_H263_CODEC);
 		nextVideoCodecPref.setTitle("H263");
 		videoCodecPref.addPreference(nextVideoCodecPref);
 		nextVideoCodecPref = new CheckBoxPreference(this);
+		nextVideoCodecPref.setDefaultValue(true);
 		nextVideoCodecPref.setKey(Keys_Preferences.MEDIA_VIDEO_MPEG4_CODEC);
 		nextVideoCodecPref.setTitle("MPEG4");
 		videoCodecPref.addPreference(nextVideoCodecPref);
@@ -476,6 +476,8 @@ public class Video_Preferences extends PreferenceActivity implements
 		} catch (NumberFormatException e) {
 			max_bandwidth = null;
 		}
+		if (max_bandwidth == 0)
+			max_bandwidth = null;
 		params.put(MediaSessionAndroid.MAX_BANDWIDTH, max_bandwidth);
 
 		Integer max_delay = null;
@@ -680,11 +682,13 @@ public class Video_Preferences extends PreferenceActivity implements
 
 		Parameters params = getMediaPreferences(context);
 
+		Integer maxBandwidth = (Integer) params
+				.get(MediaSessionAndroid.MAX_BANDWIDTH);
+		if (maxBandwidth == null)
+			maxBandwidth = 0;
 		info = "Media preferences\n" + "Interfaz\n"
 				+ params.get(MediaSessionAndroid.NET_IF)
-				+ "\n\nMax BandWidth\n"
-				+ params.get(MediaSessionAndroid.MAX_BANDWIDTH)
-				+ "\n\nVideo codec\n"
+				+ "\n\nMax BandWidth\n" + maxBandwidth + "\n\nVideo codec\n"
 				+ params.get(MediaSessionAndroid.VIDEO_CODECS)
 				+ "\n\nAudio codec\n"
 				+ params.get(MediaSessionAndroid.AUDIO_CODECS)
