@@ -32,6 +32,7 @@ import android.util.Log;
 
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.media.MediaControlIncoming;
+import com.kurento.kas.phone.shared.Actions;
 import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.videocall.VideoCallService;
 
@@ -147,6 +148,10 @@ public class SoftPhoneService extends Service implements SoftphoneCallListener {
 		videoCallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		Log.d(LOG_TAG, "Start Service " + videoCallIntent);
 		startService(videoCallIntent);
+
+		Intent iOutgoingClose = new Intent();
+		iOutgoingClose.setAction(Actions.OUTGOING_CALL_CLOSE);
+		sendBroadcast(iOutgoingClose);
 
 	}
 

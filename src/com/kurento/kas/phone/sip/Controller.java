@@ -331,9 +331,6 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 						currentCall.getMediaTypesModes());
 
 				callListener.callSetup();
-				Intent iOutgoingClose = new Intent();
-				iOutgoingClose.setAction(Actions.OUTGOING_CALL_CLOSE);
-				context.sendBroadcast(iOutgoingClose);
 			}
 		} else if (CallEvent.CALL_TERMINATE.equals(eventType)) {
 			setIsCall(false);
