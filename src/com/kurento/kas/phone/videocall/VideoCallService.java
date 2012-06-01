@@ -147,15 +147,12 @@ public class VideoCallService extends Service {
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
 
-		// NetworkConnection nc = (NetworkConnection)
-		// ApplicationContext.contextTable
-		// .get("networkConnection");
 		Joinable audioJoinable = (Joinable) ApplicationContext.contextTable
 				.get("audioJoinable");
-		// if (audio == null) {
-		// Log.e(LOG_TAG, "Audio Joinable is NULL");
-		// return;
-		// }
+
+		videoCallIntent = new Intent(this, VideoCall.class);
+		videoCallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(videoCallIntent);
 
 		try {
 
@@ -173,9 +170,6 @@ public class VideoCallService extends Service {
 			e.printStackTrace();
 		}
 
-		videoCallIntent = new Intent(this, VideoCall.class);
-		videoCallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(videoCallIntent);
 	}
 
 	@Override
