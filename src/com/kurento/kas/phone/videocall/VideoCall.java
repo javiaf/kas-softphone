@@ -90,6 +90,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		VideoCallService.setUpdateListener(this);
 		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
 		mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK
@@ -126,7 +127,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			setContentView(R.layout.onlycall);
 		}
 
-		VideoCallService.setUpdateListener(this);
+
 		hang = false;
 		Log.d(LOG_TAG, "OnCreate " + hang);
 
