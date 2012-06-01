@@ -368,7 +368,7 @@ public class MediaControlIncoming extends Activity implements
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			reject();
 		}
-		return true;
+		return false;
 	}
 
 	@Override
