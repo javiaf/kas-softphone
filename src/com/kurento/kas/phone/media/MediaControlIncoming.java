@@ -331,6 +331,9 @@ public class MediaControlIncoming extends Activity implements
 										}
 									}, 4500);
 								} catch (Exception e) {
+									Log.d(LOG_TAG,
+											"Exception: " + e.getMessage());
+									notCallExits();
 									e.printStackTrace();
 								}
 							}
@@ -437,6 +440,15 @@ public class MediaControlIncoming extends Activity implements
 			}
 		}
 
+	}
+
+	private void notCallExits() {
+		TextView incoming_call = (TextView) findViewById(R.id.incoming_call);
+
+		incoming_call.setTextColor(Color.RED);
+		incoming_call.setText("Not Call Exists");
+		incoming_call.setTextSize(20);
+		finishHandler();
 	}
 
 	private void notReceivedCallSetup() {
