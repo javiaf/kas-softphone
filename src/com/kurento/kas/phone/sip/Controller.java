@@ -22,6 +22,7 @@ import com.kurento.commons.ua.Call;
 import com.kurento.commons.ua.CallListener;
 import com.kurento.commons.ua.EndPoint;
 import com.kurento.commons.ua.EndPointListener;
+import com.kurento.commons.ua.TerminateReason;
 import com.kurento.commons.ua.UA;
 import com.kurento.commons.ua.UaStun;
 import com.kurento.commons.ua.event.CallEvent;
@@ -268,7 +269,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 	@Override
 	public void reject() throws Exception {
 		setIsCall(false);
-		pendingEndPointEvent.getCallSource().hangup();
+		pendingEndPointEvent.getCallSource().terminate(TerminateReason.DECLINE);
 	}
 
 	@Override
@@ -288,7 +289,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 		setIsCall(false);
 		if (currentCall != null)
 			try {
-				currentCall.hangup();
+				currentCall.terminate();
 			} catch (ServerInternalErrorException e) {
 				Log.e(LOG, e.getMessage(), e);
 			}
@@ -300,7 +301,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 		setIsCall(false);
 		if (currentCall != null)
 			try {
-				currentCall.hangup();
+				currentCall.terminate();
 			} catch (ServerInternalErrorException e) {
 				Log.e(LOG, e.getMessage(), e);
 			}
@@ -409,15 +410,18 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			i.setAction(Actions.REGISTER_USER_FAIL);
 			context.sendBroadcast(i);
 		} else if (event.getEventType().equals(EndPointEvent.INCOMING_CALL)) {
-			this.pendingEndPointEvent = event;
-			incomingCall = pendingEndPointEvent.getCallSource();
-			incomingCall.addListener(this);
-
+			// this.pendingEndPointEvent = event;
+			// incomingCall = pendingEndPointEvent.getCallSource();
+			// incomingCall.addListener(this);
 			try {
 				if (getIsCall()) {
 					Log.d(LOG, "Send reject because I've received an INVITE");
-					reject();
+					event.getCallSource().terminate(TerminateReason.BUSY);
+					// reject();
 				} else {
+					this.pendingEndPointEvent = event;
+					incomingCall = pendingEndPointEvent.getCallSource();
+					incomingCall.addListener(this);
 					setIsCall(true);
 					Log.d(LOG, "I've received an INVITE");
 					Log.d(LOG, "Me llama Uri: "
