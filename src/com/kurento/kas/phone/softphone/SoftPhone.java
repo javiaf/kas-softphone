@@ -9,6 +9,7 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
@@ -174,7 +175,15 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 
 	private void createController() {
 		dialogWait = ProgressDialog.show(SoftPhone.this, "", "Please wait ...",
-				true);
+				true, true, new OnCancelListener() {
+
+					@Override
+					public void onCancel(DialogInterface dialog) {
+						Log.d(LOG_TAG, "Cancel Dialog");
+						if (dialogWait != null && dialogWait.isShowing())
+							dialogWait.dismiss();
+					}
+				});
 
 		new Thread(new Runnable() {
 			public void run() {
@@ -188,7 +197,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 							controller);
 					Log.d(LOG_TAG, "controller completed");
 					serviceAndFilters();
-					if (dialogWait != null)
+					if (dialogWait != null && dialogWait.isShowing())
 						dialogWait.dismiss();
 				} catch (Exception e) {
 					e.printStackTrace();

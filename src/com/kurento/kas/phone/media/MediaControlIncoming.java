@@ -28,6 +28,8 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
@@ -104,7 +106,7 @@ public class MediaControlIncoming extends Activity implements
 				incoming_call.setTextSize(20);
 				finishHandler();
 			} else if (Actions.CALL_SETUP.equals(action)) {
-				if (dialogWait != null)
+				if (dialogWait != null && dialogWait.isShowing())
 					dialogWait.dismiss();
 				finish();
 			}
@@ -309,9 +311,23 @@ public class MediaControlIncoming extends Activity implements
 									controller.aceptCall();
 									dialogWait = ProgressDialog.show(
 											MediaControlIncoming.this, "",
-											"Establishing call ...", true);
+											"Establishing call ...", true,
+											true, new OnCancelListener() {
+
+												@Override
+												public void onCancel(
+														DialogInterface dialog) {
+													notReceivedCallSetup();
+												}
+											});
 									ApplicationContext.contextTable
 											.remove("incomingCall");
+
+									mHandler.postDelayed(new Runnable() {
+										public void run() {
+											notReceivedCallSetup();
+										}
+									}, 4500);
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
@@ -418,6 +434,26 @@ public class MediaControlIncoming extends Activity implements
 				finish();
 			}
 		}
+
+	}
+
+	private void notReceivedCallSetup() {
+		if (dialogWait != null && dialogWait.isShowing())
+			dialogWait.dismiss();
+		TextView incoming_call = (TextView) findViewById(R.id.incoming_call);
+
+		incoming_call.setTextColor(Color.RED);
+		incoming_call.setText("Not received Call Setup");
+		incoming_call.setTextSize(20);
+		if (controller != null) {
+			try {
+				controller.reject();
+				ApplicationContext.contextTable.remove("incomingCall");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		finishHandler();
 
 	}
 
