@@ -381,6 +381,11 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			context.sendBroadcast(iOutgoingClose);
 		} else if (CallEvent.MEDIA_RESOURCE_NOT_AVAILABLE.equals(eventType)) {
 			setIsCall(false);
+		} else if (CallEvent.CALL_RINGING.equals(eventType)) {
+			Log.d(LOG, "Ringing ...");
+			Intent iIncomingCall = new Intent();
+			iIncomingCall.setAction(Actions.CALL_RINGING);
+			context.sendBroadcast(iIncomingCall);
 		} else
 			setIsCall(false);
 	}

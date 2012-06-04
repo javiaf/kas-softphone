@@ -110,6 +110,13 @@ public class MediaControlOutgoing extends Activity {
 				outgoing_call.setTextSize(20);
 				isRejectOrError = true;
 				finishHandler();
+			} else if (Actions.CALL_RINGING.equals(action)) {
+				// Play sound
+				Log.d(LOG_TAG, "Ringing ... start AudioMedia Player");
+				mPlayer = MediaPlayer.create(getApplicationContext(),
+						R.raw.tone_call);
+				mPlayer.setLooping(true);
+				mPlayer.start();
 			}
 		}
 	};
@@ -127,6 +134,7 @@ public class MediaControlOutgoing extends Activity {
 			intentFilter.addAction(Actions.OUTGOING_CALL_CLOSE);
 			intentFilter.addAction(Actions.MEDIA_NOT_SUPPORTED);
 			intentFilter.addAction(Actions.USER_NOT_FOUND);
+			intentFilter.addAction(Actions.CALL_RINGING);
 		}
 		registerReceiver(mReceiver, intentFilter);
 
@@ -213,8 +221,8 @@ public class MediaControlOutgoing extends Activity {
 				ApplicationContext.contextTable.put("db", db);
 			}
 		}
-		// Play sound
-		mPlayer = MediaPlayer.create(this, R.raw.tone_call);
+		// // Play sound
+		// mPlayer = MediaPlayer.create(this, R.raw.tone_call);
 
 		final Controller controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
@@ -273,8 +281,8 @@ public class MediaControlOutgoing extends Activity {
 
 		isCanceled = false;
 
-		mPlayer.setLooping(true);
-		mPlayer.start();
+		// mPlayer.setLooping(true);
+		// mPlayer.start();
 
 		final DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
