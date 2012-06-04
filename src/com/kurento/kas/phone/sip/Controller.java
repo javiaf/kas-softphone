@@ -268,7 +268,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 	@Override
 	public void reject() throws Exception {
 		setIsCall(false);
-		pendingEndPointEvent.getCallSource().reject();
+		pendingEndPointEvent.getCallSource().hangup();
 	}
 
 	@Override
@@ -300,7 +300,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 		setIsCall(false);
 		if (currentCall != null)
 			try {
-				currentCall.cancel();
+				currentCall.hangup();
 			} catch (ServerInternalErrorException e) {
 				Log.e(LOG, e.getMessage(), e);
 			}
@@ -309,7 +309,8 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 	@Override
 	public void onEvent(CallEvent event) {
 		CallEventEnum eventType = event.getEventType();
-		Log.d(LOG, "onEvent  SipCallEvent: " + eventType.toString());
+		Log.d(LOG, "onEvent  SipCallEvent: " + eventType.toString()
+				+ "; Message: " + event.getMessage());
 
 		// Only use it to do tests
 		if (controlController != null)
@@ -520,10 +521,11 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 				+ ". Period: " + period);
 		if ((task = taskTable.get(kurentoTask)) == null) {
 			Log.d(LOG, "New kurentoTask");
-			task = new AlarmTask(kurentoTask, 0, period, context);
+			task = new AlarmTask(kurentoTask, delay, period, context);
 			taskTable.put(kurentoTask, task);
+			task.run();
 		}
-		task.run();
+
 	}
 
 	@Override
