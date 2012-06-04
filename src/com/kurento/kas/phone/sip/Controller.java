@@ -350,6 +350,12 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			context.sendBroadcast(iOutgoingClose);
 			// if (callListener != null)
 			// callListener.callReject();
+		} else if (CallEvent.CALL_BUSY.equals(eventType)) {
+			setIsCall(false);
+			Log.d(LOG, "Call Busy");
+			Intent iOutgoingClose = new Intent();
+			iOutgoingClose.setAction(Actions.CALL_BUSY);
+			context.sendBroadcast(iOutgoingClose);
 		} else if (CallEvent.CALL_CANCEL.equals(eventType)) {
 			setIsCall(false);
 			Log.d(LOG, "Call Cancel");

@@ -88,6 +88,12 @@ public class MediaControlOutgoing extends Activity {
 				}
 			} else if (Actions.CALL_REJECT.equals(action)) {
 				outgoing_call.setTextColor(Color.RED);
+				outgoing_call.setText("Decline call");
+				outgoing_call.setTextSize(20);
+				isRejectOrError = true;
+				finishHandler();
+			} else if (Actions.CALL_BUSY.equals(action)) {
+				outgoing_call.setTextColor(Color.RED);
 				outgoing_call.setText("Busy line");
 				outgoing_call.setTextSize(20);
 				isRejectOrError = true;
@@ -138,6 +144,7 @@ public class MediaControlOutgoing extends Activity {
 			intentFilter.addAction(Actions.MEDIA_NOT_SUPPORTED);
 			intentFilter.addAction(Actions.USER_NOT_FOUND);
 			intentFilter.addAction(Actions.CALL_RINGING);
+			intentFilter.addAction(Actions.CALL_BUSY);
 		}
 		registerReceiver(mReceiver, intentFilter);
 

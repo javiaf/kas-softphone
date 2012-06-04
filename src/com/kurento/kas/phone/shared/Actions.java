@@ -26,6 +26,7 @@ public class Actions {
 	public final static String CALL_TERMINATE = CallEvent.CALL_TERMINATE
 			.toString();
 	public final static String CALL_REJECT = CallEvent.CALL_REJECT.toString();
+	public final static String CALL_BUSY = CallEvent.CALL_BUSY.toString();
 	public final static String CALL_ERROR = CallEvent.CALL_ERROR.toString();
 	public final static String CALL_CANCEL = CallEvent.CALL_CANCEL.toString();
 	public final static String CALL_RINGING = CallEvent.CALL_RINGING.toString();
