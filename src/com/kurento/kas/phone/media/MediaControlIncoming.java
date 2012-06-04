@@ -78,6 +78,7 @@ public class MediaControlIncoming extends Activity implements
 	private String notificationTitleSoft = "KurentoPhone";
 
 	private Handler mHandler = new Handler();
+	private Boolean isCallSetup = false;
 
 	private Boolean isAccepted = false;
 	private Boolean isRejected = false;
@@ -106,6 +107,7 @@ public class MediaControlIncoming extends Activity implements
 				incoming_call.setTextSize(20);
 				finishHandler();
 			} else if (Actions.CALL_SETUP.equals(action)) {
+				isCallSetup = true;
 				if (dialogWait != null && dialogWait.isShowing())
 					dialogWait.dismiss();
 				finish();
@@ -438,6 +440,9 @@ public class MediaControlIncoming extends Activity implements
 	}
 
 	private void notReceivedCallSetup() {
+		if (isCallSetup)
+			return;
+
 		if (dialogWait != null && dialogWait.isShowing())
 			dialogWait.dismiss();
 		TextView incoming_call = (TextView) findViewById(R.id.incoming_call);
