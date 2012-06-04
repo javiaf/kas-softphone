@@ -36,7 +36,7 @@ public class RegisterService extends Service {
 					"Sending register from Second service with expires time  "
 							+ expiresTime);
 			try {
-				getEndpoint().register();
+				getEndpoint().register(expiresTime);
 			} catch (ServerInternalErrorException e) {
 				this.stopSelf();
 			}
