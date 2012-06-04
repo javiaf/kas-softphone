@@ -113,10 +113,13 @@ public class MediaControlOutgoing extends Activity {
 			} else if (Actions.CALL_RINGING.equals(action)) {
 				// Play sound
 				Log.d(LOG_TAG, "Ringing ... start AudioMedia Player");
-				mPlayer = MediaPlayer.create(getApplicationContext(),
-						R.raw.tone_call);
-				mPlayer.setLooping(true);
-				mPlayer.start();
+				if (mPlayer == null)
+					mPlayer = MediaPlayer.create(getApplicationContext(),
+							R.raw.tone_call);
+				if (mPlayer != null && !mPlayer.isPlaying()) {
+					mPlayer.setLooping(true);
+					mPlayer.start();
+				}
 			}
 		}
 	};
