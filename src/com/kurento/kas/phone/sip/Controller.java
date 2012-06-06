@@ -26,8 +26,6 @@ import com.kurento.commons.ua.event.CallEvent;
 import com.kurento.commons.ua.event.CallEventEnum;
 import com.kurento.commons.ua.event.EndPointEvent;
 import com.kurento.commons.ua.exception.ServerInternalErrorException;
-import com.kurento.commons.ua.timer.KurentoUaTimer;
-import com.kurento.commons.ua.timer.KurentoUaTimerTask;
 import com.kurento.kas.mscontrol.MSControlFactory;
 import com.kurento.kas.mscontrol.MediaSessionAndroid;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
@@ -42,7 +40,7 @@ import com.kurento.kas.phone.softphone.SoftphoneCallListener;
 import com.kurento.kas.phone.testutils.ControllerController;
 
 public class Controller implements EndPointListener, CallListener, IPhone,
-		CallNotifier, KurentoUaTimer {
+		CallNotifier {
 	public final static String LOG = Controller.class.getName();
 
 	private Context context;
@@ -142,7 +140,6 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			sipConfig.setEnableKeepAlive(keep_alive);
 			sipConfig.setKeepAlivePeriod(keep_delay);
 			sipConfig.setTransport(transport);
-			sipConfig.setTimer(this);
 
 			UaFactory.setMediaSession(mediaSession);
 		} catch (MsControlException e) {
@@ -467,113 +464,118 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 		this.localAddressS = localAddressTest;
 	}
 
-	// Implement KurentoTimerUA
-
-	private Map<KurentoUaTimerTask, AlarmTask> taskTable = new HashMap<KurentoUaTimerTask, AlarmTask>();
-
-	private class AlarmTask extends KurentoUaTimerTask {
-		private KurentoUaTimerTask task;
-		private long delay;
-		private long period;
-		private AlarmManager alarmManager;
-		private Context context;
-		private PendingIntent pendingIntent;
-
-		protected AlarmTask(KurentoUaTimerTask task, long delay, long period,
-				Context context) {
-			this.task = task;
-			this.delay = delay;
-			this.period = period;
-			this.context = context;
-
-			Log.d(LOG, "New AlarmTask. Delay : " + delay + ". Period: "
-					+ period);
-
-			// TODO Change the SipEndPointImpl by EndPoint
-			RegisterService.setEndpoint((SipEndPointImpl) endPoint);
-			alarmManager = (AlarmManager) this.context
-					.getSystemService(Context.ALARM_SERVICE);
-			Intent myIntent = new Intent(this.context, RegisterService.class);
-			pendingIntent = PendingIntent.getService(this.context, 0, myIntent,
-					0);
-		}
-
-		@Override
-		public void run() {
-			Log.d(LOG, "Run AlarmTask");
-			alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-					delay, period, pendingIntent);
-			// // Start Alarm?
-			// task.run();
-		}
-
-		public void cancel() {
-			Log.d(LOG, "Cancel AlarmTask");
-			if (alarmManager != null)
-				alarmManager.cancel(pendingIntent);
-		}
-	}
-
-	@Override
-	public void cancel(KurentoUaTimerTask kurentoTask) {
-		Log.d(LOG, "Cancel " + kurentoTask);
-		AlarmTask task;
-		if ((task = taskTable.get(kurentoTask)) != null) {
-			Log.d(LOG, "task.cancel ");
-			task.cancel();
-		}
-	}
-
-	@Override
-	public void purge() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void schedule(KurentoUaTimerTask kurentoTask, Date when, long period) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void schedule(KurentoUaTimerTask kurentoTask, long delay, long period) {
-		AlarmTask task;
-		Log.d(LOG, "Schedule. " + kurentoTask + ".Delay : " + delay
-				+ ". Period: " + period);
-		if ((task = taskTable.get(kurentoTask)) == null) {
-			Log.d(LOG, "New kurentoTask");
-			task = new AlarmTask(kurentoTask, delay, period, context);
-			taskTable.put(kurentoTask, task);
-			task.run();
-		}
-
-	}
-
-	@Override
-	public void schedule(KurentoUaTimerTask kurentoTask, Date when) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void schedule(KurentoUaTimerTask kurentoTask, long delay) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void scheduleAtFixedRate(KurentoUaTimerTask kurentoTask, long delay,
-			long period) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void scheduleAtFixedRate(KurentoUaTimerTask kurentoTask, Date when,
-			long period) {
-		// TODO Auto-generated method stub
-
-	}
+	// // Implement KurentoTimerUA
+	//
+	// private Map<KurentoUaTimerTask, AlarmTask> taskTable = new
+	// HashMap<KurentoUaTimerTask, AlarmTask>();
+	//
+	// private class AlarmTask extends KurentoUaTimerTask {
+	// private KurentoUaTimerTask task;
+	// private long delay;
+	// private long period;
+	// private AlarmManager alarmManager;
+	// private Context context;
+	// private PendingIntent pendingIntent;
+	//
+	// protected AlarmTask(KurentoUaTimerTask task, long delay, long period,
+	// Context context) {
+	// this.task = task;
+	// this.delay = delay;
+	// this.period = period;
+	// this.context = context;
+	//
+	// Log.d(LOG, "New AlarmTask. Delay : " + delay + ". Period: "
+	// + period);
+	//
+	// // TODO Change the SipEndPointImpl by EndPoint
+	// // RegisterService.setEndpoint((SipEndPointImpl) endPoint);
+	// alarmManager = (AlarmManager) this.context
+	// .getSystemService(Context.ALARM_SERVICE);
+	// Intent myIntent = new Intent(this.context, RegisterService.class);
+	// pendingIntent = PendingIntent.getService(this.context, 0, myIntent,
+	// 0);
+	// }
+	//
+	// @Override
+	// public void run() {
+	// Log.d(LOG, "Run AlarmTask");
+	// alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+	// delay, period, pendingIntent);
+	// // // Start Alarm?
+	// // task.run();
+	// }
+	//
+	// public void cancel() {
+	// Log.d(LOG, "Cancel AlarmTask");
+	// if (alarmManager != null)
+	// alarmManager.cancel(pendingIntent);
+	// }
+	// }
+	//
+	// @Override
+	// public void cancel(KurentoUaTimerTask kurentoTask) {
+	// Log.d(LOG, "Cancel " + kurentoTask);
+	// AlarmTask task;
+	// if ((task = taskTable.get(kurentoTask)) != null) {
+	// Log.d(LOG, "task.cancel ");
+	// task.cancel();
+	// }
+	// }
+	//
+	// @Override
+	// public void purge() {
+	// // TODO Auto-generated method stub
+	//
+	// }
+	//
+	// @Override
+	// public void schedule(KurentoUaTimerTask kurentoTask, Date when, long
+	// period) {
+	// // TODO Auto-generated method stub
+	//
+	// }
+	//
+	// @Override
+	// public void schedule(KurentoUaTimerTask kurentoTask, long delay, long
+	// period) {
+	// AlarmTask task;
+	// Log.d(LOG, "Schedule. " + kurentoTask + ".Delay : " + delay
+	// + ". Period: " + period);
+	// if ((task = taskTable.get(kurentoTask)) == null) {
+	// Log.d(LOG, "New kurentoTask");
+	// task = new AlarmTask(kurentoTask, delay, period, context);
+	// taskTable.put(kurentoTask, task);
+	// task.run();
+	// }
+	//
+	// }
+	//
+	// @Override
+	// public void schedule(KurentoUaTimerTask kurentoTask, Date when) {
+	// // TODO Auto-generated method stub
+	//
+	// }
+	//
+	// @Override
+	// public void schedule(KurentoUaTimerTask kurentoTask, long delay) {
+	// // TODO Auto-generated method stub
+	//
+	// }
+	//
+	// @Override
+	// public void scheduleAtFixedRate(KurentoUaTimerTask kurentoTask, long
+	// delay,
+	// long period) {
+	// // TODO Auto-generated method stub
+	//
+	// }
+	//
+	// @Override
+	// public void scheduleAtFixedRate(KurentoUaTimerTask kurentoTask, Date
+	// when,
+	// long period) {
+	// // TODO Auto-generated method stub
+	//
+	// }
 
 }
