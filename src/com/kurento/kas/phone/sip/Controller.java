@@ -285,6 +285,9 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			setIsCall(true);
 			Log.d(LOG, "Send an INVITE to " + remoteURI);
 			currentCall = endPoint.dial(remoteURI, this);
+			Intent iOutgoingDial = new Intent();
+			iOutgoingDial.setAction(Actions.CURRENT_CALL_OK);
+			context.sendBroadcast(iOutgoingDial);
 		}
 	}
 

@@ -19,6 +19,7 @@ public class Actions {
 			.toString();
 	public final static String OUTGOING_CALL = "OUTGOING_CALL";
 	public final static String OUTGOING_CALL_CLOSE = "OUTGOING_CALL_CLOSE";
+	public final static String CURRENT_CALL_OK = "CURRENT_CALL_OK";
 
 	public final static String VIDEOCALL_CLOSE = "VIDEOCALL_CLOSE";
 

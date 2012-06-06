@@ -66,6 +66,7 @@ public class MediaControlOutgoing extends Activity {
 	private String notificationTitleSoft = "KurentoPhone";
 
 	private Handler mHandler = new Handler();
+	private ImageButton buttonReject;
 
 	private Boolean isCanceled = false;
 	private Boolean isRejectOrError = false;
@@ -126,14 +127,20 @@ public class MediaControlOutgoing extends Activity {
 					mPlayer.setLooping(true);
 					mPlayer.start();
 				}
+			} else if (Actions.CURRENT_CALL_OK.equals(action)) {
+				buttonReject = (ImageButton) findViewById(R.id.button_call_reject);
+				buttonReject.setVisibility(View.VISIBLE);
 			}
 		}
 	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.control_call_outgoingcall);
+
+		buttonReject = (ImageButton) findViewById(R.id.button_call_reject);
+		buttonReject.setVisibility(View.INVISIBLE);
 
 		intentFilter = new IntentFilter();
 
@@ -145,6 +152,7 @@ public class MediaControlOutgoing extends Activity {
 			intentFilter.addAction(Actions.USER_NOT_FOUND);
 			intentFilter.addAction(Actions.CALL_RINGING);
 			intentFilter.addAction(Actions.CALL_BUSY);
+			intentFilter.addAction(Actions.CURRENT_CALL_OK);
 		}
 		registerReceiver(mReceiver, intentFilter);
 
@@ -247,7 +255,7 @@ public class MediaControlOutgoing extends Activity {
 				}
 			}
 		}).start();
-
+		super.onCreate(savedInstanceState);
 	}
 
 	@Override
