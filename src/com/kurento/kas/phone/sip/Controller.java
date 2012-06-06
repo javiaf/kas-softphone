@@ -1,12 +1,9 @@
 package com.kurento.kas.phone.sip;
 
 import java.net.InetAddress;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -14,7 +11,7 @@ import android.util.Log;
 import com.kurento.commons.mscontrol.MsControlException;
 import com.kurento.commons.mscontrol.Parameters;
 import com.kurento.commons.mscontrol.join.JoinableStream.StreamType;
-import com.kurento.commons.sip.agent.SipEndPointImpl;
+import com.kurento.commons.sip.agent.NetworkListener;
 import com.kurento.commons.sip.agent.UaFactory;
 import com.kurento.commons.sip.agent.UaImpl;
 import com.kurento.commons.sip.util.SipConfig;
@@ -56,6 +53,8 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 	private Call currentCall;
 	private Call incomingCall;
 	private int expires = 3600;
+
+	private NetworkListener networkListener;
 
 	private Boolean isCall = false;
 
@@ -166,6 +165,8 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			e.printStackTrace();
 		}
 		try {
+			networkListener = UaFactory.getNetworkListener(ua);
+
 			Map<String, Object> extra = new HashMap<String, Object>();
 			extra.put(UaImpl.SIP_EXPIRES, expires);
 			extra.put(UaImpl.SIP_PASWORD, password);
@@ -226,12 +227,18 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 	}
 
 	public void networkChanged() {
-		if (ua != null)
+		if (networkListener != null)
 			try {
-				ua.reconfigure();
+				networkListener.networkReconfigure();
 			} catch (ServerInternalErrorException e) {
-				e.printStackTrace();
+				Log.e(LOG, "NetworkChanged: " + e.getMessage(), e);
 			}
+		// if (ua != null)
+		// try {
+		// ua.reconfigure();
+		// } catch (ServerInternalErrorException e) {
+		// e.printStackTrace();
+		// }
 	}
 
 	public MediaSessionAndroid getMediaSession() {
