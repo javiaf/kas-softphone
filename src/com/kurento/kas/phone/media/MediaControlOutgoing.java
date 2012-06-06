@@ -289,9 +289,9 @@ public class MediaControlOutgoing extends Activity {
 				.get("controller");
 		Log.d(LOG_TAG, "controller: " + controller);
 		ApplicationContext.contextTable.remove("outgoingCall");
-		finish();
 		try {
 			controller.cancel();
+			finishHandler((long) 2500);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

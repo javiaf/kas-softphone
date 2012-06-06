@@ -281,6 +281,7 @@ public class MediaControlIncoming extends Activity implements
 
 		isAccepted = false;
 		isRejected = false;
+
 		mPlayer.setLooping(true);
 		mPlayer.start();
 
