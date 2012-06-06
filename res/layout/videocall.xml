@@ -7,7 +7,7 @@
     <SurfaceView
         android:id="@+id/video_receive_surface"
         android:layout_width="380dip"
-        android:layout_height="330dip" >
+        android:layout_height="300dip" >
     </SurfaceView>
 
     <TableLayout
@@ -85,5 +85,12 @@
         android:layout_height="96dip"
         android:layout_gravity="bottom|right" >
     </SurfaceView>
+
+    <TextView
+        android:id="@+id/txt_bandwidth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:text="--" />
 
 </FrameLayout>

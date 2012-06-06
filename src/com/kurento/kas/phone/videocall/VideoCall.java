@@ -82,6 +82,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private Boolean isOccult = true;
 	WakeLock mWakeLock = null;
 
+	TextView txt_bandwidth;
+
 	View videoCaptureSurface;
 
 	Boolean isStarted = true;
@@ -142,6 +144,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			int Orientation = getWindowManager().getDefaultDisplay()
 					.getOrientation();
 			try {
+				txt_bandwidth = (TextView) findViewById(R.id.txt_bandwidth);
+
 				if ((videoMode != null)
 						&& (Mode.SENDONLY.equals(videoMode) || Mode.SENDRECV
 								.equals(videoMode))) {
@@ -226,6 +230,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			// return;
 			// }
 			// TODO: Review. Not do it when the button Camara has been pushed
+			txt_bandwidth.setText("A: ---- ; V: -----");
 			try {
 				if (videoPlayerComponent != null) {
 					videoPlayerComponent.join(Direction.SEND, videoJoinable);
