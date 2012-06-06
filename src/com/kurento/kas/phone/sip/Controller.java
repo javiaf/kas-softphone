@@ -140,6 +140,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			sipConfig.setEnableKeepAlive(keep_alive);
 			sipConfig.setKeepAlivePeriod(keep_delay);
 			sipConfig.setTransport(transport);
+			sipConfig.setTimer(new AlarmUaTimer(context));
 
 			UaFactory.setMediaSession(mediaSession);
 		} catch (MsControlException e) {
