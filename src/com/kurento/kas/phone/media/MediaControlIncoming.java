@@ -336,7 +336,8 @@ public class MediaControlIncoming extends Activity implements
 									notCallExits();
 									e.printStackTrace();
 								}
-							}
+							} else
+								notCallExits();
 							isAccepted = true;
 						}
 					}
