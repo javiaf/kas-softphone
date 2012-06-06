@@ -340,14 +340,18 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			}
 		} else if (CallEvent.CALL_TERMINATE.equals(eventType)) {
 			setIsCall(false);
+			currentCall = null;
+
 			Log.d(LOG, "Call Terminate");
 			if (callListener != null)
 				callListener.callTerminate();
+
 			Intent iOutgoingClose = new Intent();
 			iOutgoingClose.setAction(Actions.OUTGOING_CALL_CLOSE);
 			context.sendBroadcast(iOutgoingClose);
 		} else if (CallEvent.CALL_REJECT.equals(eventType)) {
 			setIsCall(false);
+			currentCall = null;
 			Log.d(LOG, "Call Reject");
 			Intent iOutgoingClose = new Intent();
 			iOutgoingClose.setAction(Actions.CALL_REJECT);
@@ -356,12 +360,16 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			// callListener.callReject();
 		} else if (CallEvent.CALL_BUSY.equals(eventType)) {
 			setIsCall(false);
+			currentCall = null;
+
 			Log.d(LOG, "Call Busy");
 			Intent iOutgoingClose = new Intent();
 			iOutgoingClose.setAction(Actions.CALL_BUSY);
 			context.sendBroadcast(iOutgoingClose);
 		} else if (CallEvent.CALL_CANCEL.equals(eventType)) {
 			setIsCall(false);
+			currentCall = null;
+
 			Log.d(LOG, "Call Cancel");
 			Intent iIncomingCall = new Intent();
 			iIncomingCall.setAction(Actions.CALL_CANCEL);
@@ -370,6 +378,8 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			// callListener.callCancel();
 		} else if (CallEvent.CALL_ERROR.equals(eventType)) {
 			setIsCall(false);
+			currentCall = null;
+
 			Intent iOutgoingClose = new Intent();
 			iOutgoingClose.setAction(Actions.CALL_ERROR);
 			context.sendBroadcast(iOutgoingClose);
@@ -380,6 +390,8 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 		} else if (CallEvent.MEDIA_NOT_SUPPORTED.equals(eventType)) {
 			Log.d(LOG, "Media Not Supported");
 			setIsCall(false);
+			currentCall = null;
+
 			Intent iOutgoingClose = new Intent();
 			iOutgoingClose.setAction(Actions.MEDIA_NOT_SUPPORTED);
 			context.sendBroadcast(iOutgoingClose);
@@ -387,11 +399,14 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 		} else if (CallEvent.USER_NOT_FOUND.equals(eventType)) {
 			Log.d(LOG, "User Not Found");
 			setIsCall(false);
+			currentCall = null;
+
 			Intent iOutgoingClose = new Intent();
 			iOutgoingClose.setAction(Actions.USER_NOT_FOUND);
 			context.sendBroadcast(iOutgoingClose);
 		} else if (CallEvent.MEDIA_RESOURCE_NOT_AVAILABLE.equals(eventType)) {
 			setIsCall(false);
+			currentCall = null;
 		} else if (CallEvent.CALL_RINGING.equals(eventType)) {
 			Log.d(LOG, "Ringing ...");
 			Intent iIncomingCall = new Intent();
