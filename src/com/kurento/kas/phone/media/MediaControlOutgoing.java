@@ -85,38 +85,42 @@ public class MediaControlOutgoing extends Activity {
 					outgoing_call.setTextColor(Color.RED);
 					outgoing_call.setText("Call Finish");
 					outgoing_call.setTextSize(20);
-					finishHandler();
+					finishHandler((long) 2500);
 				}
 			} else if (Actions.CALL_REJECT.equals(action)) {
 				outgoing_call.setTextColor(Color.RED);
 				outgoing_call.setText("Decline call");
 				outgoing_call.setTextSize(20);
 				isRejectOrError = true;
-				finishHandler();
+				finishHandler((long) 2500);
 			} else if (Actions.CALL_BUSY.equals(action)) {
 				outgoing_call.setTextColor(Color.RED);
 				outgoing_call.setText("Busy line");
 				outgoing_call.setTextSize(20);
 				isRejectOrError = true;
-				finishHandler();
+				finishHandler((long) 2500);
 			} else if (Actions.CALL_ERROR.equals(action)) {
+				Bundle extras = intent.getExtras();
+				String message = "Call Error\n";
+				if (extras != null)
+					message = message + extras.getString("message");
 				outgoing_call.setTextColor(Color.RED);
-				outgoing_call.setText("Call Error");
+				outgoing_call.setText(message);
 				outgoing_call.setTextSize(20);
 				isRejectOrError = true;
-				finishHandler();
+				finishHandler((long) 5000);
 			} else if (Actions.MEDIA_NOT_SUPPORTED.equals(action)) {
 				outgoing_call.setTextColor(Color.RED);
 				outgoing_call.setText("Media Not Supported");
 				outgoing_call.setTextSize(20);
 				isRejectOrError = true;
-				finishHandler();
+				finishHandler((long) 2500);
 			} else if (Actions.USER_NOT_FOUND.equals(action)) {
 				outgoing_call.setTextColor(Color.RED);
 				outgoing_call.setText("User Not Found");
 				outgoing_call.setTextSize(20);
 				isRejectOrError = true;
-				finishHandler();
+				finishHandler((long) 2500);
 			} else if (Actions.CALL_RINGING.equals(action)) {
 				// Play sound
 				Log.d(LOG_TAG, "Ringing ... start AudioMedia Player");
@@ -373,14 +377,14 @@ public class MediaControlOutgoing extends Activity {
 		super.onDestroy();
 	}
 
-	private void finishHandler() {
+	private void finishHandler(long time) {
 		if (mPlayer != null)
 			mPlayer.stop();
 		mHandler.postDelayed(new Runnable() {
 			public void run() {
 				finish();
 			}
-		}, 2500);
+		}, time);
 	}
 
 }

@@ -385,6 +385,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 
 			Intent iOutgoingClose = new Intent();
 			iOutgoingClose.setAction(Actions.CALL_ERROR);
+			iOutgoingClose.putExtra("message", event.getMessage());
 			context.sendBroadcast(iOutgoingClose);
 
 			// Log.d(LOG, "Call Error");
@@ -442,21 +443,25 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			// incomingCall = pendingEndPointEvent.getCallSource();
 			// incomingCall.addListener(this);
 			try {
-				if (getIsCall()) {
-					Log.d(LOG, "Send reject because I've received an INVITE");
-					event.getCallSource().terminate(TerminateReason.BUSY);
-					// reject();
-				} else {
-					this.pendingEndPointEvent = event;
-					incomingCall = pendingEndPointEvent.getCallSource();
-					incomingCall.addListener(this);
-					setIsCall(true);
-					Log.d(LOG, "I've received an INVITE");
-					Log.d(LOG, "Me llama Uri: "
-							+ event.getCallSource().getRemoteUri());
-					if (callListener != null)
-						callListener.incomingCall(event.getCallSource()
-								.getRemoteUri());
+				synchronized (this) {
+					if (getIsCall()) {
+						Log.d(LOG,
+								"Send reject because I've received an INVITE");
+						event.getCallSource().terminate(TerminateReason.BUSY);
+						// reject();
+					} else {
+						setIsCall(true);
+						this.pendingEndPointEvent = event;
+						incomingCall = pendingEndPointEvent.getCallSource();
+						incomingCall.addListener(this);
+
+						Log.d(LOG, "I've received an INVITE");
+						Log.d(LOG, "Me llama Uri: "
+								+ event.getCallSource().getRemoteUri());
+						if (callListener != null)
+							callListener.incomingCall(event.getCallSource()
+									.getRemoteUri());
+					}
 				}
 			} catch (Exception e) {
 				Log.e(LOG, e.getMessage(), e);
