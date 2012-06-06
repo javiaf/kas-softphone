@@ -266,7 +266,6 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 	@Override
 	public void aceptCall() throws Exception {
 		if (incomingCall != null) {
-			setIsCall(true);
 			incomingCall.accept();
 		}
 	}
