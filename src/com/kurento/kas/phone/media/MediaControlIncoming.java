@@ -52,6 +52,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -302,6 +303,7 @@ public class MediaControlIncoming extends Activity implements
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 
 		final ImageButton buttonCall = (ImageButton) findViewById(R.id.button_call_accept);
+		final LayoutParams buttonCallParams = buttonCall.getLayoutParams();
 		buttonCall.setOnTouchListener(new OnTouchListener() {
 
 			@Override
@@ -359,6 +361,9 @@ public class MediaControlIncoming extends Activity implements
 					}
 				}
 					break;
+				case MotionEvent.ACTION_UP:
+					buttonCall.setLayoutParams(buttonCallParams);
+					break;
 				}
 				return true;
 
@@ -366,6 +371,7 @@ public class MediaControlIncoming extends Activity implements
 		});
 
 		final ImageButton buttonReject = (ImageButton) findViewById(R.id.button_call_reject);
+		final LayoutParams buttonRejectParams = buttonReject.getLayoutParams();
 		buttonReject.setOnTouchListener(new OnTouchListener() {
 
 			@Override
@@ -396,9 +402,11 @@ public class MediaControlIncoming extends Activity implements
 					}
 				}
 					break;
+				case MotionEvent.ACTION_UP:
+					buttonReject.setLayoutParams(buttonRejectParams);
+					break;
 				}
 				return true;
-
 			}
 		});
 
