@@ -85,8 +85,15 @@
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:layout_marginLeft="100dp"
-	    android:layout_marginTop="80dp"
+	    android:layout_marginTop="100dp"
 	    android:src="@drawable/microphone_icon" />
+	
+	<TextView
+        android:id="@+id/txt_bandwidth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:text="------" />
 
 </FrameLayout>
 
