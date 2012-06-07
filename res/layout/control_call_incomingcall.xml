@@ -23,13 +23,13 @@
 			android:layout_gravity="top|center_horizontal" />
 	</LinearLayout>
 	<ImageButton android:id="@+id/button_call_accept"
-	     android:layout_marginLeft="-80px"
+	     android:layout_marginLeft="-50sp"
 		android:layout_width="wrap_content" android:background="@drawable/ic_jog_dial_answer"
 		android:layout_height="wrap_content" android:layout_alignParentBottom="true"
 		android:layout_alignParentRight="true" android:layout_gravity="left|center_horizontal|bottom" />
 
 	<ImageButton android:id="@+id/button_call_reject" android:background="@drawable/ic_jog_dial_decline"
-	     android:layout_marginRight="-80px"
+	     android:layout_marginRight="-50sp"
 		android:layout_alignParentBottom="true"
 		android:layout_alignParentRight="true" android:layout_height="wrap_content"
 		android:layout_width="wrap_content" android:layout_gravity="right|center_horizontal|bottom" />
