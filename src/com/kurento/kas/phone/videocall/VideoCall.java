@@ -211,6 +211,11 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.getMessage());
 			}
+
+			audioRecorderComponent = (MediaComponentAndroid) ApplicationContext.contextTable
+					.get("audioRecorderComponent");
+			audioPlayerComponent = (MediaComponentAndroid) ApplicationContext.contextTable
+					.get("audioPlayerComponent");
 		} else
 			Log.e(LOG_TAG, "Controller is null");
 	}
