@@ -87,16 +87,18 @@ public class MediaControlIncoming extends Activity implements
 	private Boolean isAccepted = false;
 	private Boolean isRejected = false;
 
+	private ImageButton buttonReject, buttonCall;
+
 	private Dialog dialogWait;
 
-	WakeLock mWakeLock = null;
+	private WakeLock mWakeLock = null;
 
-	MediaPlayer mPlayer;
-	Ringtone ringIncoming;
+	private MediaPlayer mPlayer;
+	private Ringtone ringIncoming;
 
 	private ControlContacts controlcontacts = new ControlContacts(this);
-	Vibrator vibrator;
-	Controller controller = (Controller) ApplicationContext.contextTable
+	private Vibrator vibrator;
+	private Controller controller = (Controller) ApplicationContext.contextTable
 			.get("controller");
 
 	private IntentFilter intentFilter;
@@ -107,6 +109,11 @@ public class MediaControlIncoming extends Activity implements
 			String action = intent.getAction();
 			TextView incoming_call = (TextView) findViewById(R.id.incoming_call);
 			if (Actions.CALL_CANCEL.equals(action)) {
+				if (buttonCall != null)
+					buttonCall.setVisibility(View.INVISIBLE);
+				if (buttonReject != null)
+					buttonReject.setVisibility(View.INVISIBLE);
+
 				incoming_call.setTextColor(Color.RED);
 				incoming_call.setText("Call Canceled");
 				incoming_call.setTextSize(20);
@@ -307,8 +314,8 @@ public class MediaControlIncoming extends Activity implements
 		final DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 
-		final ImageButton buttonReject = (ImageButton) findViewById(R.id.button_call_reject);
-		final ImageButton buttonCall = (ImageButton) findViewById(R.id.button_call_accept);
+		buttonReject = (ImageButton) findViewById(R.id.button_call_reject);
+		buttonCall = (ImageButton) findViewById(R.id.button_call_accept);
 		final LayoutParams buttonCallParams = buttonCall.getLayoutParams();
 		buttonCall.setOnTouchListener(new OnTouchListener() {
 
@@ -379,7 +386,6 @@ public class MediaControlIncoming extends Activity implements
 
 			}
 		});
-
 
 		final LayoutParams buttonRejectParams = buttonReject.getLayoutParams();
 		buttonReject.setOnTouchListener(new OnTouchListener() {
