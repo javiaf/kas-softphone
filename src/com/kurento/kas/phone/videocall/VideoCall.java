@@ -690,6 +690,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	}
 
 	private void startGetMediaInfo() {
+		timer = new Timer();
 		timer.schedule(new TimerTask() {
 			public void run() {
 				mHandler.post(new Runnable() {
