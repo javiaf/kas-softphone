@@ -334,6 +334,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 				// currentCall.getMediaTypesModes());
 
 				NetworkConnection nc = currentCall.getNetworkConnection();
+				ApplicationContext.contextTable.put("nc", nc);
 				try {
 					ApplicationContext.contextTable.put("audioJoinable",
 							nc.getJoinableStream(StreamType.audio));
