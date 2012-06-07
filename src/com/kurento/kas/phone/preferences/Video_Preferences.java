@@ -82,7 +82,7 @@ public class Video_Preferences extends PreferenceActivity implements
 		EditTextPreference editTextMaxBw = new EditTextPreference(this);
 		editTextMaxBw.setDialogTitle("MAX_BW");
 		editTextMaxBw.setKey(Keys_Preferences.MEDIA_GENERAL_MAX_BW);
-		editTextMaxBw.setTitle("Max bandwidth");
+		editTextMaxBw.setTitle("Max bandwidth (kbits)");
 		editTextMaxBw.setSummary("Select max bandwidth");
 
 		generalCategory.addPreference(editTextMaxBw);
@@ -478,7 +478,8 @@ public class Video_Preferences extends PreferenceActivity implements
 		}
 		if (max_bandwidth == 0)
 			max_bandwidth = null;
-		params.put(MediaSessionAndroid.MAX_BANDWIDTH, max_bandwidth);
+		// MediaSessionAndroid hopes bits but the preferences gives kbits
+		params.put(MediaSessionAndroid.MAX_BANDWIDTH, max_bandwidth * 1000);
 
 		Integer max_delay = null;
 		try {
@@ -688,7 +689,8 @@ public class Video_Preferences extends PreferenceActivity implements
 			maxBandwidth = 0;
 		info = "Media preferences\n" + "Interfaz\n"
 				+ params.get(MediaSessionAndroid.NET_IF)
-				+ "\n\nMax BandWidth\n" + maxBandwidth + "\n\nVideo codec\n"
+				+ "\n\nMax BandWidth (kbits)\n" + maxBandwidth / 1000
+				+ "\n\nVideo codec\n"
 				+ params.get(MediaSessionAndroid.VIDEO_CODECS)
 				+ "\n\nAudio codec\n"
 				+ params.get(MediaSessionAndroid.AUDIO_CODECS)

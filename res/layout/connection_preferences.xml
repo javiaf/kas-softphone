@@ -36,7 +36,7 @@
 	        android:summary = "If it selected, it used the Keep Alive."
 		    android:key="MEDIA_NET_KEEP_ALIVE" />
 	    <EditTextPreference android:key="MEDIA_NET_KEEP_DELAY"
-			android:title="Keep delay (ms)" android:summary="Select keep delay"
+			android:title="Keep delay (seg)" android:summary="Select keep delay"
 			android:singleLine="true" />
 	    <ListPreference
            android:title="Transport"

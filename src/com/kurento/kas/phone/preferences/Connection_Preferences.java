@@ -136,7 +136,7 @@ public class Connection_Preferences extends PreferenceActivity implements
 					+ "Keep Alive\n"
 					+ (Boolean) params
 							.get(Keys_Preferences.MEDIA_NET_KEEP_ALIVE)
-					+ "\n\nKeep Delay\n"
+					+ "\n\nKeep Delay (seg)\n"
 					+ (Long) params.get(Keys_Preferences.MEDIA_NET_KEEP_DELAY)
 					+ "\n\nTransport\n"
 					+ (String) params.get(Keys_Preferences.MEDIA_NET_TRANSPORT);
@@ -175,7 +175,7 @@ public class Connection_Preferences extends PreferenceActivity implements
 				Keys_Preferences.MEDIA_NET_KEEP_ALIVE, false));
 		params.put(Keys_Preferences.MEDIA_NET_KEEP_DELAY, Long
 				.parseLong(settings.getString(
-						Keys_Preferences.MEDIA_NET_KEEP_DELAY, "10000")));
+						Keys_Preferences.MEDIA_NET_KEEP_DELAY, "10")));
 		params.put(Keys_Preferences.MEDIA_NET_TRANSPORT,
 				settings.getString(Keys_Preferences.MEDIA_NET_TRANSPORT, "UDP"));
 

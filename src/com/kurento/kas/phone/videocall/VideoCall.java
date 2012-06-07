@@ -230,7 +230,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			// return;
 			// }
 			// TODO: Review. Not do it when the button Camara has been pushed
-			txt_bandwidth.setText("A: ---- ; V: -----");
+			txt_bandwidth.setText("A: 250 ; V: 150");
 			try {
 				if (videoPlayerComponent != null) {
 					videoPlayerComponent.join(Direction.SEND, videoJoinable);
