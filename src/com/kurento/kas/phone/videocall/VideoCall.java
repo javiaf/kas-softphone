@@ -63,12 +63,12 @@ import com.kurento.commons.mscontrol.MsControlException;
 import com.kurento.commons.mscontrol.Parameters;
 import com.kurento.commons.mscontrol.join.Joinable;
 import com.kurento.commons.mscontrol.join.Joinable.Direction;
+import com.kurento.commons.mscontrol.join.JoinableStream.StreamType;
 import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
 import com.kurento.commons.mscontrol.networkconnection.SdpPortManagerException;
 import com.kurento.kas.mscontrol.MSControlFactory;
 import com.kurento.kas.mscontrol.MediaSessionAndroid;
 import com.kurento.kas.mscontrol.mediacomponent.AndroidAction;
-import com.kurento.kas.mscontrol.mediacomponent.AndroidInfo;
 import com.kurento.kas.mscontrol.mediacomponent.MediaComponentAndroid;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.preferences.Connection_Preferences;
@@ -690,26 +690,24 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				mHandler.post(new Runnable() {
 					@Override
 					public void run() {
-						if (videoRecorderComponent != null) {
-							try {
-								videoBW = (Integer) videoRecorderComponent
-										.getInfo(AndroidInfo.BIT_RATE);
-							} catch (MsControlException e) {
-								videoBW = 0;
-							}
-							infoBW = "V: " + videoBW;
+						if (nc != null) {
+							if (videoRecorderComponent != null) {
+								videoBW = (int) nc.getBitrate(StreamType.video,
+										Direction.RECV);
+								infoBW = "V: " + videoBW;
+							} else
+								infoBW = "No Video";
+
+							if (audioRecorderComponent != null) {
+								audioBW = (int) nc.getBitrate(StreamType.audio,
+										Direction.RECV);
+								infoBW = infoBW + " ---- A: " + audioBW;
+							} else
+								infoBW = infoBW + " ---- No Audio";
+
 						} else
-							infoBW = "No Video";
-						if (audioRecorderComponent != null) {
-							try {
-								audioBW = (Integer) audioRecorderComponent
-										.getInfo(AndroidInfo.BIT_RATE);
-							} catch (MsControlException e) {
-								audioBW = 0;
-							}
-							infoBW = infoBW + " ---- A: " + audioBW;
-						} else
-							infoBW = infoBW + " ---- No Audio";
+							infoBW = "No Video ---- No Audio";
+
 						txt_bandwidth.setText(infoBW);
 					}
 				});
