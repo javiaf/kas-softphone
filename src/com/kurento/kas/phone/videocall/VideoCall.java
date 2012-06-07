@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kurento.kas.phone.videocall;
 
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -26,6 +28,7 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -56,10 +59,10 @@ import com.kurento.commons.mscontrol.MsControlException;
 import com.kurento.commons.mscontrol.Parameters;
 import com.kurento.commons.mscontrol.join.Joinable;
 import com.kurento.commons.mscontrol.join.Joinable.Direction;
-import com.kurento.commons.mscontrol.mediacomponent.MediaComponent;
 import com.kurento.kas.mscontrol.MSControlFactory;
 import com.kurento.kas.mscontrol.MediaSessionAndroid;
 import com.kurento.kas.mscontrol.mediacomponent.AndroidAction;
+import com.kurento.kas.mscontrol.mediacomponent.AndroidInfo;
 import com.kurento.kas.mscontrol.mediacomponent.MediaComponentAndroid;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.preferences.Connection_Preferences;
@@ -77,16 +80,24 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private Map<MediaType, Mode> callDirectionMap, mediaTypesModes;
 	private int cameraFacing = 0;
 
-	MediaComponentAndroid videoPlayerComponent = null;
-	MediaComponent videoRecorderComponent = null;
+	private MediaComponentAndroid videoPlayerComponent = null;
+	private MediaComponentAndroid videoRecorderComponent = null;
+	private MediaComponentAndroid audioRecorderComponent = null;
+	private MediaComponentAndroid audioPlayerComponent = null;
+
+	private Integer audioBW, videoBW;
+	private Timer timer;
+	private String infoBW;
+
 	private Boolean isOccult = true;
-	WakeLock mWakeLock = null;
+	private WakeLock mWakeLock = null;
 
-	TextView txt_bandwidth;
+	private TextView txt_bandwidth;
+	private Handler mHandler;
 
-	View videoCaptureSurface;
+	private View videoCaptureSurface;
 
-	Boolean isStarted = true;
+	private Boolean isStarted = true;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -129,9 +140,12 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			setContentView(R.layout.onlycall);
 		}
 
-
 		hang = false;
-		Log.d(LOG_TAG, "OnCreate " + hang);
+
+		audioBW = 0;
+		videoBW = 0;
+		mHandler = new Handler();
+		timer = new Timer();
 
 		Controller controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
@@ -219,6 +233,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		super.onResume();
 		Log.d(LOG_TAG, "HANG = " + hang);
 		if (!hang) {
+			startGetMediaInfo();
 			// NetworkConnection nc = (NetworkConnection)
 			// ApplicationContext.contextTable
 			// .get("networkConnection");
@@ -230,7 +245,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			// return;
 			// }
 			// TODO: Review. Not do it when the button Camara has been pushed
-			txt_bandwidth.setText("A: 250 ; V: 150");
+
 			try {
 				if (videoPlayerComponent != null) {
 					videoPlayerComponent.join(Direction.SEND, videoJoinable);
@@ -263,7 +278,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 				@Override
 				public void onClick(View v) {
-					MediaComponentAndroid audioPlayerComponent = (MediaComponentAndroid) ApplicationContext.contextTable
+					audioPlayerComponent = (MediaComponentAndroid) ApplicationContext.contextTable
 							.get("audioPlayerComponent");
 
 					try {
@@ -413,7 +428,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 					MediaSessionAndroid mediaSession = controller
 							.getMediaSession();
-					MediaComponentAndroid audioRecorderComponent = (MediaComponentAndroid) ApplicationContext.contextTable
+					audioRecorderComponent = (MediaComponentAndroid) ApplicationContext.contextTable
 							.get("audioRecorderComponent");
 					try {
 						if (audioRecorderComponent != null) {
@@ -580,6 +595,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			videoRecorderComponent.stop();
 		if (videoPlayerComponent != null)
 			videoPlayerComponent.stop();
+		if (timer != null)
+			timer.cancel();
 		super.onPause();
 	}
 
@@ -654,6 +671,39 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	public void update(Message message) {
 		Log.d(LOG_TAG, "Message = " + message);
 		finish();
+	}
+
+	private void startGetMediaInfo() {
+		timer.schedule(new TimerTask() {
+			public void run() {
+				mHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						if (videoRecorderComponent != null) {
+							try {
+								videoBW = (Integer) videoRecorderComponent
+										.getInfo(AndroidInfo.BIT_RATE);
+							} catch (MsControlException e) {
+								videoBW = 0;
+							}
+							infoBW = "V: " + videoBW;
+						} else
+							infoBW = "No Video";
+						if (audioRecorderComponent != null) {
+							try {
+								audioBW = (Integer) audioRecorderComponent
+										.getInfo(AndroidInfo.BIT_RATE);
+							} catch (MsControlException e) {
+								audioBW = 0;
+							}
+							infoBW = infoBW + " ---- A: " + audioBW;
+						} else
+							infoBW = infoBW + " ---- No Audio";
+						txt_bandwidth.setText(infoBW);
+					}
+				});
+			}
+		}, 0, 1000);
 	}
 
 }
