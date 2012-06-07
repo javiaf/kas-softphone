@@ -11,6 +11,7 @@ import android.util.Log;
 import com.kurento.commons.mscontrol.MsControlException;
 import com.kurento.commons.mscontrol.Parameters;
 import com.kurento.commons.mscontrol.join.JoinableStream.StreamType;
+import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
 import com.kurento.commons.sip.agent.NetworkListener;
 import com.kurento.commons.sip.agent.UaFactory;
 import com.kurento.commons.sip.agent.UaImpl;
@@ -332,10 +333,19 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 				// ApplicationContext.contextTable.put("callDirection",
 				// currentCall.getMediaTypesModes());
 
-				ApplicationContext.contextTable.put("audioJoinable",
-						currentCall.getJoinable(StreamType.audio));
-				ApplicationContext.contextTable.put("videoJoinable",
-						currentCall.getJoinable(StreamType.video));
+				NetworkConnection nc = currentCall.getNetworkConnection();
+				try {
+					ApplicationContext.contextTable.put("audioJoinable",
+							nc.getJoinableStream(StreamType.audio));
+				} catch (MsControlException e) {
+					// TODO: handle exception
+				}
+				try {
+					ApplicationContext.contextTable.put("videoJoinable",
+							nc.getJoinableStream(StreamType.video));
+				} catch (MsControlException e) {
+					// TODO: handle exception
+				}
 				ApplicationContext.contextTable.put("mediaTypesModes",
 						currentCall.getMediaTypesModes());
 
