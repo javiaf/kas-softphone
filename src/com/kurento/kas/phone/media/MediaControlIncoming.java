@@ -285,7 +285,12 @@ public class MediaControlIncoming extends Activity implements
 				e.printStackTrace();
 			}
 		}
-		finish();
+		TextView incoming_call = (TextView) findViewById(R.id.incoming_call);
+
+		incoming_call.setTextColor(Color.RED);
+		incoming_call.setText("Call Finish");
+		incoming_call.setTextSize(20);
+		finishHandler();
 	}
 
 	@Override
@@ -302,6 +307,7 @@ public class MediaControlIncoming extends Activity implements
 		final DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 
+		final ImageButton buttonReject = (ImageButton) findViewById(R.id.button_call_reject);
 		final ImageButton buttonCall = (ImageButton) findViewById(R.id.button_call_accept);
 		final LayoutParams buttonCallParams = buttonCall.getLayoutParams();
 		buttonCall.setOnTouchListener(new OnTouchListener() {
@@ -329,6 +335,10 @@ public class MediaControlIncoming extends Activity implements
 							if (controller != null) {
 								try {
 									controller.aceptCall();
+
+									buttonCall.setVisibility(View.INVISIBLE);
+									buttonReject.setVisibility(View.INVISIBLE);
+
 									dialogWait = ProgressDialog.show(
 											MediaControlIncoming.this, "",
 											"Establishing call ...", true,
@@ -370,7 +380,7 @@ public class MediaControlIncoming extends Activity implements
 			}
 		});
 
-		final ImageButton buttonReject = (ImageButton) findViewById(R.id.button_call_reject);
+
 		final LayoutParams buttonRejectParams = buttonReject.getLayoutParams();
 		buttonReject.setOnTouchListener(new OnTouchListener() {
 
@@ -398,6 +408,9 @@ public class MediaControlIncoming extends Activity implements
 							// if (mPlayer != null)
 							// mPlayer.stop();
 							reject();
+
+							buttonCall.setVisibility(View.INVISIBLE);
+							buttonReject.setVisibility(View.INVISIBLE);
 						}
 					}
 				}

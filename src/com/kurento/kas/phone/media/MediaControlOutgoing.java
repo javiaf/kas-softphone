@@ -331,6 +331,7 @@ public class MediaControlOutgoing extends Activity {
 
 						} else if ((x > dm.widthPixels / 2) && (!isCanceled)) {
 							cancel();
+							buttonReject.setVisibility(View.INVISIBLE);
 							isCanceled = true;
 						}
 					}
