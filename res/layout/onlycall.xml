@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/video_frame" android:layout_height="fill_parent"
-	android:layout_width="fill_parent">
+    android:id="@+id/video_frame"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
 
-
-	<TableLayout
+    <TableLayout
         android:id="@+id/tableLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
             </LinearLayout>
 
             <LinearLayout
-                 android:id="@+id/LinearLayout1"
+                android:id="@+id/LinearLayout1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" >
@@ -73,22 +73,28 @@
         </TableRow>
     </TableLayout>
 
-	<TextView
-	    android:id="@+id/info_not_video"
-	    android:layout_width="306dp"
-	    android:layout_height="wrap_content"
-	    android:text="Video Not Negociated"
-	    android:textAppearance="?android:attr/textAppearanceLarge" />
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
 
-	<ImageView
-	    android:id="@+id/imageView1"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_marginLeft="100dp"
-	    android:layout_marginTop="100dp"
-	    android:src="@drawable/microphone_icon" />
-	
-	<TextView
+        <TextView
+            android:id="@+id/info_not_video"
+            android:layout_width="306dp"
+            android:layout_height="wrap_content"
+            android:text="Video Not Negociated"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_below="@id/info_not_video"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dip"
+            android:layout_marginLeft="100dip"
+            android:src="@drawable/microphone_icon" />
+    </RelativeLayout>
+
+    <TextView
         android:id="@+id/txt_bandwidth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -96,4 +102,3 @@
         android:text="------" />
 
 </FrameLayout>
-
