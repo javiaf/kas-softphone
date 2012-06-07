@@ -53,12 +53,18 @@ import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.kurento.commons.media.format.MediaSpec;
+import com.kurento.commons.media.format.Payload;
+import com.kurento.commons.media.format.SessionSpec;
 import com.kurento.commons.media.format.enums.MediaType;
 import com.kurento.commons.media.format.enums.Mode;
+import com.kurento.commons.media.format.payload.PayloadRtp;
 import com.kurento.commons.mscontrol.MsControlException;
 import com.kurento.commons.mscontrol.Parameters;
 import com.kurento.commons.mscontrol.join.Joinable;
 import com.kurento.commons.mscontrol.join.Joinable.Direction;
+import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
+import com.kurento.commons.mscontrol.networkconnection.SdpPortManagerException;
 import com.kurento.kas.mscontrol.MSControlFactory;
 import com.kurento.kas.mscontrol.MediaSessionAndroid;
 import com.kurento.kas.mscontrol.mediacomponent.AndroidAction;
@@ -84,6 +90,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private MediaComponentAndroid videoRecorderComponent = null;
 	private MediaComponentAndroid audioRecorderComponent = null;
 	private MediaComponentAndroid audioPlayerComponent = null;
+
+	private NetworkConnection nc;
 
 	private Integer audioBW, videoBW;
 	private Timer timer;
@@ -151,6 +159,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				.get("controller");
 
 		if (controller != null) {
+			nc = (NetworkConnection) ApplicationContext.contextTable.get("nc");
+
 			MediaSessionAndroid mediaSession = controller.getMediaSession();
 
 			DisplayMetrics dm = new DisplayMetrics();
@@ -648,7 +658,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			dialog.setContentView(R.layout.info_video);
 
 			((TextView) dialog.findViewById(R.id.info_video))
-					.setText(info_video);
+					.setText("MEDIA NEGOCIATE\n" + getInfoSdp()
+							+ "\n\n-------\nMEDIA CONFIGURATE\n " + info_video);
 
 			dialog.show();
 
@@ -706,4 +717,37 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		}, 0, 1000);
 	}
 
+	private String getInfoSdp() {
+		String info = "NC hasn't Info";
+		if (nc != null) {
+			SessionSpec sessionSpec;
+			try {
+				sessionSpec = nc.getSdpPortManager()
+						.getMediaServerSessionDescription();
+				info = "";
+				for (MediaSpec media : sessionSpec.getMediaSpecs()) {
+					if (media.getTypes().contains(MediaType.AUDIO))
+						info += "\nAudio: \n";
+					else if (media.getTypes().contains(MediaType.VIDEO))
+						info += "\nVideo: \n";
+
+					for (Payload payload : media.getPayloads()) {
+						try {
+							PayloadRtp infoRtp = payload.getRtp();
+							info += infoRtp.toString() + "\n";
+						} catch (Exception e) {
+							continue;
+						}
+					}
+				}
+			} catch (SdpPortManagerException e1) {
+				return "NC hasn't Info";
+			} catch (MsControlException e1) {
+				return "NC hasn't Info";
+			}
+			return info;
+		}
+		return "NC hasn't Info";
+
+	}
 }
