@@ -698,14 +698,14 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 						if (nc != null) {
 							if (videoRecorderComponent != null) {
 								videoBW = (int) nc.getBitrate(StreamType.video,
-										Direction.RECV);
+										Direction.RECV) / 1000;
 								infoBW = "V: " + videoBW;
 							} else
 								infoBW = "No Video";
 
 							if (audioRecorderComponent != null) {
 								audioBW = (int) nc.getBitrate(StreamType.audio,
-										Direction.RECV);
+										Direction.RECV) / 1000;
 								infoBW = infoBW + " ---- A: " + audioBW;
 							} else
 								infoBW = infoBW + " ---- No Audio";
