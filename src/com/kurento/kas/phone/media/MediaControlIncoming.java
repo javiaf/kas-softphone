@@ -94,7 +94,7 @@ public class MediaControlIncoming extends Activity implements
 	private WakeLock mWakeLock = null;
 
 	private MediaPlayer mPlayer;
-	private Ringtone ringIncoming;
+	private Ringtone ringIncoming = null;
 
 	private ControlContacts controlcontacts = new ControlContacts(this);
 	private Vibrator vibrator;
@@ -213,15 +213,13 @@ public class MediaControlIncoming extends Activity implements
 		}
 
 		vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-		// mPlayer = MediaPlayer.create(this, R.raw.tone_call);
 
 		Uri notification = RingtoneManager
 				.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-		ringIncoming = RingtoneManager.getRingtone(getApplicationContext(),
-				notification);
-
-		if (ringIncoming != null)
-			ringIncoming.play();
+		// ringIncoming = RingtoneManager.getRingtone(getApplicationContext(),
+		// notification);
+		mPlayer = MediaPlayer.create(this, notification);
+		
 
 		long[] pattern = { 0, 1000, 2000, 3000 };
 
@@ -308,8 +306,10 @@ public class MediaControlIncoming extends Activity implements
 		isAccepted = false;
 		isRejected = false;
 
-		// mPlayer.setLooping(true);
-		// mPlayer.start();
+		if (mPlayer != null) {
+			mPlayer.setLooping(true);
+			mPlayer.start();
+		}
 
 		final DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -337,8 +337,8 @@ public class MediaControlIncoming extends Activity implements
 							vibrator.cancel();
 							if (ringIncoming != null)
 								ringIncoming.stop();
-							// if (mPlayer != null)
-							// mPlayer.stop();
+							if (mPlayer != null)
+								mPlayer.stop();
 							if (controller != null) {
 								try {
 									controller.aceptCall();
@@ -411,8 +411,8 @@ public class MediaControlIncoming extends Activity implements
 							isRejected = true;
 							if (ringIncoming != null)
 								ringIncoming.stop();
-							// if (mPlayer != null)
-							// mPlayer.stop();
+							if (mPlayer != null)
+								mPlayer.stop();
 							reject();
 
 							buttonCall.setVisibility(View.INVISIBLE);
@@ -459,8 +459,8 @@ public class MediaControlIncoming extends Activity implements
 		if (ringIncoming != null)
 			ringIncoming.stop();
 
-		// if (mPlayer != null)
-		// mPlayer.stop();
+		if (mPlayer != null)
+			mPlayer.stop();
 
 		mNotificationMgr.cancel(NOTIF_CALLING_IN);
 		mNotif = new Notification(R.drawable.icon, notificationTitleSoft,
@@ -527,8 +527,8 @@ public class MediaControlIncoming extends Activity implements
 		if (ringIncoming != null)
 			ringIncoming.stop();
 
-		// if (mPlayer != null)
-		// mPlayer.stop();
+		if (mPlayer != null)
+			mPlayer.stop();
 		if (vibrator != null)
 			vibrator.cancel();
 		mHandler.postDelayed(new Runnable() {
