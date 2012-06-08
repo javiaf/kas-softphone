@@ -25,6 +25,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -69,6 +70,7 @@ import com.kurento.commons.mscontrol.networkconnection.SdpPortManagerException;
 import com.kurento.kas.mscontrol.MSControlFactory;
 import com.kurento.kas.mscontrol.MediaSessionAndroid;
 import com.kurento.kas.mscontrol.mediacomponent.AndroidAction;
+import com.kurento.kas.mscontrol.mediacomponent.AndroidInfo;
 import com.kurento.kas.mscontrol.mediacomponent.MediaComponentAndroid;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.preferences.Connection_Preferences;
@@ -95,7 +97,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 	private Integer audioBW, videoBW;
 	private Timer timer;
-	private String infoBW;
+	private String infoInputBW, infoOutputBW;
 
 	private Boolean isOccult = true;
 	private WakeLock mWakeLock = null;
@@ -169,6 +171,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 					.getOrientation();
 			try {
 				txt_bandwidth = (TextView) findViewById(R.id.txt_bandwidth);
+				txt_bandwidth.setTextColor(Color.RED);
 
 				if ((videoMode != null)
 						&& (Mode.SENDONLY.equals(videoMode) || Mode.SENDRECV
@@ -697,24 +700,63 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 					@Override
 					public void run() {
 						if (nc != null) {
+							// Get input info
 							if (videoRecorderComponent != null) {
 								videoBW = (int) nc.getBitrate(StreamType.video,
 										Direction.RECV) / 1000;
-								infoBW = "V: " + videoBW;
+								try {
+									infoInputBW = "V: "
+											+ videoBW
+											+ " kbps / "
+											+ videoRecorderComponent
+													.getInfo(AndroidInfo.RECORDER_QUEUE);
+								} catch (MsControlException e) {
+									infoInputBW = "No Video";
+								}
 							} else
-								infoBW = "No Video";
+								infoInputBW = "No Video";
 
 							if (audioRecorderComponent != null) {
 								audioBW = (int) nc.getBitrate(StreamType.audio,
 										Direction.RECV) / 1000;
-								infoBW = infoBW + " ---- A: " + audioBW;
+								try {
+									infoInputBW = infoInputBW
+											+ " ---- A: "
+											+ audioBW
+											+ " kbps / "
+											+ audioRecorderComponent
+													.getInfo(AndroidInfo.RECORDER_QUEUE);
+								} catch (MsControlException e) {
+									infoInputBW = infoInputBW
+											+ " ---- No Audio";
+								}
 							} else
-								infoBW = infoBW + " ---- No Audio";
+								infoInputBW = infoInputBW + " ---- No Audio";
 
-						} else
-							infoBW = "No Video ---- No Audio";
+							// Get output info
+							if (videoPlayerComponent != null) {
+								videoBW = (int) nc.getBitrate(StreamType.video,
+										Direction.SEND) / 1000;
+								infoOutputBW = "V: " + videoBW + " kbps";
+							} else
+								infoOutputBW = "No Video";
 
-						txt_bandwidth.setText(infoBW);
+							if (audioPlayerComponent != null) {
+								audioBW = (int) nc.getBitrate(StreamType.audio,
+										Direction.SEND) / 1000;
+								infoOutputBW = infoOutputBW + " ---- A: "
+										+ audioBW + " kbps";
+							} else
+								infoOutputBW = infoOutputBW + " ---- No Audio";
+
+						} else {
+							infoInputBW = "No Video ---- No Audio";
+							infoOutputBW = "No Video ---- No Audio";
+						}
+
+
+						txt_bandwidth.setText("I: " + infoInputBW + "\nO: "
+								+ infoOutputBW);
 					}
 				});
 			}
