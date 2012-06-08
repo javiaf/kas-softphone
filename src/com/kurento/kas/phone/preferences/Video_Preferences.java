@@ -82,7 +82,7 @@ public class Video_Preferences extends PreferenceActivity implements
 		EditTextPreference editTextMaxBw = new EditTextPreference(this);
 		editTextMaxBw.setDialogTitle("MAX_BW");
 		editTextMaxBw.setKey(Keys_Preferences.MEDIA_GENERAL_MAX_BW);
-		editTextMaxBw.setTitle("Max bandwidth (kbits)");
+		editTextMaxBw.setTitle("Max bandwidth (kbps)");
 		editTextMaxBw.setSummary("Select max bandwidth");
 
 		generalCategory.addPreference(editTextMaxBw);
