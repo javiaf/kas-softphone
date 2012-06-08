@@ -478,7 +478,7 @@ public class Video_Preferences extends PreferenceActivity implements
 		}
 		if (max_bandwidth == 0)
 			max_bandwidth = null;
-		// MediaSessionAndroid hopes bits but the preferences gives kbits
+		// MediaSessionAndroid hopes bits but the preferences gives kbps
 		params.put(MediaSessionAndroid.MAX_BANDWIDTH, max_bandwidth * 1000);
 
 		Integer max_delay = null;
@@ -689,7 +689,7 @@ public class Video_Preferences extends PreferenceActivity implements
 			maxBandwidth = 0;
 		info = "Media preferences\n" + "Interfaz\n"
 				+ params.get(MediaSessionAndroid.NET_IF)
-				+ "\n\nMax BandWidth (kbits)\n" + maxBandwidth / 1000
+				+ "\n\nMax BandWidth (kbps)\n" + maxBandwidth / 1000
 				+ "\n\nVideo codec\n"
 				+ params.get(MediaSessionAndroid.VIDEO_CODECS)
 				+ "\n\nAudio codec\n"
