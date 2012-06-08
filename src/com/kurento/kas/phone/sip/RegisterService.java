@@ -27,7 +27,6 @@ public class RegisterService extends Service {
 
 		if (b != null) {
 			Integer uuid = b.getInt("uuid");
-			Log.d(LOG_TAG, "UUID: Service " + uuid);
 			try {
 				AlarmUaTimer.getTaskTable().get(uuid).run();
 			} catch (Exception e) {

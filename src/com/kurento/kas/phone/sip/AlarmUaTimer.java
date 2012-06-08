@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
 
 import com.kurento.commons.ua.timer.KurentoUaTimer;
 import com.kurento.commons.ua.timer.KurentoUaTimerTask;
@@ -40,8 +39,6 @@ public class AlarmUaTimer implements KurentoUaTimer {
 
 	@Override
 	public void cancel(KurentoUaTimerTask task) {
-		// TODO Search task into table and stop pendingIntent
-		Log.d(LOG, "Cancel " + task);
 		Integer uuid = -1;
 		for (Iterator<Integer> i = taskTable.keySet().iterator(); i.hasNext();) {
 			Integer key = (Integer) i.next();
@@ -49,11 +46,9 @@ public class AlarmUaTimer implements KurentoUaTimer {
 				uuid = key;
 			}
 		}
-		Log.d(LOG, "Cancel " + uuid);
 		pendingIntent = PendingIntent.getService(this.context, uuid,
 				serviceIntent, 0);
 		alarmManager.cancel(pendingIntent);
-		// // If remove this task, always other alarm is created
 		taskTable.remove(uuid);
 	}
 
@@ -72,16 +67,11 @@ public class AlarmUaTimer implements KurentoUaTimer {
 	@Override
 	public void schedule(final KurentoUaTimerTask task, long delay, long period) {
 		Integer uuid;
-		Log.d(LOG,
-				"Task: " + task + " ; taskTable.contains "
-						+ taskTable.containsValue(task));
 		if (!taskTable.containsValue(task)) {
 			// The new Random().nextInt is necessary because we need that
 			// pendingIntent will be differents.
 			uuid = new Random().nextInt();
 			taskTable.put(uuid, task);
-			Log.d(LOG, "UUID: " + uuid + "; Task: " + task + "; delay:" + delay
-					+ " period:" + period);
 
 			Bundle extras = new Bundle();
 			extras.putInt("uuid", uuid);
