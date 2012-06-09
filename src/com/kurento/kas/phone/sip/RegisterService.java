@@ -23,14 +23,16 @@ public class RegisterService extends Service {
 
 	@Override
 	public void onStart(Intent intent, int startId) {
-		Bundle b = intent.getExtras();
+		if (intent != null) {
+			Bundle b = intent.getExtras();
 
-		if (b != null) {
-			Integer uuid = b.getInt("uuid");
-			try {
-				AlarmUaTimer.getTaskTable().get(uuid).run();
-			} catch (Exception e) {
-				// Do nothing
+			if (b != null) {
+				Integer uuid = b.getInt("uuid");
+				try {
+					AlarmUaTimer.getTaskTable().get(uuid).run();
+				} catch (Exception e) {
+					// Do nothing
+				}
 			}
 		}
 	}
