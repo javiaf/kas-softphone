@@ -476,10 +476,12 @@ public class Video_Preferences extends PreferenceActivity implements
 		} catch (NumberFormatException e) {
 			max_bandwidth = null;
 		}
-		if (max_bandwidth == 0)
+		if (max_bandwidth == null || max_bandwidth == 0) {
 			max_bandwidth = null;
-		// MediaSessionAndroid hopes bits but the preferences gives kbps
-		params.put(MediaSessionAndroid.MAX_BANDWIDTH, max_bandwidth * 1000);
+			// MediaSessionAndroid hopes bits but the preferences gives kbps
+			params.put(MediaSessionAndroid.MAX_BANDWIDTH, null);
+		} else
+			params.put(MediaSessionAndroid.MAX_BANDWIDTH, max_bandwidth * 1000);
 
 		Integer max_delay = null;
 		try {
