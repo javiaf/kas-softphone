@@ -314,9 +314,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 				try {
 					stopService(intentService);
 				} catch (Exception e) {
-					Log.e(LOG_TAG,
-							"stopService " + e.getMessage() + "; "
-									+ e.toString());
+					Log.e(LOG_TAG, "Exception: " + e.getMessage(), e);
 				}
 
 				SQLiteDatabase db = (SQLiteDatabase) ApplicationContext.contextTable
@@ -372,7 +370,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 			try {
 				openContacts();
 			} catch (Exception e) {
-				Log.e(LOG_TAG, e.getMessage(), e);
+				Log.e(LOG_TAG, "Exception: " + e.getMessage(), e);
 			}
 			break;
 		case R.id.call:
@@ -414,7 +412,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 							Toast.makeText(this, "Another call in progress",
 									Toast.LENGTH_SHORT).show();
 						} catch (Exception e) {
-							Log.e(LOG_TAG, e.getMessage(), e);
+							Log.e(LOG_TAG, "Exception: " + e.getMessage(), e);
 						}
 					}
 				}
@@ -594,7 +592,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 				mediaIntent.putExtra("Uri", remoteURI);
 				startActivityForResult(mediaIntent, MEDIA_CONTROL_OUTGOING);
 			} catch (Exception e) {
-				Log.e(LOG_TAG, e.getMessage(), e);
+				Log.e(LOG_TAG, "Exception: " + e.getMessage(), e);
 			}
 		} else
 			Toast.makeText(this, "You must be register", Toast.LENGTH_SHORT)

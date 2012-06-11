@@ -145,10 +145,10 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 
 			UaFactory.setMediaSession(mediaSession);
 		} catch (MsControlException e) {
-			Log.e(LOG, e.getMessage(), e);
+			Log.e(LOG, "MsControlException: " + e.getMessage(), e);
 			return;
 		} catch (Exception ex) {
-			Log.e(LOG, ex.getMessage(), ex);
+			Log.e(LOG, "Exception: " + ex.getMessage(), ex);
 			return;
 		}
 
@@ -173,7 +173,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			// EndPointFactory.getInstance(username, domain, password,
 			// expires, ua, this);
 		} catch (Exception e) {
-			Log.e(LOG, e.getMessage(), e);
+			Log.e(LOG, "Exception: " + e.getMessage(), e);
 			return;
 		}
 		setIsCall(false);
@@ -207,8 +207,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			context.sendBroadcast(i);
 			finishUA();
 		} catch (Exception e) {
-			Log.e(LOG, e.getMessage(), e);
-			e.printStackTrace();
+			Log.e(LOG, "Exception: " + e.getMessage(), e);
 		}
 		reconfigureController();
 		networkChanged();
@@ -221,7 +220,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 							.getMediaPreferences(context));
 			UaFactory.setMediaSession(mediaSession);
 		} catch (MsControlException e) {
-			Log.e(LOG, e.getMessage(), e);
+			Log.e(LOG, "MsControlException: " + e.getMessage(), e);
 		}
 	}
 
@@ -301,7 +300,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 				if (callListener != null)
 					callListener.callTerminate();
 			} catch (ServerInternalErrorException e) {
-				Log.e(LOG, e.getMessage(), e);
+				Log.e(LOG, "ServerInternalErrorException: " + e.getMessage(), e);
 			}
 	}
 
@@ -313,7 +312,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			try {
 				currentCall.terminate();
 			} catch (ServerInternalErrorException e) {
-				Log.e(LOG, e.getMessage(), e);
+				Log.e(LOG, "ServerInternalErrorException: " + e.getMessage(), e);
 			}
 	}
 
@@ -477,7 +476,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 					}
 				}
 			} catch (Exception e) {
-				Log.e(LOG, e.getMessage(), e);
+				Log.e(LOG, "Exception: " + e.getMessage(), e);
 			}
 		} else if (event.getEventType().equals(
 				EndPointEvent.UNREGISTER_USER_SUCESSFUL)) {

@@ -13,7 +13,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package com.kurento.kas.phone.controlcontacts;
 
 import android.content.Context;
@@ -31,7 +31,6 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Shader.TileMode;
 import android.provider.ContactsContract;
 import android.util.Log;
-
 
 public class ControlContacts {
 	private static final String LOG_TAG = ControlContacts.class.getName();
@@ -214,7 +213,7 @@ public class ControlContacts {
 		Bitmap bm = null;
 		int contact_id = -1;
 		int photo_id = -1;
-		if (id != -1){
+		if (id != -1) {
 			contact_id = id;
 
 			Cursor pidcursor = c.getContentResolver().query(
@@ -240,8 +239,8 @@ public class ControlContacts {
 			if (photo != null) {
 				bm = BitmapFactory.decodeByteArray(photo, 0, photo.length);
 			}
-		}
-		else Log.d(LOG_TAG, "Id is null, not contatc");
+		} else
+			Log.d(LOG_TAG, "Id is null, not contatc");
 		return bm;
 	}
 
@@ -260,10 +259,10 @@ public class ControlContacts {
 
 		String id = null;
 		String name = null;
-//		String number = null;
+		// String number = null;
 		String note = null;
 		String sip = null;
-//		String imType = "";
+		// String imType = "";
 		if (cursor.moveToFirst()) {
 			int nameIdx = cursor
 					.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME);
@@ -273,11 +272,10 @@ public class ControlContacts {
 			id = cursor.getString(idIdx);
 			name = cursor.getString(nameIdx);
 
-			Log.e(LOG_TAG, "Value de nameIdx:" + nameIdx + " ID User: " + id);
-
 			// Leer las notas del usuario si tine
 
-//			String[] columns = new String[] { ContactsContract.CommonDataKinds.Note.NOTE };
+			// String[] columns = new String[] {
+			// ContactsContract.CommonDataKinds.Note.NOTE };
 			String where = ContactsContract.Data.RAW_CONTACT_ID + " = ? AND "
 					+ ContactsContract.Data.MIMETYPE + " = ?";
 			String[] whereParameters = new String[] { id,
@@ -287,14 +285,10 @@ public class ControlContacts {
 					ContactsContract.Data.CONTENT_URI, null, where,
 					whereParameters, null);
 
-			Log.e(LOG_TAG, "Valor de contacts:" + contacts.getCount());
-			;
-//			String rv = null;
+			// String rv = null;
 			if (contacts.moveToFirst()) {
-				Log.e(LOG_TAG,
-						"Valor de las colunas:" + contacts.getColumnCount());
 				for (int i = 0; i < contacts.getColumnCount(); i++)
-					Log.e(LOG_TAG, "Name:" + contacts.getColumnName(i)
+					Log.d(LOG_TAG, "Name:" + contacts.getColumnName(i)
 							+ "; ValueIm = " + contacts.getString(i));
 
 				note = contacts.getString(contacts
@@ -304,7 +298,8 @@ public class ControlContacts {
 
 			// Leer las IM del usuario si tine
 
-//			String[] columnsIm = new String[] { ContactsContract.CommonDataKinds.Im.PROTOCOL };
+			// String[] columnsIm = new String[] {
+			// ContactsContract.CommonDataKinds.Im.PROTOCOL };
 
 			String whereIm = ContactsContract.Data.RAW_CONTACT_ID + " = ? AND "
 					+ ContactsContract.Data.MIMETYPE + " = ?";
@@ -314,14 +309,11 @@ public class ControlContacts {
 			Cursor contactsIm = c.getContentResolver().query(
 					ContactsContract.Data.CONTENT_URI, null, whereIm,
 					whereParametersIm, null);
-			Log.e(LOG_TAG, "Valor de contacts:" + contactsIm.getCount());
-			;
+
 			String rvIm = null;
 			if (contactsIm.moveToFirst()) {
-				Log.e(LOG_TAG,
-						"Valor de las colunas:" + contactsIm.getColumnCount());
 				for (int i = 0; i < contactsIm.getColumnCount(); i++)
-					Log.e(LOG_TAG, "NameIm:" + contactsIm.getColumnName(i)
+					Log.d(LOG_TAG, "NameIm:" + contactsIm.getColumnName(i)
 							+ "; ValueIm = " + contactsIm.getString(i));
 				rvIm = " Protocolo: "
 						+ contactsIm
@@ -341,7 +333,7 @@ public class ControlContacts {
 			}
 			contactsIm.close();
 
-			Log.e(LOG_TAG, "Valor de nameIdx:" + nameIdx + " ID: " + id
+			Log.d(LOG_TAG, "Valor de nameIdx:" + nameIdx + " ID: " + id
 					+ " IM: " + rvIm);
 
 		}
@@ -352,56 +344,53 @@ public class ControlContacts {
 		} else
 			return null;
 	}
-	
-	public Bitmap getRefelection(Bitmap image)
-    {
-    	  //The gap we want between the reflection and the original image
-        final int reflectionGap = 4;
-       
-        //Get you bit map from drawable folder
-        Bitmap originalImage = image ;
-       
-     
-        int width = originalImage.getWidth();
-        int height = originalImage.getHeight();
-       
-     
-        //This will not scale but will flip on the Y axis
-        Matrix matrix = new Matrix();
-        matrix.preScale(1, -1);
-       
-        //Create a Bitmap with the flip matix applied to it.
-        //We only want the bottom half of the image
-        Bitmap reflectionImage = Bitmap.createBitmap(originalImage, 0, height/2, width, height/2, matrix, false);
-       
-           
-        //Create a new bitmap with same width but taller to fit reflection
-        Bitmap bitmapWithReflection = Bitmap.createBitmap(width
-          , (height + height/2), Config.ARGB_8888);
-     
-       //Create a new Canvas with the bitmap that's big enough for
-       //the image plus gap plus reflection
-       Canvas canvas = new Canvas(bitmapWithReflection);
-       //Draw in the original image
-       canvas.drawBitmap(originalImage, 0, 0, null);
-       //Draw in the gap
-       Paint deafaultPaint = new Paint();
-       canvas.drawRect(0, height, width, height + reflectionGap, deafaultPaint);
-       //Draw in the reflection
-       canvas.drawBitmap(reflectionImage,0, height + reflectionGap, null);
-     
-       //Create a shader that is a linear gradient that covers the reflection
-       Paint paint = new Paint();
-       LinearGradient shader = new LinearGradient(0, originalImage.getHeight(), 0,
-         bitmapWithReflection.getHeight() + reflectionGap, 0x70ffffff, 0x00ffffff,
-         TileMode.CLAMP);
-       //Set the paint to use this shader (linear gradient)
-       paint.setShader(shader);
-       //Set the Transfer mode to be porter duff and destination in
-       paint.setXfermode(new PorterDuffXfermode(Mode.DST_IN));
-       //Draw a rectangle using the paint with our linear gradient
-       canvas.drawRect(0, height, width,
-         bitmapWithReflection.getHeight() + reflectionGap, paint);
-       return bitmapWithReflection;
-    }
+
+	public Bitmap getRefelection(Bitmap image) {
+		// The gap we want between the reflection and the original image
+		final int reflectionGap = 4;
+
+		// Get you bit map from drawable folder
+		Bitmap originalImage = image;
+
+		int width = originalImage.getWidth();
+		int height = originalImage.getHeight();
+
+		// This will not scale but will flip on the Y axis
+		Matrix matrix = new Matrix();
+		matrix.preScale(1, -1);
+
+		// Create a Bitmap with the flip matix applied to it.
+		// We only want the bottom half of the image
+		Bitmap reflectionImage = Bitmap.createBitmap(originalImage, 0,
+				height / 2, width, height / 2, matrix, false);
+
+		// Create a new bitmap with same width but taller to fit reflection
+		Bitmap bitmapWithReflection = Bitmap.createBitmap(width,
+				(height + height / 2), Config.ARGB_8888);
+
+		// Create a new Canvas with the bitmap that's big enough for
+		// the image plus gap plus reflection
+		Canvas canvas = new Canvas(bitmapWithReflection);
+		// Draw in the original image
+		canvas.drawBitmap(originalImage, 0, 0, null);
+		// Draw in the gap
+		Paint deafaultPaint = new Paint();
+		canvas.drawRect(0, height, width, height + reflectionGap, deafaultPaint);
+		// Draw in the reflection
+		canvas.drawBitmap(reflectionImage, 0, height + reflectionGap, null);
+
+		// Create a shader that is a linear gradient that covers the reflection
+		Paint paint = new Paint();
+		LinearGradient shader = new LinearGradient(0,
+				originalImage.getHeight(), 0, bitmapWithReflection.getHeight()
+						+ reflectionGap, 0x70ffffff, 0x00ffffff, TileMode.CLAMP);
+		// Set the paint to use this shader (linear gradient)
+		paint.setShader(shader);
+		// Set the Transfer mode to be porter duff and destination in
+		paint.setXfermode(new PorterDuffXfermode(Mode.DST_IN));
+		// Draw a rectangle using the paint with our linear gradient
+		canvas.drawRect(0, height, width, bitmapWithReflection.getHeight()
+				+ reflectionGap, paint);
+		return bitmapWithReflection;
+	}
 }

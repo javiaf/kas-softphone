@@ -188,10 +188,9 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 							MediaComponentAndroid.VIDEO_PLAYER, params);
 				}
 			} catch (MsControlException e) {
-				Log.e(LOG_TAG, "MsControl + " + e.toString());
-				e.printStackTrace();
+				Log.e(LOG_TAG, "MsControlException: " + e.getMessage(), e);
 			} catch (Exception e) {
-				Log.e(LOG_TAG, "Exception " + e.toString());
+				Log.e(LOG_TAG, "Exception: " + e.getMessage(), e);
 			}
 
 			try {
@@ -209,10 +208,10 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 							MediaComponentAndroid.VIDEO_RECORDER, params);
 				}
 			} catch (MsControlException e) {
-				Log.e(LOG_TAG, e.getMessage());
+				Log.e(LOG_TAG, "MsControlException: " + e.getMessage(), e);
 				e.printStackTrace();
 			} catch (Exception e) {
-				Log.e(LOG_TAG, e.getMessage());
+				Log.e(LOG_TAG, "Exception: " + e.getMessage(), e);
 			}
 
 			audioRecorderComponent = (MediaComponentAndroid) ApplicationContext.contextTable
@@ -275,10 +274,10 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				}
 
 			} catch (MsControlException e) {
-				Log.e(LOG_TAG, e.getMessage());
+				Log.e(LOG_TAG, "MsControlException: " + e.getMessage(), e);
 				e.printStackTrace();
 			} catch (Exception e) {
-				Log.e(LOG_TAG, e.getMessage());
+				Log.e(LOG_TAG, "Exception: " + e.getMessage(), e);
 			}
 
 			final Button buttonTerminateCall = (Button) findViewById(R.id.button_terminate_call);
@@ -326,8 +325,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 							}
 						}
 					} catch (MsControlException e) {
-						Log.e(LOG_TAG, "Exception Mute. " + e.toString());
-						e.printStackTrace();
+						Log.e(LOG_TAG, "MsControlException: " + e.getMessage(),
+								e);
 					}
 				}
 			});
@@ -338,7 +337,6 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 					@Override
 					public void onClick(View v) {
-						// TODO Auto-generated method stub
 						Log.d(LOG_TAG, "Button Push");
 
 						// Log.d(LOG_TAG, "VideoPlayercomponent is Stop");
@@ -356,8 +354,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 							} catch (MsControlException e) {
 								// TODO Auto-generated catch block
 								Log.e(LOG_TAG,
-										"Exception unjoin " + e.toString());
-								e.printStackTrace();
+										"MsControlException: " + e.getMessage(),
+										e);
 							}
 							videoPlayerComponent = null;
 
@@ -406,11 +404,9 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 								Log.d(LOG_TAG,
 										"Create videoPlayercomponent start");
 							} catch (MsControlException e) {
-								// TODO Auto-generated catch block
 								Log.d(LOG_TAG,
-										"Exception button Camera "
-												+ e.toString());
-								e.printStackTrace();
+										"MsControlException: " + e.getMessage(),
+										e);
 							}
 						}
 					}
@@ -487,9 +483,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 							}
 						}
 					} catch (MsControlException e) {
-						Log.e(LOG_TAG,
-								"Exception change speaker." + e.toString());
-						e.printStackTrace();
+						Log.e(LOG_TAG, "MsControlException: " + e.getMessage(),
+								e);
 					}
 				}
 			});
@@ -577,14 +572,14 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 								videoPlayerComponent
 										.onAction(AndroidAction.CAMERA_AUTOFOCUS);
 							} catch (MsControlException e) {
-								Log.e(LOG_TAG, e.getMessage(), e);
+								Log.e(LOG_TAG,
+										"MsControlException: " + e.getMessage(),
+										e);
 							}
 						return false;
 					}
 				});
 			}
-
-			Log.e(LOG_TAG, "onResume OK");
 		}
 	}
 
@@ -753,7 +748,6 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 							infoInputBW = "No Video ---- No Audio";
 							infoOutputBW = "No Video ---- No Audio";
 						}
-
 
 						txt_bandwidth.setText("I: " + infoInputBW + "\nO: "
 								+ infoOutputBW);

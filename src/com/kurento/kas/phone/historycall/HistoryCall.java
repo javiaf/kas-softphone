@@ -85,7 +85,7 @@ public class HistoryCall extends ListActivity {
 			Log.d(LOG_TAG, "onCreate " + sqlCreate);
 			db.execSQL(sqlCreate);
 		} catch (Exception e) {
-			Log.d(LOG_TAG, "Table created yet.");
+			Log.e(LOG_TAG, "Table created yet.");
 		}
 		return db;
 	}
