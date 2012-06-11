@@ -54,8 +54,8 @@ public class HistoryCall extends ListActivity {
 	private static final String LOG_TAG = HistoryCall.class.getName();
 	private static final String DB = "DBHistoryCall";
 
-	private SQLiteDatabase openOrCreateBD() {
-		SQLiteDatabase db = openOrCreateDatabase(DB + ".db",
+	public static SQLiteDatabase openOrCreateBD(Context context) {
+		SQLiteDatabase db = context.openOrCreateDatabase(DB + ".db",
 				SQLiteDatabase.CREATE_IF_NECESSARY, null);
 		db.setVersion(1);
 		db.setLocale(Locale.getDefault());
@@ -98,7 +98,7 @@ public class HistoryCall extends ListActivity {
 		SQLiteDatabase db; // = openOrCreateBD();
 		db = (SQLiteDatabase) ApplicationContext.contextTable.get("db");
 		if (db == null)
-			db = openOrCreateBD();
+			db = openOrCreateBD(getApplicationContext());
 
 		@SuppressWarnings("unchecked")
 		ArrayList<ListViewHistoryItem> items = (ArrayList<ListViewHistoryItem>) ApplicationContext.contextTable

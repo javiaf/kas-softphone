@@ -137,10 +137,19 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 
 		intentFilter = new IntentFilter();
 		isCreated = true;
+
+		// Start BD
+		// TODO This code must changed from other class that manages this
+		SQLiteDatabase db = (SQLiteDatabase) ApplicationContext.contextTable
+				.get("db");
+
+		if (db == null)
+			db = HistoryCall.openOrCreateBD(getApplicationContext());
+
+		ApplicationContext.contextTable.put("db", db);
 		// errorReporter = new ErrorReporter();
 		//
 		// errorReporter.Init(getApplicationContext());
-
 
 		// if (Connection_Preferences
 		// .getConnectionPreferences(getApplicationContext()) == null) {
