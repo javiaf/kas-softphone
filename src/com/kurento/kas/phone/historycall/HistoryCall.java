@@ -13,7 +13,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package com.kurento.kas.phone.historycall;
 
 import java.lang.reflect.Field;
@@ -95,7 +95,10 @@ public class HistoryCall extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.history_call);
 
-		SQLiteDatabase db = openOrCreateBD();
+		SQLiteDatabase db; // = openOrCreateBD();
+		db = (SQLiteDatabase) ApplicationContext.contextTable.get("db");
+		if (db == null)
+			db = openOrCreateBD();
 
 		@SuppressWarnings("unchecked")
 		ArrayList<ListViewHistoryItem> items = (ArrayList<ListViewHistoryItem>) ApplicationContext.contextTable
@@ -109,29 +112,28 @@ public class HistoryCall extends ListActivity {
 			items = new ArrayList<ListViewHistoryItem>();
 
 			if (db != null) {
-				Cursor cur = db.query(DB, null, null, null, null, null, "idTable DESC");
+				Cursor cur = db.query(DB, null, null, null, null, null,
+						"idTable DESC");
 				Log.d(LOG_TAG, "Cursos = " + cur.getCount());
 				cur.moveToFirst();
 				while (cur.isAfterLast() == false) {
 
 					Boolean mType = false;
-					mType = (cur.getString(cur
-							.getColumnIndex("type")).equals("1")) ? true
-							: false;
+					mType = (cur.getString(cur.getColumnIndex("type"))
+							.equals("1")) ? true : false;
 					ListViewHistoryItem item = new ListViewHistoryItem(
 							cur.getInt(cur.getColumnIndex("id")),
 							cur.getString(cur.getColumnIndex("uri")),
-							cur.getString(cur.getColumnIndex("name")),
-							mType,
+							cur.getString(cur.getColumnIndex("name")), mType,
 							cur.getString(cur.getColumnIndex("date")));
 					items.add(item);
-					
+
 					listViewAdapter.add(item);
 					cur.moveToNext();
 				}
 				cur.close();
 			}
-		} 
+		}
 		setListAdapter(listViewAdapter);
 
 		ApplicationContext.contextTable.put("itemsHistory", items);
