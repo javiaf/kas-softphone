@@ -137,6 +137,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 
 		intentFilter = new IntentFilter();
 		isCreated = true;
+		errorReporter = new ErrorReporter();
+		errorReporter.Init(getApplicationContext());
 
 		// Start BD
 		// TODO This code must changed from other class that manages this
@@ -147,9 +149,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 			db = HistoryCall.openOrCreateBD(getApplicationContext());
 
 		ApplicationContext.contextTable.put("db", db);
-		// errorReporter = new ErrorReporter();
-		//
-		// errorReporter.Init(getApplicationContext());
 
 		// if (Connection_Preferences
 		// .getConnectionPreferences(getApplicationContext()) == null) {
