@@ -298,6 +298,8 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 		if (currentCall != null)
 			try {
 				currentCall.terminate();
+				if (callListener != null)
+					callListener.callTerminate();
 			} catch (ServerInternalErrorException e) {
 				Log.e(LOG, e.getMessage(), e);
 			}

@@ -93,6 +93,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 			} else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
 				NetworkInfo ni = intent.getExtras()
 						.getParcelable("networkInfo");
+				Log.d(LOG_TAG, "Connection Type: " + ni.getType() + "; State:"
+						+ ni.getState());
 				switch (ni.getType()) {
 				case ConnectivityManager.TYPE_WIFI:
 					if (ni.getState().equals(NetworkInfo.State.CONNECTED)) {
@@ -106,6 +108,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 						wifi.setBackgroundResource(R.drawable.wifi_off_120);
 						connection
 								.setBackgroundResource(R.drawable.disconnect_icon);
+						if (controller != null && controller.getIsCall())
+							controller.hang();
 					}
 					break;
 				case ConnectivityManager.TYPE_MOBILE:
@@ -120,6 +124,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 						_3g.setBackgroundResource(R.drawable.icon_3g_off_120);
 						connection
 								.setBackgroundResource(R.drawable.disconnect_icon);
+						if (controller != null && controller.getIsCall())
+							controller.hang();
 					}
 					break;
 				default:
