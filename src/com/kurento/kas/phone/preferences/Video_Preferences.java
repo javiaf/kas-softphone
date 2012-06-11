@@ -211,11 +211,18 @@ public class Video_Preferences extends PreferenceActivity implements
 		// Size Camera
 		ArrayList<String> list = new ArrayList<String>();
 		ListPreference listSizeCam = new ListPreference(this);
-		Camera mCamera = Camera.open();
 
+		boolean cif = false;
+		boolean qcif = false;
+
+		Camera mCamera = null;
+		try {
+			mCamera = Camera.open();
+		} catch (Exception e) {
+			Log.e(Video_Preferences.class.getName(),
+					"Exception: " + e.getMessage(), e);
+		}
 		if (mCamera != null) {
-			boolean cif = false;
-			boolean qcif = false;
 			Camera.Parameters parameteres = mCamera.getParameters();
 			List<Size> sizes = parameteres.getSupportedPreviewSizes();
 			for (int i = 0; i < sizes.size(); i++) {
@@ -227,12 +234,13 @@ public class Video_Preferences extends PreferenceActivity implements
 					if (sizes.get(i).width == 176 && sizes.get(i).height == 144)
 						qcif = true;
 			}
-			if (!cif)
-				list.add("352x288");
-			if (!qcif)
-				list.add("176x144");
 			mCamera.release();
 		}
+		if (!cif)
+			list.add("352x288");
+		if (!qcif)
+			list.add("176x144");
+
 		CharSequence[] entries = list.toArray(new CharSequence[list.size()]);
 		CharSequence[] entryValues = list
 				.toArray(new CharSequence[list.size()]);
