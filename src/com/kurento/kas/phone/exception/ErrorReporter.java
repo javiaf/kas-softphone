@@ -16,6 +16,7 @@ import java.util.Random;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.StringEntity;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -198,6 +199,15 @@ public class ErrorReporter implements Thread.UncaughtExceptionHandler {
 	}
 
 	public void uncaughtException(Thread t, Throwable e) {
+		// Cancel the notifications
+		NotificationManager mNotificationMgr = (NotificationManager) CurContext
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+		// Cancel the notifications
+		if (mNotificationMgr != null) {
+			mNotificationMgr.cancel(4);
+			mNotificationMgr.cancel(3);
+			mNotificationMgr.cancel(2);
+		}
 		Log.d(LOG, "unCaughtException");
 		String Report = "";
 		Date CurDate = new Date();
