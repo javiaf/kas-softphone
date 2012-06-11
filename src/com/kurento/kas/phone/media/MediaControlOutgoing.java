@@ -124,7 +124,6 @@ public class MediaControlOutgoing extends Activity {
 				finishHandler((long) 2500);
 			} else if (Actions.CALL_RINGING.equals(action)) {
 				// Play sound
-				Log.d(LOG_TAG, "Ringing ... start AudioMedia Player");
 				if (mPlayer == null)
 					mPlayer = MediaPlayer.create(getApplicationContext(),
 							R.raw.tone_call);
