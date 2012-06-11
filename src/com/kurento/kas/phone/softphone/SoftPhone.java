@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.controlcontacts.ControlContacts;
+import com.kurento.kas.phone.exception.ErrorReporter;
 import com.kurento.kas.phone.historycall.HistoryCall;
 import com.kurento.kas.phone.historycall.ListViewHistoryItem;
 import com.kurento.kas.phone.media.MediaControlOutgoing;
@@ -64,6 +66,7 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 	private Controller controller;
 	private boolean isRegister = false;
 	private boolean isExit = false;
+	private ErrorReporter errorReporter;
 
 	private ControlContacts controlcontacts = new ControlContacts(this);
 
@@ -134,6 +137,11 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 
 		intentFilter = new IntentFilter();
 		isCreated = true;
+		// errorReporter = new ErrorReporter();
+		//
+		// errorReporter.Init(getApplicationContext());
+
+
 		// if (Connection_Preferences
 		// .getConnectionPreferences(getApplicationContext()) == null) {
 		// /* First Register */
@@ -296,6 +304,11 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 							"stopService " + e.getMessage() + "; "
 									+ e.toString());
 				}
+
+				SQLiteDatabase db = (SQLiteDatabase) ApplicationContext.contextTable
+						.get("db");
+				if (db != null)
+					db.close();
 
 				if (ApplicationContext.contextTable != null) {
 					ApplicationContext.contextTable.put("isRegister",
