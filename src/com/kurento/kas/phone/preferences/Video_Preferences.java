@@ -697,13 +697,60 @@ public class Video_Preferences extends PreferenceActivity implements
 				.get(MediaSessionAndroid.MAX_BANDWIDTH);
 		if (maxBandwidth == null)
 			maxBandwidth = 0;
-		info = "Media preferences\n" + "Interfaz\n"
+
+		Integer maxDelay = (Integer) params.get(MediaSessionAndroid.MAX_DELAY);
+		if (maxDelay == null)
+			maxDelay = 0;
+
+		Boolean syncronizeMedia = (Boolean) params
+				.get(MediaSessionAndroid.SYNCHRONIZE_MEDIA_STREAMS);
+		if (syncronizeMedia == null)
+			syncronizeMedia = false;
+
+		Integer frontCamera = (Integer) params
+				.get(MediaComponentAndroid.CAMERA_FACING);
+		String camera = "Back camera";
+		if (frontCamera != null && frontCamera == 1)
+			camera = "Front camera";
+
+		PortRange videoPort = (PortRange) params
+				.get(MediaSessionAndroid.VIDEO_LOCAL_PORT_RANGE);
+		String videoPortInfo = "Not defined";
+		if (videoPort != null)
+			videoPortInfo = "Min: " + videoPort.getMinPort() + "; Max: "
+					+ videoPort.getMaxPort();
+
+		Integer gopSize = (Integer) params.get(MediaSessionAndroid.GOP_SIZE);
+		if (gopSize == null)
+			gopSize = 6;
+
+		Integer frameRate = (Integer) params
+				.get(MediaSessionAndroid.MAX_FRAME_RATE);
+		if (frameRate == null)
+			frameRate = 15;
+
+		PortRange audioPort = (PortRange) params
+				.get(MediaSessionAndroid.AUDIO_LOCAL_PORT_RANGE);
+		String audioPortInfo = "Not defined";
+		if (audioPort != null)
+			audioPortInfo = "Min: " + audioPort.getMinPort() + "; Max: "
+					+ audioPort.getMaxPort();
+
+		info = "Media preferences\n" + "Interface\n"
 				+ params.get(MediaSessionAndroid.NET_IF)
 				+ "\n\nMax BandWidth (kbps)\n" + maxBandwidth / 1000
-				+ "\n\nVideo codec\n"
+				+ "\n\nMax Delay (ms)\n" + maxDelay
+				+ "\n\nSyncronize Media Stream\n" + syncronizeMedia
+				+ "\n\nCamera\n" + camera + "\n\nVideo codec\n"
 				+ params.get(MediaSessionAndroid.VIDEO_CODECS)
-				+ "\n\nAudio codec\n"
+				+ "\n\nPort Range Video\n" + videoPortInfo
+				+ "\n\nCamera Size\n"
+				+ params.get(MediaSessionAndroid.FRAME_WIDTH) + "x"
+				+ params.get(MediaSessionAndroid.FRAME_HEIGHT)
+				+ "\n\nGop Size\n" + gopSize + "\n\nMax Frame Rate\n"
+				+ frameRate + "\n\nAudio codec\n"
 				+ params.get(MediaSessionAndroid.AUDIO_CODECS)
+				+ "\n\nPort Range Audio\n" + audioPortInfo
 				+ "\n\nCall direcction\n"
 				+ params.get(MediaSessionAndroid.STREAMS_MODES);
 
