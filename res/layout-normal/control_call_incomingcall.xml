@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/FrameLayout01"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/incoming_call"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_marginBottom="20dp"
+            android:background="#00000000"
+            android:padding="10dip"
+            android:text="@string/incoming_call"
+            android:textColor="#FFFFFF"
+            android:textSize="15dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/incoming_sip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginBottom="20dp"
+            android:background="#00000000"
+            android:padding="10dp"
+            android:text="@string/incoming_sip"
+            android:textColor="#FFFFFF"
+            android:textSize="15dp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/image_call"
+          android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="90dp"
+        android:src="@drawable/image_call" />
+
+    <ImageButton
+        android:id="@+id/button_call_accept"
+        android:layout_width="150dp"
+        android:layout_height="85dp"
+        android:layout_marginLeft="-50dp"
+        android:layout_marginTop="70dp"
+        android:background="@drawable/ic_jog_dial_answer" />
+
+    <ImageButton
+        android:id="@+id/button_call_reject"
+         android:layout_width="150dp"
+        android:layout_height="80dp"
+        android:layout_marginLeft="215dp"
+        android:layout_marginTop="-85dp"
+        android:background="@drawable/ic_jog_dial_decline" />
+
+</LinearLayout>

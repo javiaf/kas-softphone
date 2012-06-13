@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/video_frame"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <SurfaceView
+        android:id="@+id/video_receive_surface"
+        android:layout_width="1061dp"
+        android:layout_height="match_parent" >
+    </SurfaceView>
+
+    <TableLayout
+        android:id="@+id/tableLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|right" >
+
+        <TableRow
+            android:id="@+id/TableRow01"
+            android:layout_gravity="center" >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/btnOcculPanel"
+                    android:layout_width="94dp"
+                    android:layout_height="545dp"
+                    android:background="@drawable/occult_menu_out"
+                    android:textOff=""
+                    android:textOn="" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/LinearLayout1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/button_terminate_call"
+                   android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_gravity="left|bottom"
+                    android:background="@drawable/ic_jog_dial_end_call" />
+
+                <ToggleButton
+                    android:id="@+id/button_camera"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/camera"
+                    android:textOff=""
+                    android:textOn="" />
+
+                <ToggleButton
+                    android:id="@+id/button_headset"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="7dp"
+                    android:background="@drawable/headset_button"
+                    android:textOff=""
+                    android:textOn="" />
+
+                <ToggleButton
+                    android:id="@+id/button_mute"
+                   android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="7dp"
+                    android:background="@drawable/mute_button"
+                    android:textOff=""
+                    android:textOn="" />
+            </LinearLayout>
+        </TableRow>
+    </TableLayout>
+
+    <SurfaceView
+        android:id="@+id/video_capture_surface"
+        android:layout_width="197dp"
+        android:layout_height="197dp"
+        android:layout_gravity="bottom|right" >
+    </SurfaceView>
+
+    <TextView
+        android:id="@+id/txt_bandwidth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:text="--" />
+
+</FrameLayout>
