@@ -254,13 +254,20 @@ public class MediaControlOutgoing extends Activity {
 			public void run() {
 				try {
 					controller.call(uri);
-				} catch (Exception e) {
-					TextView outgoing_call = (TextView) findViewById(R.id.outgoing_call);
-					outgoing_call.setTextColor(Color.RED);
-					outgoing_call.setText("Problem with call" + e.getMessage());
-					outgoing_call.setTextSize(20);
-					isRejectOrError = true;
-					finishHandler((long) 2500);
+				} catch (final Exception e) {
+					mHandler.post(new Runnable() {
+						@Override
+						public void run() {
+							TextView outgoing_call = (TextView) findViewById(R.id.outgoing_call);
+							outgoing_call.setTextColor(Color.RED);
+							outgoing_call.setText("Problem with call"
+									+ e.getMessage());
+							outgoing_call.setTextSize(20);
+							isRejectOrError = true;
+							finishHandler((long) 2500);
+						}
+					});
+
 				}
 			}
 		}).start();
