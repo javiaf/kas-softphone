@@ -5,9 +5,16 @@
     android:layout_height="match_parent" >
 
     <SurfaceView
+        android:id="@+id/video_capture_surface"
+        android:layout_width="197dp"
+        android:layout_height="197dp"
+        android:layout_gravity="bottom|right" >
+    </SurfaceView>
+
+    <SurfaceView
         android:id="@+id/video_receive_surface"
-        android:layout_width="1061dp"
-        android:layout_height="match_parent" >
+        android:layout_width="930dp"
+        android:layout_height="750dp" >
     </SurfaceView>
 
     <TableLayout
@@ -42,7 +49,7 @@
 
                 <Button
                     android:id="@+id/button_terminate_call"
-                   android:layout_width="130dp"
+                    android:layout_width="130dp"
                     android:layout_height="130dp"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentRight="true"
@@ -71,7 +78,7 @@
 
                 <ToggleButton
                     android:id="@+id/button_mute"
-                   android:layout_width="120dp"
+                    android:layout_width="120dp"
                     android:layout_height="120dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="7dp"
@@ -81,13 +88,6 @@
             </LinearLayout>
         </TableRow>
     </TableLayout>
-
-    <SurfaceView
-        android:id="@+id/video_capture_surface"
-        android:layout_width="197dp"
-        android:layout_height="197dp"
-        android:layout_gravity="bottom|right" >
-    </SurfaceView>
 
     <TextView
         android:id="@+id/txt_bandwidth"
