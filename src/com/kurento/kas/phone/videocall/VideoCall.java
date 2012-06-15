@@ -176,9 +176,6 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			int Orientation = getWindowManager().getDefaultDisplay()
 					.getOrientation();
 			try {
-				txt_bandwidth = (TextView) findViewById(R.id.txt_bandwidth);
-				txt_bandwidth.setTextColor(Color.RED);
-
 				if ((videoMode != null)
 						&& (Mode.SENDONLY.equals(videoMode) || Mode.SENDRECV
 								.equals(videoMode))) {
@@ -256,6 +253,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		super.onResume();
 		Log.d(LOG_TAG, "HANG = " + hang);
 		if (!hang) {
+			txt_bandwidth = (TextView) findViewById(R.id.txt_bandwidth);
+			txt_bandwidth.setTextColor(Color.RED);
 			startGetMediaInfo();
 			// NetworkConnection nc = (NetworkConnection)
 			// ApplicationContext.contextTable
@@ -787,9 +786,9 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 							infoInputBW = "No Video ---- No Audio";
 							infoOutputBW = "No Video ---- No Audio";
 						}
-
-						txt_bandwidth.setText("I: " + infoInputBW + "\nO: "
-								+ infoOutputBW);
+						if (txt_bandwidth != null)
+							txt_bandwidth.setText("I: " + infoInputBW + "\nO: "
+									+ infoOutputBW);
 					}
 				});
 			}
