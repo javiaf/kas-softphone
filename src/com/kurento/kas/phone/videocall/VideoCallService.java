@@ -188,6 +188,11 @@ public class VideoCallService extends Service {
 
 		mNotificationMgr.notify(NOTIF_SOFTPHONE, mNotif);
 
+		audioRecorderComponent = (MediaComponentAndroid) ApplicationContext.contextTable
+				.get("audioRecorderComponent");
+		audioPlayerComponent = (MediaComponentAndroid) ApplicationContext.contextTable
+				.get("audioPlayerComponent");
+
 		if (audioPlayerComponent != null)
 			audioPlayerComponent.stop();
 
