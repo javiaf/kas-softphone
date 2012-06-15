@@ -51,6 +51,7 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
@@ -87,6 +88,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private boolean hang = false;
 	private Map<MediaType, Mode> callDirectionMap, mediaTypesModes;
 	private int cameraFacing = 0;
+	private Integer movement = 100; // Movement of the panel retractil
 
 	private MediaComponentAndroid videoPlayerComponent = null;
 	private MediaComponentAndroid videoRecorderComponent = null;
@@ -98,12 +100,14 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private Integer audioBW, videoBW;
 	private Timer timer;
 	private String infoInputBW, infoOutputBW;
+	private DisplayMetrics dm;
 
 	private Boolean isOccult = true;
 	private WakeLock mWakeLock = null;
 
 	private TextView txt_bandwidth;
 	private Handler mHandler;
+	private LinearLayout panel;
 
 	private View videoCaptureSurface;
 
@@ -150,6 +154,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			setContentView(R.layout.onlycall);
 		}
 
+		panel = (TableLayout) findViewById(R.id.tableLayout1);
+
 		hang = false;
 
 		audioBW = 0;
@@ -165,7 +171,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 			MediaSessionAndroid mediaSession = controller.getMediaSession();
 
-			DisplayMetrics dm = new DisplayMetrics();
+			dm = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(dm);
 			int Orientation = getWindowManager().getDefaultDisplay()
 					.getOrientation();
@@ -490,29 +496,52 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			});
 
 			final Button btnOccult = (Button) findViewById(R.id.btnOcculPanel);
-
+			panel = (LinearLayout) findViewById(R.id.LinearLayout1);
 			btnOccult.setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
-
-					final TableLayout t = (TableLayout) findViewById(R.id.tableLayout1);
+					Log.d(LOG_TAG, "PANEL MOVE");
+					switch (dm.densityDpi) {
+					case DisplayMetrics.DENSITY_LOW:
+						movement = 51;
+						break;
+					case DisplayMetrics.DENSITY_MEDIUM:
+						// This case is the same that DENSITY_DEFAULT
+						movement = 86;
+						break;
+					case DisplayMetrics.DENSITY_HIGH:
+						movement = 102;
+						break;
+					case DisplayMetrics.DENSITY_XHIGH:
+						movement = 137;
+						break;
+					default:
+						movement = 102;
+						break;
+					}
 
 					Animation a = new Animation() {
 					};
 					if (!isOccult) {
-						a = new TranslateAnimation(100, 0, 0, 0);
-						a.setDuration(50L);
+						a = new TranslateAnimation(movement, 0, 0, 0);
+						a.setDuration(1000L);
 						a.setInterpolator(new AccelerateDecelerateInterpolator());
-						t.setAnimation(a);
-						t.startAnimation(a);
+						panel.setAnimation(a);
+						btnOccult.setAnimation(a);
 						a.setAnimationListener(new AnimationListener() {
 
 							@Override
 							public void onAnimationStart(Animation animation) {
-
-								t.layout(t.getLeft() - 100, t.getTop(),
-										t.getRight() - 100, t.getBottom());
+								Log.d(LOG_TAG, "PANEL OCULT - MOVEMENT");
+								panel.layout(panel.getLeft() - movement,
+										panel.getTop(), panel.getRight()
+												- movement, panel.getBottom());
+								btnOccult.layout(
+										btnOccult.getLeft() - movement,
+										btnOccult.getTop(),
+										btnOccult.getRight() - movement,
+										btnOccult.getBottom());
 								btnOccult
 										.setBackgroundResource(R.drawable.occult_menu_in);
 							}
@@ -521,6 +550,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 							public void onAnimationEnd(Animation animation) {
 								btnOccult
 										.setBackgroundResource(R.drawable.occult_menu_out);
+
 							}
 
 							@Override
@@ -528,15 +558,16 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 							}
 						});
+						panel.startAnimation(a);
 						isOccult = true;
 					} else {
-						isOccult = false;
-						a = new TranslateAnimation(0, 100, 0, 0);
-						a.setDuration(50L);
-
+						a = new TranslateAnimation(0, movement, 0, 0);
+						a.setDuration(1000L);
 						a.setInterpolator(new AccelerateDecelerateInterpolator());
-						t.setAnimation(a);
-						t.startAnimation(a);
+						panel.setAnimation(a);
+						btnOccult.setAnimation(a);
+						panel.startAnimation(a);
+						isOccult = false;
 						a.setAnimationListener(new AnimationListener() {
 
 							@Override
@@ -552,12 +583,20 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 							@Override
 							public void onAnimationEnd(Animation animation) {
-								t.layout(t.getLeft() + 100, t.getTop(),
-										t.getRight() + 100, t.getBottom());
+								Log.d(LOG_TAG, "PANEL OCULT + MOVEMENT");
+								panel.layout(panel.getLeft() + movement,
+										panel.getTop(), panel.getRight()
+												+ movement, panel.getBottom());
+								btnOccult.layout(
+										btnOccult.getLeft() + movement,
+										btnOccult.getTop(),
+										btnOccult.getRight() + movement,
+										btnOccult.getBottom());
 								btnOccult
 										.setBackgroundResource(R.drawable.occult_menu_in);
 							}
 						});
+
 					}
 				}
 			});
