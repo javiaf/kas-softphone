@@ -12,7 +12,7 @@
 		<sign.develop>true</sign.develop>
 
 		<!-- Versions -->
-		<kurentoAndroidSdkVersion>1.0.1-SNAPSHOT</kurentoAndroidSdkVersion>
+		<kurentoAndroidSdkVersion>1.0.1</kurentoAndroidSdkVersion>
 		<android.version>2.3.3</android.version>
 		<android-async-http.version>1.3.1</android-async-http.version>
 	</properties>
