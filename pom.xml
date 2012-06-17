@@ -208,7 +208,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>[1.0.0)</version>
+				<version>3.0</version>
 				<configuration>
 					<siteDirectory>${basedir}/site</siteDirectory>
 				</configuration>
