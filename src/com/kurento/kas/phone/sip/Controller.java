@@ -8,10 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.kurento.commons.mscontrol.MsControlException;
-import com.kurento.commons.mscontrol.Parameters;
-import com.kurento.commons.mscontrol.join.JoinableStream.StreamType;
-import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
+import com.kurento.commons.config.Parameters;
 import com.kurento.commons.sip.agent.NetworkListener;
 import com.kurento.commons.sip.agent.UaFactory;
 import com.kurento.commons.sip.agent.UaImpl;
@@ -27,8 +24,6 @@ import com.kurento.commons.ua.event.CallEvent;
 import com.kurento.commons.ua.event.CallEventEnum;
 import com.kurento.commons.ua.event.EndPointEvent;
 import com.kurento.commons.ua.exception.ServerInternalErrorException;
-import com.kurento.kas.mscontrol.MSControlFactory;
-import com.kurento.kas.mscontrol.MediaSessionAndroid;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.network.NetworkIP;
 import com.kurento.kas.phone.preferences.Connection_Preferences;
@@ -39,6 +34,11 @@ import com.kurento.kas.phone.softphone.CallNotifier;
 import com.kurento.kas.phone.softphone.IPhone;
 import com.kurento.kas.phone.softphone.SoftphoneCallListener;
 import com.kurento.kas.phone.testutils.ControllerController;
+import com.kurento.mscontrol.commons.MsControlException;
+import com.kurento.mscontrol.commons.join.JoinableStream.StreamType;
+import com.kurento.mscontrol.commons.networkconnection.NetworkConnection;
+import com.kurento.mscontrol.kas.MediaSessionAndroid;
+import com.kurento.mscontrol.kas.MsControlFactoryAndroid;
 
 public class Controller implements EndPointListener, CallListener, IPhone,
 		CallNotifier {
@@ -92,7 +92,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 			this.mediaPrefereces = Video_Preferences
 					.getMediaPreferences(context);
 
-			this.mediaSession = MSControlFactory
+			this.mediaSession = MsControlFactoryAndroid
 					.createMediaSession(mediaPrefereces);
 
 			this.mediaNetPreferences = Connection_Preferences
@@ -215,7 +215,7 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 
 	public void mediaHasChanged() {
 		try {
-			mediaSession = MSControlFactory
+			mediaSession = MsControlFactoryAndroid
 					.createMediaSession(Video_Preferences
 							.getMediaPreferences(context));
 			UaFactory.setMediaSession(mediaSession);
