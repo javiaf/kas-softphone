@@ -55,24 +55,8 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
-import com.kurento.commons.media.format.MediaSpec;
-import com.kurento.commons.media.format.Payload;
-import com.kurento.commons.media.format.SessionSpec;
-import com.kurento.commons.media.format.enums.MediaType;
-import com.kurento.commons.media.format.enums.Mode;
-import com.kurento.commons.media.format.payload.PayloadRtp;
-import com.kurento.commons.mscontrol.MsControlException;
-import com.kurento.commons.mscontrol.Parameters;
-import com.kurento.commons.mscontrol.join.Joinable;
-import com.kurento.commons.mscontrol.join.Joinable.Direction;
-import com.kurento.commons.mscontrol.join.JoinableStream.StreamType;
-import com.kurento.commons.mscontrol.networkconnection.NetworkConnection;
-import com.kurento.commons.mscontrol.networkconnection.SdpPortManagerException;
-import com.kurento.kas.mscontrol.MSControlFactory;
-import com.kurento.kas.mscontrol.MediaSessionAndroid;
-import com.kurento.kas.mscontrol.mediacomponent.AndroidAction;
-import com.kurento.kas.mscontrol.mediacomponent.AndroidInfo;
-import com.kurento.kas.mscontrol.mediacomponent.MediaComponentAndroid;
+import com.kurento.commons.config.Parameters;
+import com.kurento.commons.config.Value;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.preferences.Connection_Preferences;
 import com.kurento.kas.phone.preferences.VideoCall_Preferences;
@@ -80,13 +64,29 @@ import com.kurento.kas.phone.preferences.Video_Preferences;
 import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.softphone.R;
 import com.kurento.kas.phone.softphone.ServiceUpdateUIListener;
+import com.kurento.mediaspec.Direction;
+import com.kurento.mediaspec.MediaSpec;
+import com.kurento.mediaspec.MediaType;
+import com.kurento.mediaspec.Payload;
+import com.kurento.mediaspec.PayloadRtp;
+import com.kurento.mediaspec.SessionSpec;
+import com.kurento.mscontrol.commons.MsControlException;
+import com.kurento.mscontrol.commons.join.Joinable;
+import com.kurento.mscontrol.commons.join.JoinableStream.StreamType;
+import com.kurento.mscontrol.commons.networkconnection.NetworkConnection;
+import com.kurento.mscontrol.commons.networkconnection.SdpPortManagerException;
+import com.kurento.mscontrol.kas.MediaSessionAndroid;
+import com.kurento.mscontrol.kas.MsControlFactoryAndroid;
+import com.kurento.mscontrol.kas.mediacomponent.AndroidAction;
+import com.kurento.mscontrol.kas.mediacomponent.AndroidInfo;
+import com.kurento.mscontrol.kas.mediacomponent.MediaComponentAndroid;
 
 public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private static final String LOG_TAG = VideoCall.class.getName();
 	private static final int SHOW_PREFERENCES = 1;
 	private PowerManager.WakeLock wl;
 	private boolean hang = false;
-	private Map<MediaType, Mode> callDirectionMap, mediaTypesModes;
+	private Map<MediaType, Direction> callDirectionMap, mediaTypesModes;
 	private int cameraFacing = 0;
 	private Integer movement = 100; // Movement of the panel retractil
 
@@ -128,9 +128,9 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
 						| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-		callDirectionMap = (Map<MediaType, Mode>) ApplicationContext.contextTable
+		callDirectionMap = (Map<MediaType, Direction>) ApplicationContext.contextTable
 				.get("callDirection");
-		mediaTypesModes = (Map<MediaType, Mode>) ApplicationContext.contextTable
+		mediaTypesModes = (Map<MediaType, Direction>) ApplicationContext.contextTable
 				.get("mediaTypesModes");
 
 		try {
@@ -140,15 +140,15 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			cameraFacing = 0;
 		}
 
-		Mode videoMode = null;
+		Direction videoMode = null;
 		if (mediaTypesModes != null)
 			videoMode = mediaTypesModes.get(MediaType.VIDEO);
 
-		if ((videoMode != null) && (Mode.RECVONLY.equals(videoMode)))
+		if ((videoMode != null) && (Direction.RECVONLY.equals(videoMode)))
 			setContentView(R.layout.videocall_receive);
-		else if ((videoMode != null) && (Mode.SENDONLY.equals(videoMode)))
+		else if ((videoMode != null) && (Direction.SENDONLY.equals(videoMode)))
 			setContentView(R.layout.videocall_send);
-		else if ((videoMode != null) && (Mode.SENDRECV.equals(videoMode)))
+		else if ((videoMode != null) && (Direction.SENDRECV.equals(videoMode)))
 			setContentView(R.layout.videocall);
 		else {
 			setContentView(R.layout.onlycall);
@@ -173,20 +173,22 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 			dm = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(dm);
-			int Orientation = getWindowManager().getDefaultDisplay()
+			int orientation = getWindowManager().getDefaultDisplay()
 					.getOrientation();
 			try {
 				if ((videoMode != null)
-						&& (Mode.SENDONLY.equals(videoMode) || Mode.SENDRECV
+						&& (Direction.SENDONLY.equals(videoMode) || Direction.SENDRECV
 								.equals(videoMode))) {
 					videoCaptureSurface = (View) findViewById(R.id.video_capture_surface);
-					Parameters params = MSControlFactory.createParameters();
+					Parameters params = MsControlFactoryAndroid
+							.createParameters();
 					params.put(MediaComponentAndroid.PREVIEW_SURFACE,
-							videoCaptureSurface);
+							new Value<View>(videoCaptureSurface));
 					params.put(MediaComponentAndroid.DISPLAY_ORIENTATION,
-							Orientation);
+							new Value<Integer>(orientation));
 					params.put(MediaComponentAndroid.CAMERA_FACING,
-							cameraFacing);
+							new Value<Integer>(cameraFacing));
+
 					videoPlayerComponent = mediaSession.createMediaComponent(
 							MediaComponentAndroid.VIDEO_PLAYER, params);
 				}
@@ -198,15 +200,18 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 			try {
 				if ((videoMode != null)
-						&& (Mode.RECVONLY.equals(videoMode) || Mode.SENDRECV
+						&& (Direction.RECVONLY.equals(videoMode) || Direction.SENDRECV
 								.equals(videoMode))) {
-					Parameters params = MSControlFactory.createParameters();
-					params.put(MediaComponentAndroid.VIEW_SURFACE,
-							(View) findViewById(R.id.video_receive_surface));
+					Parameters params = MsControlFactoryAndroid
+							.createParameters();
+					params.put(
+							MediaComponentAndroid.VIEW_SURFACE,
+							new Value<View>(
+									(View) findViewById(R.id.video_receive_surface)));
 					params.put(MediaComponentAndroid.DISPLAY_WIDTH,
-							dm.widthPixels);
+							new Value<Integer>(dm.widthPixels));
 					params.put(MediaComponentAndroid.DISPLAY_HEIGHT,
-							dm.heightPixels);
+							new Value<Integer>(dm.heightPixels));
 					videoRecorderComponent = mediaSession.createMediaComponent(
 							MediaComponentAndroid.VIDEO_RECORDER, params);
 				}
@@ -270,11 +275,13 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 			try {
 				if (videoPlayerComponent != null) {
-					videoPlayerComponent.join(Direction.SEND, videoJoinable);
+					videoPlayerComponent.join(Joinable.Direction.SEND,
+							videoJoinable);
 					videoPlayerComponent.start();
 				}
 				if (videoRecorderComponent != null) {
-					videoRecorderComponent.join(Direction.RECV, videoJoinable);
+					videoRecorderComponent.join(Joinable.Direction.RECV,
+							videoJoinable);
 					videoRecorderComponent.start();
 				}
 
@@ -319,7 +326,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 									.get("mute");
 							if (mute != null) {
 								if (mute)
-									audioPlayerComponent.join(Direction.SEND,
+									audioPlayerComponent.join(
+											Joinable.Direction.SEND,
 											audioJoinable);
 								else
 									audioPlayerComponent.unjoin(audioJoinable);
@@ -375,23 +383,25 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 							DisplayMetrics dm = new DisplayMetrics();
 							getWindowManager().getDefaultDisplay().getMetrics(
 									dm);
-							int Orientation = getWindowManager()
+							int orientation = getWindowManager()
 									.getDefaultDisplay().getOrientation();
-							Parameters params = MSControlFactory
+							Parameters params = MsControlFactoryAndroid
 									.createParameters();
 							params.put(
 									MediaComponentAndroid.PREVIEW_SURFACE,
-									(View) findViewById(R.id.video_capture_surface));
+									new Value<View>(
+											(View) findViewById(R.id.video_capture_surface)));
 							params.put(
 									MediaComponentAndroid.DISPLAY_ORIENTATION,
-									Orientation);
+									new Value<Integer>(orientation));
 							if (cameraFacing == 0) {
 								params.put(MediaComponentAndroid.CAMERA_FACING,
-										1);
+										new Value<Integer>(1));
 								cameraFacing = 1;
 							} else {
 								params.put(MediaComponentAndroid.CAMERA_FACING,
-										0);
+										new Value<Integer>(0));
+
 								cameraFacing = 0;
 							}
 							ApplicationContext.contextTable.put("cameraFacing",
@@ -403,7 +413,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 												params);
 								Log.d(LOG_TAG,
 										"Create new videoPlayerComponent");
-								videoPlayerComponent.join(Direction.SEND,
+								videoPlayerComponent.join(
+										Joinable.Direction.SEND,
 										videoJoinable);
 								videoPlayerComponent.start();
 								Log.d(LOG_TAG,
@@ -455,7 +466,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 							audioRecorderComponent.unjoin(audioJoinable);
 						}
 
-						Parameters params = MSControlFactory.createParameters();
+						Parameters params = MsControlFactoryAndroid
+								.createParameters();
 
 						Boolean speaker = (Boolean) ApplicationContext.contextTable
 								.get("speaker");
@@ -463,10 +475,12 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 							if (speaker)
 								params.put(MediaComponentAndroid.STREAM_TYPE,
-										AudioManager.STREAM_MUSIC);
+										new Value<Integer>(
+												AudioManager.STREAM_MUSIC));
 							else
 								params.put(MediaComponentAndroid.STREAM_TYPE,
-										AudioManager.STREAM_VOICE_CALL);
+										new Value<Integer>(
+												AudioManager.STREAM_VOICE_CALL));
 
 							speaker = !speaker;
 							ApplicationContext.contextTable.put("speaker",
@@ -481,7 +495,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 									audioRecorderComponent);
 
 							if (audioRecorderComponent != null) {
-								audioRecorderComponent.join(Direction.RECV,
+								audioRecorderComponent.join(
+										Joinable.Direction.RECV,
 										audioJoinable);
 								audioRecorderComponent.start();
 
@@ -736,7 +751,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 							// Get input info
 							if (videoRecorderComponent != null) {
 								videoBW = (int) nc.getBitrate(StreamType.video,
-										Direction.RECV) / 1000;
+										Joinable.Direction.RECV) / 1000;
 								try {
 									infoInputBW = "V: "
 											+ videoBW
@@ -751,7 +766,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 							if (audioRecorderComponent != null) {
 								audioBW = (int) nc.getBitrate(StreamType.audio,
-										Direction.RECV) / 1000;
+										Joinable.Direction.RECV) / 1000;
 								try {
 									infoInputBW = infoInputBW
 											+ " ---- A: "
@@ -769,14 +784,14 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 							// Get output info
 							if (videoPlayerComponent != null) {
 								videoBW = (int) nc.getBitrate(StreamType.video,
-										Direction.SEND) / 1000;
+										Joinable.Direction.SEND) / 1000;
 								infoOutputBW = "V: " + videoBW + " kbps";
 							} else
 								infoOutputBW = "No Video";
 
 							if (audioPlayerComponent != null) {
 								audioBW = (int) nc.getBitrate(StreamType.audio,
-										Direction.SEND) / 1000;
+										Joinable.Direction.SEND) / 1000;
 								infoOutputBW = infoOutputBW + " ---- A: "
 										+ audioBW + " kbps";
 							} else
@@ -803,10 +818,10 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				sessionSpec = nc.getSdpPortManager()
 						.getMediaServerSessionDescription();
 				info = "";
-				for (MediaSpec media : sessionSpec.getMediaSpecs()) {
-					if (media.getTypes().contains(MediaType.AUDIO))
+				for (MediaSpec media : sessionSpec.getMedias()) {
+					if (media.getType().contains(MediaType.AUDIO))
 						info += "\nAudio: \n";
-					else if (media.getTypes().contains(MediaType.VIDEO))
+					else if (media.getType().contains(MediaType.VIDEO))
 						info += "\nVideo: \n";
 
 					for (Payload payload : media.getPayloads()) {

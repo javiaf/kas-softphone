@@ -40,18 +40,19 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
 
-import com.kurento.commons.media.format.enums.MediaType;
-import com.kurento.commons.media.format.enums.Mode;
-import com.kurento.commons.mscontrol.Parameters;
+import com.kurento.commons.config.Parameters;
+import com.kurento.commons.config.Value;
 import com.kurento.kas.media.codecs.AudioCodecType;
 import com.kurento.kas.media.codecs.VideoCodecType;
-import com.kurento.kas.mscontrol.MSControlFactory;
-import com.kurento.kas.mscontrol.MediaSessionAndroid;
-import com.kurento.kas.mscontrol.mediacomponent.MediaComponentAndroid;
-import com.kurento.kas.mscontrol.networkconnection.NetIF;
-import com.kurento.kas.mscontrol.networkconnection.PortRange;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.network.NetworkIP;
+import com.kurento.mediaspec.Direction;
+import com.kurento.mediaspec.MediaType;
+import com.kurento.mscontrol.kas.MediaSessionAndroid;
+import com.kurento.mscontrol.kas.MsControlFactoryAndroid;
+import com.kurento.mscontrol.kas.mediacomponent.MediaComponentAndroid;
+import com.kurento.mscontrol.kas.networkconnection.NetIF;
+import com.kurento.mscontrol.kas.networkconnection.PortRange;
 
 public class Video_Preferences extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener {
@@ -446,7 +447,7 @@ public class Video_Preferences extends PreferenceActivity implements
 	}
 
 	public static Parameters getMediaPreferences(Context context) {
-		Parameters params = MSControlFactory.createParameters();
+		Parameters params = MsControlFactoryAndroid.createParameters();
 
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(context);
@@ -456,7 +457,8 @@ public class Video_Preferences extends PreferenceActivity implements
 			if (ip == null)
 				ip = InetAddress.getLocalHost();
 
-			params.put(MediaSessionAndroid.LOCAL_ADDRESS, ip);
+			Value<InetAddress> ipValue = new Value<InetAddress>(ip);
+			params.put(MediaSessionAndroid.LOCAL_ADDRESS, ipValue);
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
 		}
@@ -475,7 +477,8 @@ public class Video_Preferences extends PreferenceActivity implements
 		}
 		ApplicationContext.contextTable.put("cameraFacing", cameraFacing);
 
-		params.put(MediaComponentAndroid.CAMERA_FACING, cameraFacing);
+		Value<Integer> cameraFacingValue = new Value<Integer>(cameraFacing);
+		params.put(MediaComponentAndroid.CAMERA_FACING, cameraFacingValue);
 
 		Integer max_bandwidth = null;
 		try {
@@ -488,8 +491,11 @@ public class Video_Preferences extends PreferenceActivity implements
 			max_bandwidth = null;
 			// MediaSessionAndroid hopes bits but the preferences gives kbps
 			params.put(MediaSessionAndroid.MAX_BANDWIDTH, null);
-		} else
-			params.put(MediaSessionAndroid.MAX_BANDWIDTH, max_bandwidth * 1000);
+		} else {
+			Value<Integer> maxBandwidthValue = new Value<Integer>(
+					max_bandwidth * 1000);
+			params.put(MediaSessionAndroid.MAX_BANDWIDTH, maxBandwidthValue);
+		}
 
 		Integer max_delay = null;
 		try {
@@ -498,24 +504,30 @@ public class Video_Preferences extends PreferenceActivity implements
 		} catch (NumberFormatException e) {
 			max_delay = null;
 		}
-		params.put(MediaSessionAndroid.MAX_DELAY, max_delay);
+		Value<Integer> maxDelayValue = new Value<Integer>(max_delay);
+		params.put(MediaSessionAndroid.MAX_DELAY, maxDelayValue);
 
 		Boolean syncMediaStreams = settings.getBoolean(
 				Keys_Preferences.MEDIA_GENERAL_SYNC_MEDIA_STREAMS, false);
-		params.put(MediaSessionAndroid.SYNCHRONIZE_MEDIA_STREAMS,
+		Value<Boolean> syncMediaStreamsValue = new Value<Boolean>(
 				syncMediaStreams);
+		params.put(MediaSessionAndroid.SYNCHRONIZE_MEDIA_STREAMS,
+				syncMediaStreamsValue);
 
-		params.put(MediaSessionAndroid.STREAMS_MODES,
+		Value<Map<MediaType, Direction>> streamsModesValue = new Value<Map<MediaType, Direction>>(
 				getCallDirectionMapFromSettings(context));
+		params.put(MediaSessionAndroid.STREAMS_MODES, streamsModesValue);
 
 		ApplicationContext.contextTable.put("callDirection",
 				getCallDirectionMapFromSettings(context));
 
-		params.put(MediaSessionAndroid.AUDIO_CODECS,
+		Value<List<AudioCodecType>> audioCodecsValue = new Value<List<AudioCodecType>>(
 				getAudioCodecsFromSettings(context));
+		params.put(MediaSessionAndroid.AUDIO_CODECS, audioCodecsValue);
 
-		params.put(MediaSessionAndroid.VIDEO_CODECS,
+		Value<List<VideoCodecType>> videoCodecsCalue = new Value<List<VideoCodecType>>(
 				getVideoCodecsFromSettings(context));
+		params.put(MediaSessionAndroid.VIDEO_CODECS, videoCodecsCalue);
 
 		PortRange audioPortRange;
 		try {
@@ -528,7 +540,10 @@ public class Video_Preferences extends PreferenceActivity implements
 			// TODO: show exception information in GUI.
 			audioPortRange = null;
 		}
-		params.put(MediaSessionAndroid.AUDIO_LOCAL_PORT_RANGE, audioPortRange);
+		Value<PortRange> audioPortRangeValue = new Value<PortRange>(
+				audioPortRange);
+		params.put(MediaSessionAndroid.AUDIO_LOCAL_PORT_RANGE,
+				audioPortRangeValue);
 
 		PortRange videoPortRange;
 		try {
@@ -540,7 +555,10 @@ public class Video_Preferences extends PreferenceActivity implements
 		} catch (Exception e) {
 			videoPortRange = null;
 		}
-		params.put(MediaSessionAndroid.VIDEO_LOCAL_PORT_RANGE, videoPortRange);
+		Value<PortRange> videoPortRangeValue = new Value<PortRange>(
+				videoPortRange);
+		params.put(MediaSessionAndroid.VIDEO_LOCAL_PORT_RANGE,
+				videoPortRangeValue);
 
 		int width, height;
 		try {
@@ -553,8 +571,10 @@ public class Video_Preferences extends PreferenceActivity implements
 			width = 352;
 			height = 288;
 		}
-		params.put(MediaSessionAndroid.FRAME_WIDTH, width);
-		params.put(MediaSessionAndroid.FRAME_HEIGHT, height);
+		Value<Integer> widthValue = new Value<Integer>(width);
+		params.put(MediaSessionAndroid.FRAME_WIDTH, widthValue);
+		Value<Integer> heightValue = new Value<Integer>(height);
+		params.put(MediaSessionAndroid.FRAME_HEIGHT, heightValue);
 
 		Integer max_frame_rate = null;
 		try {
@@ -563,7 +583,8 @@ public class Video_Preferences extends PreferenceActivity implements
 		} catch (NumberFormatException e) {
 			max_frame_rate = null;
 		}
-		params.put(MediaSessionAndroid.MAX_FRAME_RATE, max_frame_rate);
+		Value<Integer> maxFrameRateValue = new Value<Integer>(max_frame_rate);
+		params.put(MediaSessionAndroid.MAX_FRAME_RATE, maxFrameRateValue);
 
 		Integer gop_size = null;
 		try {
@@ -572,7 +593,8 @@ public class Video_Preferences extends PreferenceActivity implements
 		} catch (NumberFormatException e) {
 			gop_size = null;
 		}
-		params.put(MediaSessionAndroid.GOP_SIZE, gop_size);
+		Value<Integer> gopSizeValue = new Value<Integer>(gop_size);
+		params.put(MediaSessionAndroid.GOP_SIZE, gopSizeValue);
 
 		Integer frame_queue_size = null;
 		try {
@@ -581,14 +603,20 @@ public class Video_Preferences extends PreferenceActivity implements
 		} catch (NumberFormatException e) {
 			frame_queue_size = null;
 		}
-		params.put(MediaSessionAndroid.FRAMES_QUEUE_SIZE, frame_queue_size);
+		Value<Integer> framesQueueSizeValue = new Value<Integer>(
+				frame_queue_size);
+		params.put(MediaSessionAndroid.FRAMES_QUEUE_SIZE, framesQueueSizeValue);
 
 		Map<String, String> stunParams = Connection_Preferences
 				.getStunPreferences(context);
-		params.put(MediaSessionAndroid.STUN_HOST,
+		Value<String> stunHostValue = new Value<String>(
 				stunParams.get(Keys_Preferences.STUN_HOST));
-		params.put(MediaSessionAndroid.STUN_PORT, Integer.parseInt(stunParams
-				.get(Keys_Preferences.STUN_HOST_PORT)));
+		params.put(MediaSessionAndroid.STUN_HOST, stunHostValue);
+
+		Value<Integer> stunPortValue = new Value<Integer>(
+				Integer.parseInt(stunParams
+						.get(Keys_Preferences.STUN_HOST_PORT)));
+		params.put(MediaSessionAndroid.STUN_PORT, stunPortValue);
 
 		ConnectivityManager connManager = (ConnectivityManager) context
 				.getSystemService(CONNECTIVITY_SERVICE);
@@ -602,7 +630,8 @@ public class Video_Preferences extends PreferenceActivity implements
 			} else if ("MOBILE".equalsIgnoreCase(conType)) {
 				netIF = NetIF.MOBILE;
 			}
-			params.put(MediaSessionAndroid.NET_IF, netIF);
+			Value<NetIF> netIFValue = new Value<NetIF>(netIF);
+			params.put(MediaSessionAndroid.NET_IF, netIFValue);
 		} else
 			params.put(MediaSessionAndroid.NET_IF, null);
 		return params;
@@ -654,36 +683,36 @@ public class Video_Preferences extends PreferenceActivity implements
 		return selectedVideoCodecs;
 	}
 
-	private static Map<MediaType, Mode> getCallDirectionMapFromSettings(
+	private static Map<MediaType, Direction> getCallDirectionMapFromSettings(
 			Context context) {
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(context);
-		Map<MediaType, Mode> callDirection = new HashMap<MediaType, Mode>();
+		Map<MediaType, Direction> callDirection = new HashMap<MediaType, Direction>();
 
 		String videoDirection = settings.getString(
 				Keys_Preferences.MEDIA_VIDEO_CALL_DIRECTION, "SEND/RECEIVE");
 
 		if (videoDirection.equals("SEND ONLY")) {
-			callDirection.put(MediaType.VIDEO, Mode.SENDONLY);
+			callDirection.put(MediaType.VIDEO, Direction.SENDONLY);
 		}
 		if (videoDirection.equals("RECEIVE ONLY")) {
-			callDirection.put(MediaType.VIDEO, Mode.RECVONLY);
+			callDirection.put(MediaType.VIDEO, Direction.RECVONLY);
 		}
 		if (videoDirection.equals("SEND/RECEIVE")) {
-			callDirection.put(MediaType.VIDEO, Mode.SENDRECV);
+			callDirection.put(MediaType.VIDEO, Direction.SENDRECV);
 		}
 
 		String audioDirection = settings.getString(
 				Keys_Preferences.MEDIA_AUDIO_CALL_DIRECTION, "SEND/RECEIVE");
 
 		if (audioDirection.equals("SEND ONLY")) {
-			callDirection.put(MediaType.AUDIO, Mode.SENDONLY);
+			callDirection.put(MediaType.AUDIO, Direction.SENDONLY);
 		}
 		if (audioDirection.equals("RECEIVE ONLY")) {
-			callDirection.put(MediaType.AUDIO, Mode.RECVONLY);
+			callDirection.put(MediaType.AUDIO, Direction.RECVONLY);
 		}
 		if (audioDirection.equals("SEND/RECEIVE")) {
-			callDirection.put(MediaType.AUDIO, Mode.SENDRECV);
+			callDirection.put(MediaType.AUDIO, Direction.SENDRECV);
 		}
 
 		return callDirection;
@@ -693,44 +722,46 @@ public class Video_Preferences extends PreferenceActivity implements
 
 		Parameters params = getMediaPreferences(context);
 
-		Integer maxBandwidth = (Integer) params
-				.get(MediaSessionAndroid.MAX_BANDWIDTH);
+		Integer maxBandwidth = params.get(MediaSessionAndroid.MAX_BANDWIDTH)
+				.getValue();
 		if (maxBandwidth == null)
 			maxBandwidth = 0;
 
-		Integer maxDelay = (Integer) params.get(MediaSessionAndroid.MAX_DELAY);
+		Integer maxDelay = params.get(MediaSessionAndroid.MAX_DELAY).getValue();
 		if (maxDelay == null)
 			maxDelay = 0;
 
-		Boolean syncronizeMedia = (Boolean) params
-				.get(MediaSessionAndroid.SYNCHRONIZE_MEDIA_STREAMS);
+		Boolean syncronizeMedia = params.get(
+				MediaSessionAndroid.SYNCHRONIZE_MEDIA_STREAMS).getValue();
 		if (syncronizeMedia == null)
 			syncronizeMedia = false;
 
-		Integer frontCamera = (Integer) params
-				.get(MediaComponentAndroid.CAMERA_FACING);
+		Integer frontCamera = params.get(MediaComponentAndroid.CAMERA_FACING)
+				.getValue();
 		String camera = "Back camera";
 		if (frontCamera != null && frontCamera == 1)
 			camera = "Front camera";
 
-		PortRange videoPort = (PortRange) params
-				.get(MediaSessionAndroid.VIDEO_LOCAL_PORT_RANGE);
+		PortRange videoPort = params.get(
+				MediaSessionAndroid.VIDEO_LOCAL_PORT_RANGE).getValue();
 		String videoPortInfo = "Not defined";
 		if (videoPort != null)
 			videoPortInfo = "Min: " + videoPort.getMinPort() + "; Max: "
 					+ videoPort.getMaxPort();
 
-		Integer gopSize = (Integer) params.get(MediaSessionAndroid.GOP_SIZE);
+		Integer gopSize = params.get(MediaSessionAndroid.GOP_SIZE).getValue();
 		if (gopSize == null)
 			gopSize = 6;
 
-		Integer frameRate = (Integer) params
-				.get(MediaSessionAndroid.MAX_FRAME_RATE);
+		Integer frameRate = params.get(MediaSessionAndroid.MAX_FRAME_RATE)
+				.getValue();
+
 		if (frameRate == null)
 			frameRate = 15;
 
-		PortRange audioPort = (PortRange) params
-				.get(MediaSessionAndroid.AUDIO_LOCAL_PORT_RANGE);
+		PortRange audioPort = params.get(
+				MediaSessionAndroid.AUDIO_LOCAL_PORT_RANGE).getValue();
+
 		String audioPortInfo = "Not defined";
 		if (audioPort != null)
 			audioPortInfo = "Min: " + audioPort.getMinPort() + "; Max: "

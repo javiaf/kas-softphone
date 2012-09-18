@@ -31,20 +31,20 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 
-import com.kurento.commons.media.format.enums.MediaType;
-import com.kurento.commons.media.format.enums.Mode;
-import com.kurento.commons.mscontrol.MsControlException;
-import com.kurento.commons.mscontrol.Parameters;
-import com.kurento.commons.mscontrol.join.Joinable;
-import com.kurento.commons.mscontrol.join.Joinable.Direction;
-import com.kurento.kas.mscontrol.MSControlFactory;
-import com.kurento.kas.mscontrol.MediaSessionAndroid;
-import com.kurento.kas.mscontrol.mediacomponent.MediaComponentAndroid;
+import com.kurento.commons.config.Parameters;
+import com.kurento.commons.config.Value;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.softphone.R;
 import com.kurento.kas.phone.softphone.ServiceUpdateUIListener;
 import com.kurento.kas.phone.softphone.SoftPhone;
+import com.kurento.mediaspec.Direction;
+import com.kurento.mediaspec.MediaType;
+import com.kurento.mscontrol.commons.MsControlException;
+import com.kurento.mscontrol.commons.join.Joinable;
+import com.kurento.mscontrol.kas.MediaSessionAndroid;
+import com.kurento.mscontrol.kas.MsControlFactoryAndroid;
+import com.kurento.mscontrol.kas.mediacomponent.MediaComponentAndroid;
 
 public class VideoCallService extends Service {
 	private final String LOG_TAG = VideoCallService.class.getName();
@@ -62,7 +62,7 @@ public class VideoCallService extends Service {
 	private String notificationTitle = "VideoCall";
 	private String notificationTitleSoft = "KurentoPhone";
 
-	private Map<MediaType, Mode> callDirectionMap;
+	private Map<MediaType, Direction> callDirectionMap;
 	private Intent videoCallIntent;
 
 	@Override
@@ -92,7 +92,7 @@ public class VideoCallService extends Service {
 		mNotificationMgr.notify(NOTIF_VIDEOCALL, mNotif);
 		mNotificationMgr.cancel(NOTIF_SOFTPHONE);
 
-		callDirectionMap = (Map<MediaType, Mode>) ApplicationContext.contextTable
+		callDirectionMap = (Map<MediaType, Direction>) ApplicationContext.contextTable
 				.get("callDirection");
 		Controller controller = (Controller) ApplicationContext.contextTable
 				.get("controller");
@@ -108,30 +108,30 @@ public class VideoCallService extends Service {
 		MediaSessionAndroid mediaSession = controller.getMediaSession();
 
 		try {
-			Mode audioMode = callDirectionMap.get(MediaType.AUDIO);
+			Direction audioMode = callDirectionMap.get(MediaType.AUDIO);
 
 			if ((audioMode != null)
-					&& (Mode.SENDONLY.equals(audioMode) || Mode.SENDRECV
+					&& (Direction.SENDONLY.equals(audioMode) || Direction.SENDRECV
 							.equals(audioMode))) {
 				ApplicationContext.contextTable.put("mute", false);
 				audioPlayerComponent = mediaSession.createMediaComponent(
 						MediaComponentAndroid.AUDIO_PLAYER,
-						Parameters.NO_PARAMETER);
+						Parameters.NO_PARAMETERS);
 				ApplicationContext.contextTable.put("audioPlayerComponent",
 						audioPlayerComponent);
 			}
 
 			if ((audioMode != null)
-					&& (Mode.RECVONLY.equals(audioMode) || Mode.SENDRECV
+					&& (Direction.RECVONLY.equals(audioMode) || Direction.SENDRECV
 							.equals(audioMode))) {
 				// speaker = false, audioRecorderComponent was created as
 				// STREAM_MUSIC
 				// speaker = true, audioRecorderComponent was created as
 				// STREAM_VOICE_CALL
 				ApplicationContext.contextTable.put("speaker", false);
-				Parameters params = MSControlFactory.createParameters();
+				Parameters params = MsControlFactoryAndroid.createParameters();
 				params.put(MediaComponentAndroid.STREAM_TYPE,
-						AudioManager.STREAM_MUSIC);
+						new Value<Integer>(AudioManager.STREAM_MUSIC));
 				audioRecorderComponent = mediaSession.createMediaComponent(
 						MediaComponentAndroid.AUDIO_RECORDER, params);
 				ApplicationContext.contextTable.put("audioRecorderComponent",
@@ -157,12 +157,14 @@ public class VideoCallService extends Service {
 		try {
 
 			if (audioPlayerComponent != null) {
-				audioPlayerComponent.join(Direction.SEND, audioJoinable);
+				audioPlayerComponent.join(Joinable.Direction.SEND,
+						audioJoinable);
 				audioPlayerComponent.start();
 			}
 
 			if (audioRecorderComponent != null) {
-				audioRecorderComponent.join(Direction.RECV, audioJoinable);
+				audioRecorderComponent.join(Joinable.Direction.RECV,
+						audioJoinable);
 				audioRecorderComponent.start();
 			}
 
