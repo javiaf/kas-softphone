@@ -722,45 +722,75 @@ public class Video_Preferences extends PreferenceActivity implements
 
 		Parameters params = getMediaPreferences(context);
 
-		Integer maxBandwidth = params.get(MediaSessionAndroid.MAX_BANDWIDTH)
-				.getValue();
-		if (maxBandwidth == null)
+		Integer maxBandwidth = 0;
+		try {
+			maxBandwidth = params.get(MediaSessionAndroid.MAX_BANDWIDTH)
+					.getValue();
+		} catch (Exception e) {
 			maxBandwidth = 0;
+		}
 
-		Integer maxDelay = params.get(MediaSessionAndroid.MAX_DELAY).getValue();
-		if (maxDelay == null)
+		Integer maxDelay = 0;
+		try {
+			maxDelay = params.get(MediaSessionAndroid.MAX_DELAY).getValue();
+		} catch (Exception e) {
 			maxDelay = 0;
+		}
 
-		Boolean syncronizeMedia = params.get(
-				MediaSessionAndroid.SYNCHRONIZE_MEDIA_STREAMS).getValue();
-		if (syncronizeMedia == null)
+		Boolean syncronizeMedia = false;
+		try {
+			syncronizeMedia = params.get(
+					MediaSessionAndroid.SYNCHRONIZE_MEDIA_STREAMS).getValue();
+		} catch (Exception e) {
 			syncronizeMedia = false;
+		}
 
-		Integer frontCamera = params.get(MediaComponentAndroid.CAMERA_FACING)
-				.getValue();
+		Integer frontCamera = 1;
+		try {
+			frontCamera = params.get(MediaComponentAndroid.CAMERA_FACING)
+					.getValue();
+		} catch (Exception e) {
+			frontCamera = 1;
+		}
 		String camera = "Back camera";
 		if (frontCamera != null && frontCamera == 1)
 			camera = "Front camera";
 
-		PortRange videoPort = params.get(
-				MediaSessionAndroid.VIDEO_LOCAL_PORT_RANGE).getValue();
+		PortRange videoPort;
+		try {
+			videoPort = params.get(MediaSessionAndroid.VIDEO_LOCAL_PORT_RANGE)
+					.getValue();
+		} catch (Exception e) {
+			videoPort = null;
+		}
 		String videoPortInfo = "Not defined";
 		if (videoPort != null)
 			videoPortInfo = "Min: " + videoPort.getMinPort() + "; Max: "
 					+ videoPort.getMaxPort();
 
-		Integer gopSize = params.get(MediaSessionAndroid.GOP_SIZE).getValue();
-		if (gopSize == null)
+		Integer gopSize = 6;
+		try {
+			gopSize = params.get(MediaSessionAndroid.GOP_SIZE).getValue();
+		} catch (Exception e) {
 			gopSize = 6;
+		}
 
-		Integer frameRate = params.get(MediaSessionAndroid.MAX_FRAME_RATE)
-				.getValue();
-
-		if (frameRate == null)
+		Integer frameRate = 15;
+		try {
+			frameRate = params.get(MediaSessionAndroid.MAX_FRAME_RATE)
+					.getValue();
+		} catch (Exception e) {
 			frameRate = 15;
-
-		PortRange audioPort = params.get(
-				MediaSessionAndroid.AUDIO_LOCAL_PORT_RANGE).getValue();
+		}
+		
+		PortRange audioPort;
+		
+		try{
+			audioPort= params.get(
+					MediaSessionAndroid.AUDIO_LOCAL_PORT_RANGE).getValue();
+		} catch (Exception e) {
+			audioPort = null;
+		}
 
 		String audioPortInfo = "Not defined";
 		if (audioPort != null)
