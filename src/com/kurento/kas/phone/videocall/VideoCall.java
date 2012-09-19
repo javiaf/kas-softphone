@@ -51,6 +51,7 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -112,6 +113,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private View videoCaptureSurface;
 
 	private Boolean isStarted = true;
+	private int widthSurfaceReceive;
+	private int heigthSurfaceReceive;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -127,6 +130,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		getWindow().addFlags(
 				WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
 						| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+		setSizeToScreen();
 
 		callDirectionMap = (Map<MediaType, Direction>) ApplicationContext.contextTable
 				.get("callDirection");
@@ -204,14 +209,19 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 								.equals(videoMode))) {
 					Parameters params = MsControlFactoryAndroid
 							.createParameters();
+
+					FrameLayout.LayoutParams receiveParams = new FrameLayout.LayoutParams(
+							widthSurfaceReceive, heigthSurfaceReceive);
+					View video_receive_surface = findViewById(R.id.video_receive_surface);
+					video_receive_surface.setLayoutParams(receiveParams);
+
 					params.put(
 							MediaComponentAndroid.VIEW_SURFACE,
-							new Value<View>(
-									(View) findViewById(R.id.video_receive_surface)));
+							new Value<View>(video_receive_surface));
 					params.put(MediaComponentAndroid.DISPLAY_WIDTH,
-							new Value<Integer>(dm.widthPixels));
+							new Value<Integer>(widthSurfaceReceive));
 					params.put(MediaComponentAndroid.DISPLAY_HEIGHT,
-							new Value<Integer>(dm.heightPixels));
+							new Value<Integer>(heigthSurfaceReceive));
 					videoRecorderComponent = mediaSession.createMediaComponent(
 							MediaComponentAndroid.VIDEO_RECORDER, params);
 				}
@@ -414,8 +424,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 								Log.d(LOG_TAG,
 										"Create new videoPlayerComponent");
 								videoPlayerComponent.join(
-										Joinable.Direction.SEND,
-										videoJoinable);
+										Joinable.Direction.SEND, videoJoinable);
 								videoPlayerComponent.start();
 								Log.d(LOG_TAG,
 										"Create videoPlayercomponent start");
@@ -496,8 +505,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 							if (audioRecorderComponent != null) {
 								audioRecorderComponent.join(
-										Joinable.Direction.RECV,
-										audioJoinable);
+										Joinable.Direction.RECV, audioJoinable);
 								audioRecorderComponent.start();
 
 							}
@@ -516,24 +524,24 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				@Override
 				public void onClick(View v) {
 					Log.d(LOG_TAG, "PANEL MOVE");
-					switch (dm.densityDpi) {
-					case DisplayMetrics.DENSITY_LOW:
-						movement = 51;
-						break;
-					case DisplayMetrics.DENSITY_MEDIUM:
-						// This case is the same that DENSITY_DEFAULT
-						movement = 86;
-						break;
-					case DisplayMetrics.DENSITY_HIGH:
-						movement = 102;
-						break;
-					case DisplayMetrics.DENSITY_XHIGH:
-						movement = 137;
-						break;
-					default:
-						movement = 102;
-						break;
-					}
+					// switch (dm.densityDpi) {
+					// case DisplayMetrics.DENSITY_LOW:
+					// movement = 51;
+					// break;
+					// case DisplayMetrics.DENSITY_MEDIUM:
+					// // This case is the same that DENSITY_DEFAULT
+					// movement = 86;
+					// break;
+					// case DisplayMetrics.DENSITY_HIGH:
+					// movement = 102;
+					// break;
+					// case DisplayMetrics.DENSITY_XHIGH:
+					// movement = 137;
+					// break;
+					// default:
+					// movement = 102;
+					// break;
+					// }
 
 					Animation a = new Animation() {
 					};
@@ -842,5 +850,70 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		}
 		return "NC hasn't Info";
 
+	}
+
+	private void setSizeToScreen() {
+
+		dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+		switch (dm.densityDpi) {
+		case DisplayMetrics.DENSITY_LOW:
+			movement = 51;
+			widthSurfaceReceive = 270;
+			heigthSurfaceReceive = 250;
+			break;
+		case DisplayMetrics.DENSITY_MEDIUM:
+			// This case is the same that DENSITY_DEFAULT
+			movement = 86;
+			if (dm.widthPixels > 900) {
+				widthSurfaceReceive = 800;
+				heigthSurfaceReceive = 650;
+
+			} else {
+				widthSurfaceReceive = 360;
+				heigthSurfaceReceive = 330;
+			}
+			break;
+		case DisplayMetrics.DENSITY_HIGH:
+			movement = 102;
+			widthSurfaceReceive = 540;
+			heigthSurfaceReceive = 500;
+			break;
+		case DisplayMetrics.DENSITY_XHIGH:
+			movement = 137;
+			widthSurfaceReceive = 900;
+			heigthSurfaceReceive = 720;
+			break;
+		default:
+			movement = 102;
+			widthSurfaceReceive = 540;
+			heigthSurfaceReceive = 500;
+			break;
+		}
+
+		switch (dm.widthPixels) {
+		case 1280:
+			widthSurfaceReceive = 890;
+			heigthSurfaceReceive = 720;
+			break;
+		case 1196:
+			widthSurfaceReceive = 825;
+			heigthSurfaceReceive = 720;
+			break;
+		case 1024:
+			widthSurfaceReceive = 715;
+			if (dm.heightPixels == 600)
+				heigthSurfaceReceive = 600;
+			else
+				heigthSurfaceReceive = 800;
+			break;
+		case 854:
+			widthSurfaceReceive = 550;
+			heigthSurfaceReceive = 500;
+			break;
+		default:
+			break;
+		}
 	}
 }
