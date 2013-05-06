@@ -28,7 +28,6 @@ import android.util.Log;
 
 import com.kurento.kas.phone.preferences.Connection_Preferences;
 import com.kurento.kas.phone.preferences.Keys_Preferences;
-import com.kurento.kas.phone.preferences.Video_Preferences;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -132,8 +131,8 @@ public class ErrorReporter implements Thread.UncaughtExceptionHandler {
 					+ Connection_Preferences
 							.getConnectionNetPreferenceInfo(context);
 
-			mediaPreferences = Video_Preferences
-					.getMediaPreferencesInfo(context);
+			// mediaPreferences = Video_Preferences
+			// .getMediaPreferencesInfo(context);
 		} catch (NameNotFoundException e) {
 			e.printStackTrace();
 		} catch (Exception e) {

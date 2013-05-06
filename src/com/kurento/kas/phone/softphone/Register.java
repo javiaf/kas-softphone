@@ -13,7 +13,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package com.kurento.kas.phone.softphone;
 
 import android.app.Activity;
@@ -28,6 +28,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.kurento.kas.phone.preferences.Keys_Preferences;
+import com.kurento.kas.sip.ua.SipPreferences;
 
 public class Register extends Activity {
 	private static final String LOG_TAG = Register.class.getName();
@@ -70,19 +71,15 @@ public class Register extends Activity {
 							.getDefaultSharedPreferences(getBaseContext());
 					SharedPreferences.Editor editor = settings.edit();
 					editor.putString(Keys_Preferences.SIP_LOCAL_USERNAME,
-							textlocalusername
-							.getText().toString());
+							textlocalusername.getText().toString());
 					editor.putString(Keys_Preferences.SIP_LOCAL_PASSWORD,
-							textlocalpassword
-							.getText().toString());
+							textlocalpassword.getText().toString());
 					editor.putString(Keys_Preferences.SIP_LOCAL_DOMAIN,
-							textlocaldomain.getText()
-							.toString());
-					editor.putString(Keys_Preferences.SIP_PROXY_IP, textproxyip.getText()
-							.toString());
-					editor.putString(Keys_Preferences.SIP_PROXY_PORT,
-							textproxyport.getText()
-							.toString());
+							textlocaldomain.getText().toString());
+					editor.putString(SipPreferences.SIP_PROXY_SERVER_ADDRESS,
+							textproxyip.getText().toString());
+					editor.putInt(SipPreferences.SIP_PROXY_SERVER_PORT, Integer
+							.parseInt(textproxyport.getText().toString()));
 					editor.commit();
 					Log.d(LOG_TAG, "All data ok");
 					setResult(RESULT_OK);

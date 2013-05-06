@@ -16,9 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.kurento.kas.phone.videocall;
 
-import java.util.Map;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -27,7 +25,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -40,10 +37,8 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -51,52 +46,31 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
-import com.kurento.commons.config.Parameters;
-import com.kurento.commons.config.Value;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
-import com.kurento.kas.phone.preferences.Connection_Preferences;
 import com.kurento.kas.phone.preferences.VideoCall_Preferences;
-import com.kurento.kas.phone.preferences.Video_Preferences;
 import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.softphone.R;
 import com.kurento.kas.phone.softphone.ServiceUpdateUIListener;
-import com.kurento.mediaspec.Direction;
-import com.kurento.mediaspec.MediaSpec;
-import com.kurento.mediaspec.MediaType;
-import com.kurento.mediaspec.Payload;
-import com.kurento.mediaspec.PayloadRtp;
-import com.kurento.mediaspec.SessionSpec;
-import com.kurento.mscontrol.commons.MsControlException;
-import com.kurento.mscontrol.commons.join.Joinable;
-import com.kurento.mscontrol.commons.join.JoinableStream.StreamType;
-import com.kurento.mscontrol.commons.networkconnection.NetworkConnection;
-import com.kurento.mscontrol.commons.networkconnection.SdpPortManagerException;
-import com.kurento.mscontrol.kas.MediaSessionAndroid;
-import com.kurento.mscontrol.kas.MsControlFactoryAndroid;
-import com.kurento.mscontrol.kas.mediacomponent.AndroidAction;
-import com.kurento.mscontrol.kas.mediacomponent.AndroidInfo;
-import com.kurento.mscontrol.kas.mediacomponent.MediaComponentAndroid;
 
 public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private static final String LOG_TAG = VideoCall.class.getName();
 	private static final int SHOW_PREFERENCES = 1;
 	private PowerManager.WakeLock wl;
 	private boolean hang = false;
-	private Map<MediaType, Direction> callDirectionMap, mediaTypesModes;
+	// private Map<MediaType, Direction> callDirectionMap, mediaTypesModes;
 	private int cameraFacing = 0;
 	private Integer movement = 100; // Movement of the panel retractil
 
-	private MediaComponentAndroid videoPlayerComponent = null;
-	private MediaComponentAndroid videoRecorderComponent = null;
-	private MediaComponentAndroid audioRecorderComponent = null;
-	private MediaComponentAndroid audioPlayerComponent = null;
-
-	private NetworkConnection nc;
+	// private MediaComponentAndroid videoPlayerComponent = null;
+	// private MediaComponentAndroid videoRecorderComponent = null;
+	// private MediaComponentAndroid audioRecorderComponent = null;
+	// private MediaComponentAndroid audioPlayerComponent = null;
+	//
+	// private NetworkConnection nc;
 
 	private Integer audioBW, videoBW;
 	private Timer timer;
@@ -133,10 +107,12 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 		setSizeToScreen();
 
-		callDirectionMap = (Map<MediaType, Direction>) ApplicationContext.contextTable
-				.get("callDirection");
-		mediaTypesModes = (Map<MediaType, Direction>) ApplicationContext.contextTable
-				.get("mediaTypesModes");
+		// callDirectionMap = (Map<MediaType, Direction>)
+		// ApplicationContext.contextTable
+		// .get("callDirection");
+		// mediaTypesModes = (Map<MediaType, Direction>)
+		// ApplicationContext.contextTable
+		// .get("mediaTypesModes");
 
 		try {
 			cameraFacing = (Integer) ApplicationContext.contextTable
@@ -145,19 +121,21 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			cameraFacing = 0;
 		}
 
-		Direction videoMode = null;
-		if (mediaTypesModes != null)
-			videoMode = mediaTypesModes.get(MediaType.VIDEO);
+		// Direction videoMode = null;
+		// if (mediaTypesModes != null)
+		// videoMode = mediaTypesModes.get(MediaType.VIDEO);
 
-		if ((videoMode != null) && (Direction.RECVONLY.equals(videoMode)))
-			setContentView(R.layout.videocall_receive);
-		else if ((videoMode != null) && (Direction.SENDONLY.equals(videoMode)))
-			setContentView(R.layout.videocall_send);
-		else if ((videoMode != null) && (Direction.SENDRECV.equals(videoMode)))
-			setContentView(R.layout.videocall);
-		else {
+		// if ((videoMode != null) && (Direction.RECVONLY.equals(videoMode)))
+		// setContentView(R.layout.videocall_receive);
+		// else if ((videoMode != null) &&
+		// (Direction.SENDONLY.equals(videoMode)))
+		// setContentView(R.layout.videocall_send);
+		// else if ((videoMode != null) &&
+		// (Direction.SENDRECV.equals(videoMode)))
+		// setContentView(R.layout.videocall);
+		// else {
 			setContentView(R.layout.onlycall);
-		}
+		// }
 
 		panel = (TableLayout) findViewById(R.id.tableLayout1);
 
@@ -168,76 +146,81 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		mHandler = new Handler();
 		timer = new Timer();
 
-		Controller controller = (Controller) ApplicationContext.contextTable
-				.get("controller");
-
-		if (controller != null) {
-			nc = (NetworkConnection) ApplicationContext.contextTable.get("nc");
-
-			MediaSessionAndroid mediaSession = controller.getMediaSession();
-
-			dm = new DisplayMetrics();
-			getWindowManager().getDefaultDisplay().getMetrics(dm);
-			int orientation = getWindowManager().getDefaultDisplay()
-					.getOrientation();
-			try {
-				if ((videoMode != null)
-						&& (Direction.SENDONLY.equals(videoMode) || Direction.SENDRECV
-								.equals(videoMode))) {
-					videoCaptureSurface = (View) findViewById(R.id.video_capture_surface);
-					Parameters params = MsControlFactoryAndroid
-							.createParameters();
-					params.put(MediaComponentAndroid.PREVIEW_SURFACE,
-							new Value<View>(videoCaptureSurface));
-					params.put(MediaComponentAndroid.DISPLAY_ORIENTATION,
-							new Value<Integer>(orientation));
-					params.put(MediaComponentAndroid.CAMERA_FACING,
-							new Value<Integer>(cameraFacing));
-
-					videoPlayerComponent = mediaSession.createMediaComponent(
-							MediaComponentAndroid.VIDEO_PLAYER, params);
-				}
-			} catch (MsControlException e) {
-				Log.e(LOG_TAG, "MsControlException: " + e.getMessage(), e);
-			} catch (Exception e) {
-				Log.e(LOG_TAG, "Exception: " + e.getMessage(), e);
-			}
-
-			try {
-				if ((videoMode != null)
-						&& (Direction.RECVONLY.equals(videoMode) || Direction.SENDRECV
-								.equals(videoMode))) {
-					Parameters params = MsControlFactoryAndroid
-							.createParameters();
-
-					FrameLayout.LayoutParams receiveParams = new FrameLayout.LayoutParams(
-							widthSurfaceReceive, heigthSurfaceReceive);
-					View video_receive_surface = findViewById(R.id.video_receive_surface);
-					video_receive_surface.setLayoutParams(receiveParams);
-
-					params.put(
-							MediaComponentAndroid.VIEW_SURFACE,
-							new Value<View>(video_receive_surface));
-					params.put(MediaComponentAndroid.DISPLAY_WIDTH,
-							new Value<Integer>(widthSurfaceReceive));
-					params.put(MediaComponentAndroid.DISPLAY_HEIGHT,
-							new Value<Integer>(heigthSurfaceReceive));
-					videoRecorderComponent = mediaSession.createMediaComponent(
-							MediaComponentAndroid.VIDEO_RECORDER, params);
-				}
-			} catch (MsControlException e) {
-				Log.e(LOG_TAG, "MsControlException: " + e.getMessage(), e);
-				e.printStackTrace();
-			} catch (Exception e) {
-				Log.e(LOG_TAG, "Exception: " + e.getMessage(), e);
-			}
-
-			audioRecorderComponent = (MediaComponentAndroid) ApplicationContext.contextTable
-					.get("audioRecorderComponent");
-			audioPlayerComponent = (MediaComponentAndroid) ApplicationContext.contextTable
-					.get("audioPlayerComponent");
-		} else
-			Log.e(LOG_TAG, "Controller is null");
+		// Controller controller = (Controller) ApplicationContext.contextTable
+		// .get("controller");
+		//
+		// if (controller != null) {
+		// nc = (NetworkConnection) ApplicationContext.contextTable.get("nc");
+		//
+		// MediaSessionAndroid mediaSession = controller.getMediaSession();
+		//
+		// dm = new DisplayMetrics();
+		// getWindowManager().getDefaultDisplay().getMetrics(dm);
+		// int orientation = getWindowManager().getDefaultDisplay()
+		// .getOrientation();
+		// try {
+		// if ((videoMode != null)
+		// && (Direction.SENDONLY.equals(videoMode) || Direction.SENDRECV
+		// .equals(videoMode))) {
+		// videoCaptureSurface = (View)
+		// findViewById(R.id.video_capture_surface);
+		// Parameters params = MsControlFactoryAndroid
+		// .createParameters();
+		// params.put(MediaComponentAndroid.PREVIEW_SURFACE,
+		// new Value<View>(videoCaptureSurface));
+		// params.put(MediaComponentAndroid.DISPLAY_ORIENTATION,
+		// new Value<Integer>(orientation));
+		// params.put(MediaComponentAndroid.CAMERA_FACING,
+		// new Value<Integer>(cameraFacing));
+		//
+		// videoPlayerComponent = mediaSession.createMediaComponent(
+		// MediaComponentAndroid.VIDEO_PLAYER, params);
+		// }
+		// } catch (MsControlException e) {
+		// Log.e(LOG_TAG, "MsControlException: " + e.getMessage(), e);
+		// } catch (Exception e) {
+		// Log.e(LOG_TAG, "Exception: " + e.getMessage(), e);
+		// }
+		//
+		// try {
+		// if ((videoMode != null)
+		// && (Direction.RECVONLY.equals(videoMode) || Direction.SENDRECV
+		// .equals(videoMode))) {
+		// Parameters params = MsControlFactoryAndroid
+		// .createParameters();
+		//
+		// FrameLayout.LayoutParams receiveParams = new
+		// FrameLayout.LayoutParams(
+		// widthSurfaceReceive, heigthSurfaceReceive);
+		// View video_receive_surface =
+		// findViewById(R.id.video_receive_surface);
+		// video_receive_surface.setLayoutParams(receiveParams);
+		//
+		// params.put(
+		// MediaComponentAndroid.VIEW_SURFACE,
+		// new Value<View>(video_receive_surface));
+		// params.put(MediaComponentAndroid.DISPLAY_WIDTH,
+		// new Value<Integer>(widthSurfaceReceive));
+		// params.put(MediaComponentAndroid.DISPLAY_HEIGHT,
+		// new Value<Integer>(heigthSurfaceReceive));
+		// videoRecorderComponent = mediaSession.createMediaComponent(
+		// MediaComponentAndroid.VIDEO_RECORDER, params);
+		// }
+		// } catch (MsControlException e) {
+		// Log.e(LOG_TAG, "MsControlException: " + e.getMessage(), e);
+		// e.printStackTrace();
+		// } catch (Exception e) {
+		// Log.e(LOG_TAG, "Exception: " + e.getMessage(), e);
+		// }
+		//
+		// audioRecorderComponent = (MediaComponentAndroid)
+		// ApplicationContext.contextTable
+		// .get("audioRecorderComponent");
+		// audioPlayerComponent = (MediaComponentAndroid)
+		// ApplicationContext.contextTable
+		// .get("audioPlayerComponent");
+		// } else
+		// Log.e(LOG_TAG, "Controller is null");
 	}
 
 	@Override
@@ -270,37 +253,30 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		if (!hang) {
 			txt_bandwidth = (TextView) findViewById(R.id.txt_bandwidth);
 			txt_bandwidth.setTextColor(Color.RED);
-			startGetMediaInfo();
-			// NetworkConnection nc = (NetworkConnection)
+			// startGetMediaInfo();
+
+			// Joinable videoJoinable = (Joinable)
 			// ApplicationContext.contextTable
-			// .get("networkConnection");
-			Joinable videoJoinable = (Joinable) ApplicationContext.contextTable
-					.get("videoJoinable");
-			// Log.e(LOG_TAG, "nc: " + nc);
-			// if (nc == null) {
-			// Log.e(LOG_TAG, "networkConnection is NULL");
-			// return;
+			// .get("videoJoinable");
+			//
+			// try {
+			// if (videoPlayerComponent != null) {
+			// videoPlayerComponent.join(Joinable.Direction.SEND,
+			// videoJoinable);
+			// videoPlayerComponent.start();
 			// }
-			// TODO: Review. Not do it when the button Camara has been pushed
-
-			try {
-				if (videoPlayerComponent != null) {
-					videoPlayerComponent.join(Joinable.Direction.SEND,
-							videoJoinable);
-					videoPlayerComponent.start();
-				}
-				if (videoRecorderComponent != null) {
-					videoRecorderComponent.join(Joinable.Direction.RECV,
-							videoJoinable);
-					videoRecorderComponent.start();
-				}
-
-			} catch (MsControlException e) {
-				Log.e(LOG_TAG, "MsControlException: " + e.getMessage(), e);
-				e.printStackTrace();
-			} catch (Exception e) {
-				Log.e(LOG_TAG, "Exception: " + e.getMessage(), e);
-			}
+			// if (videoRecorderComponent != null) {
+			// videoRecorderComponent.join(Joinable.Direction.RECV,
+			// videoJoinable);
+			// videoRecorderComponent.start();
+			// }
+			//
+			// } catch (MsControlException e) {
+			// Log.e(LOG_TAG, "MsControlException: " + e.getMessage(), e);
+			// e.printStackTrace();
+			// } catch (Exception e) {
+			// Log.e(LOG_TAG, "Exception: " + e.getMessage(), e);
+			// }
 
 			final Button buttonTerminateCall = (Button) findViewById(R.id.button_terminate_call);
 			buttonTerminateCall.setOnClickListener(new OnClickListener() {
@@ -311,211 +287,222 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				}
 			});
 
-			final Button buttonMute = (Button) findViewById(R.id.button_mute);
+			// final Button buttonMute = (Button)
+			// findViewById(R.id.button_mute);
+			//
+			// buttonMute.setOnClickListener(new OnClickListener() {
+			//
+			// @Override
+			// public void onClick(View v) {
+			// audioPlayerComponent = (MediaComponentAndroid)
+			// ApplicationContext.contextTable
+			// .get("audioPlayerComponent");
+			//
+			// try {
+			// if (audioPlayerComponent != null) {
+			// // NetworkConnection nc = (NetworkConnection)
+			// // ApplicationContext.contextTable
+			// // .get("networkConnection");
+			// // if (nc == null) {
+			// // Log.e(LOG_TAG, "networkConnection is NULL");
+			// // return;
+			// // }
+			// Joinable audioJoinable = (Joinable)
+			// ApplicationContext.contextTable
+			// .get("audioJoinable");
+			//
+			// Boolean mute = (Boolean) ApplicationContext.contextTable
+			// .get("mute");
+			// if (mute != null) {
+			// if (mute)
+			// audioPlayerComponent.join(
+			// Joinable.Direction.SEND,
+			// audioJoinable);
+			// else
+			// audioPlayerComponent.unjoin(audioJoinable);
+			//
+			// mute = !mute;
+			// ApplicationContext.contextTable.put("mute",
+			// mute);
+			// }
+			// }
+			// } catch (MsControlException e) {
+			// Log.e(LOG_TAG, "MsControlException: " + e.getMessage(),
+			// e);
+			// }
+			// }
+			// });
 
-			buttonMute.setOnClickListener(new OnClickListener() {
+			// try {
+			// final Button buttonCamera = (Button)
+			// findViewById(R.id.button_camera);
+			//
+			// buttonCamera.setOnClickListener(new OnClickListener() {
+			//
+			// @Override
+			// public void onClick(View v) {
+			// Log.d(LOG_TAG, "Button Push");
+			//
+			// // Log.d(LOG_TAG, "VideoPlayercomponent is Stop");
+			// Controller controller = (Controller)
+			// ApplicationContext.contextTable
+			// .get("controller");
+			// // NetworkConnection nc = (NetworkConnection)
+			// // ApplicationContext.contextTable
+			// // .get("networkConnection");
+			// Joinable videoJoinable = (Joinable)
+			// ApplicationContext.contextTable
+			// .get("videoJoinable");
+			// if (videoPlayerComponent != null) {
+			// videoPlayerComponent.release();
+			// try {
+			// videoPlayerComponent.unjoin(videoJoinable);
+			// } catch (MsControlException e) {
+			// // TODO Auto-generated catch block
+			// Log.e(LOG_TAG,
+			// "MsControlException: " + e.getMessage(),
+			// e);
+			// }
+			// videoPlayerComponent = null;
+			//
+			// }
+			// Log.d(LOG_TAG, "videoPlayercomonent is null, it's Ok");
+			// if (controller != null) {
+			// MediaSessionAndroid mediaSession = controller
+			// .getMediaSession();
+			//
+			// Log.d(LOG_TAG, "Create MediaSession");
+			//
+			// DisplayMetrics dm = new DisplayMetrics();
+			// getWindowManager().getDefaultDisplay().getMetrics(
+			// dm);
+			// int orientation = getWindowManager()
+			// .getDefaultDisplay().getOrientation();
+			// Parameters params = MsControlFactoryAndroid
+			// .createParameters();
+			// params.put(
+			// MediaComponentAndroid.PREVIEW_SURFACE,
+			// new Value<View>(
+			// (View) findViewById(R.id.video_capture_surface)));
+			// params.put(
+			// MediaComponentAndroid.DISPLAY_ORIENTATION,
+			// new Value<Integer>(orientation));
+			// if (cameraFacing == 0) {
+			// params.put(MediaComponentAndroid.CAMERA_FACING,
+			// new Value<Integer>(1));
+			// cameraFacing = 1;
+			// } else {
+			// params.put(MediaComponentAndroid.CAMERA_FACING,
+			// new Value<Integer>(0));
+			//
+			// cameraFacing = 0;
+			// }
+			// ApplicationContext.contextTable.put("cameraFacing",
+			// cameraFacing);
+			// try {
+			// videoPlayerComponent = mediaSession
+			// .createMediaComponent(
+			// MediaComponentAndroid.VIDEO_PLAYER,
+			// params);
+			// Log.d(LOG_TAG,
+			// "Create new videoPlayerComponent");
+			// videoPlayerComponent.join(
+			// Joinable.Direction.SEND, videoJoinable);
+			// videoPlayerComponent.start();
+			// Log.d(LOG_TAG,
+			// "Create videoPlayercomponent start");
+			// } catch (MsControlException e) {
+			// Log.d(LOG_TAG,
+			// "MsControlException: " + e.getMessage(),
+			// e);
+			// }
+			// }
+			// }
+			// });
+			// } catch (Exception e) {
+			// Log.d(LOG_TAG, "This button doesn't exist in xml");
+			// }
 
-				@Override
-				public void onClick(View v) {
-					audioPlayerComponent = (MediaComponentAndroid) ApplicationContext.contextTable
-							.get("audioPlayerComponent");
-
-					try {
-						if (audioPlayerComponent != null) {
-							// NetworkConnection nc = (NetworkConnection)
-							// ApplicationContext.contextTable
-							// .get("networkConnection");
-							// if (nc == null) {
-							// Log.e(LOG_TAG, "networkConnection is NULL");
-							// return;
-							// }
-							Joinable audioJoinable = (Joinable) ApplicationContext.contextTable
-									.get("audioJoinable");
-
-							Boolean mute = (Boolean) ApplicationContext.contextTable
-									.get("mute");
-							if (mute != null) {
-								if (mute)
-									audioPlayerComponent.join(
-											Joinable.Direction.SEND,
-											audioJoinable);
-								else
-									audioPlayerComponent.unjoin(audioJoinable);
-
-								mute = !mute;
-								ApplicationContext.contextTable.put("mute",
-										mute);
-							}
-						}
-					} catch (MsControlException e) {
-						Log.e(LOG_TAG, "MsControlException: " + e.getMessage(),
-								e);
-					}
-				}
-			});
-			try {
-				final Button buttonCamera = (Button) findViewById(R.id.button_camera);
-
-				buttonCamera.setOnClickListener(new OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-						Log.d(LOG_TAG, "Button Push");
-
-						// Log.d(LOG_TAG, "VideoPlayercomponent is Stop");
-						Controller controller = (Controller) ApplicationContext.contextTable
-								.get("controller");
-						// NetworkConnection nc = (NetworkConnection)
-						// ApplicationContext.contextTable
-						// .get("networkConnection");
-						Joinable videoJoinable = (Joinable) ApplicationContext.contextTable
-								.get("videoJoinable");
-						if (videoPlayerComponent != null) {
-							videoPlayerComponent.release();
-							try {
-								videoPlayerComponent.unjoin(videoJoinable);
-							} catch (MsControlException e) {
-								// TODO Auto-generated catch block
-								Log.e(LOG_TAG,
-										"MsControlException: " + e.getMessage(),
-										e);
-							}
-							videoPlayerComponent = null;
-
-						}
-						Log.d(LOG_TAG, "videoPlayercomonent is null, it's Ok");
-						if (controller != null) {
-							MediaSessionAndroid mediaSession = controller
-									.getMediaSession();
-
-							Log.d(LOG_TAG, "Create MediaSession");
-
-							DisplayMetrics dm = new DisplayMetrics();
-							getWindowManager().getDefaultDisplay().getMetrics(
-									dm);
-							int orientation = getWindowManager()
-									.getDefaultDisplay().getOrientation();
-							Parameters params = MsControlFactoryAndroid
-									.createParameters();
-							params.put(
-									MediaComponentAndroid.PREVIEW_SURFACE,
-									new Value<View>(
-											(View) findViewById(R.id.video_capture_surface)));
-							params.put(
-									MediaComponentAndroid.DISPLAY_ORIENTATION,
-									new Value<Integer>(orientation));
-							if (cameraFacing == 0) {
-								params.put(MediaComponentAndroid.CAMERA_FACING,
-										new Value<Integer>(1));
-								cameraFacing = 1;
-							} else {
-								params.put(MediaComponentAndroid.CAMERA_FACING,
-										new Value<Integer>(0));
-
-								cameraFacing = 0;
-							}
-							ApplicationContext.contextTable.put("cameraFacing",
-									cameraFacing);
-							try {
-								videoPlayerComponent = mediaSession
-										.createMediaComponent(
-												MediaComponentAndroid.VIDEO_PLAYER,
-												params);
-								Log.d(LOG_TAG,
-										"Create new videoPlayerComponent");
-								videoPlayerComponent.join(
-										Joinable.Direction.SEND, videoJoinable);
-								videoPlayerComponent.start();
-								Log.d(LOG_TAG,
-										"Create videoPlayercomponent start");
-							} catch (MsControlException e) {
-								Log.d(LOG_TAG,
-										"MsControlException: " + e.getMessage(),
-										e);
-							}
-						}
-					}
-				});
-			} catch (Exception e) {
-				Log.d(LOG_TAG, "This button doesn't exist in xml");
-			}
-
-			final Button buttonSpeaker = (Button) findViewById(R.id.button_headset);
-
-			buttonSpeaker.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-
-					Controller controller = (Controller) ApplicationContext.contextTable
-							.get("controller");
-					if (controller == null) {
-						Log.e(LOG_TAG, "controller is NULL");
-						return;
-					}
-
-					// NetworkConnection nc = (NetworkConnection)
-					// ApplicationContext.contextTable
-					// .get("networkConnection");
-					// if (nc == null) {
-					// Log.e(LOG_TAG, "networkConnection is NULL");
-					// return;
-					// }
-
-					Joinable audioJoinable = (Joinable) ApplicationContext.contextTable
-							.get("audioJoinable");
-
-					MediaSessionAndroid mediaSession = controller
-							.getMediaSession();
-					audioRecorderComponent = (MediaComponentAndroid) ApplicationContext.contextTable
-							.get("audioRecorderComponent");
-					try {
-						if (audioRecorderComponent != null) {
-							audioRecorderComponent.stop();
-							audioRecorderComponent.unjoin(audioJoinable);
-						}
-
-						Parameters params = MsControlFactoryAndroid
-								.createParameters();
-
-						Boolean speaker = (Boolean) ApplicationContext.contextTable
-								.get("speaker");
-						if (speaker != null) {
-
-							if (speaker)
-								params.put(MediaComponentAndroid.STREAM_TYPE,
-										new Value<Integer>(
-												AudioManager.STREAM_MUSIC));
-							else
-								params.put(MediaComponentAndroid.STREAM_TYPE,
-										new Value<Integer>(
-												AudioManager.STREAM_VOICE_CALL));
-
-							speaker = !speaker;
-							ApplicationContext.contextTable.put("speaker",
-									speaker);
-
-							audioRecorderComponent = mediaSession
-									.createMediaComponent(
-											MediaComponentAndroid.AUDIO_RECORDER,
-											params);
-							ApplicationContext.contextTable.put(
-									"audioRecorderComponent",
-									audioRecorderComponent);
-
-							if (audioRecorderComponent != null) {
-								audioRecorderComponent.join(
-										Joinable.Direction.RECV, audioJoinable);
-								audioRecorderComponent.start();
-
-							}
-						}
-					} catch (MsControlException e) {
-						Log.e(LOG_TAG, "MsControlException: " + e.getMessage(),
-								e);
-					}
-				}
-			});
+			// final Button buttonSpeaker = (Button)
+			// findViewById(R.id.button_headset);
+			//
+			// buttonSpeaker.setOnClickListener(new OnClickListener() {
+			//
+			// @Override
+			// public void onClick(View v) {
+			//
+			// Controller controller = (Controller)
+			// ApplicationContext.contextTable
+			// .get("controller");
+			// if (controller == null) {
+			// Log.e(LOG_TAG, "controller is NULL");
+			// return;
+			// }
+			//
+			// // NetworkConnection nc = (NetworkConnection)
+			// // ApplicationContext.contextTable
+			// // .get("networkConnection");
+			// // if (nc == null) {
+			// // Log.e(LOG_TAG, "networkConnection is NULL");
+			// // return;
+			// // }
+			//
+			// Joinable audioJoinable = (Joinable)
+			// ApplicationContext.contextTable
+			// .get("audioJoinable");
+			//
+			// MediaSessionAndroid mediaSession = controller
+			// .getMediaSession();
+			// audioRecorderComponent = (MediaComponentAndroid)
+			// ApplicationContext.contextTable
+			// .get("audioRecorderComponent");
+			// try {
+			// if (audioRecorderComponent != null) {
+			// audioRecorderComponent.stop();
+			// audioRecorderComponent.unjoin(audioJoinable);
+			// }
+			//
+			// Parameters params = MsControlFactoryAndroid
+			// .createParameters();
+			//
+			// Boolean speaker = (Boolean) ApplicationContext.contextTable
+			// .get("speaker");
+			// if (speaker != null) {
+			//
+			// if (speaker)
+			// params.put(MediaComponentAndroid.STREAM_TYPE,
+			// new Value<Integer>(
+			// AudioManager.STREAM_MUSIC));
+			// else
+			// params.put(MediaComponentAndroid.STREAM_TYPE,
+			// new Value<Integer>(
+			// AudioManager.STREAM_VOICE_CALL));
+			//
+			// speaker = !speaker;
+			// ApplicationContext.contextTable.put("speaker",
+			// speaker);
+			//
+			// audioRecorderComponent = mediaSession
+			// .createMediaComponent(
+			// MediaComponentAndroid.AUDIO_RECORDER,
+			// params);
+			// ApplicationContext.contextTable.put(
+			// "audioRecorderComponent",
+			// audioRecorderComponent);
+			//
+			// if (audioRecorderComponent != null) {
+			// audioRecorderComponent.join(
+			// Joinable.Direction.RECV, audioJoinable);
+			// audioRecorderComponent.start();
+			//
+			// }
+			// }
+			// } catch (MsControlException e) {
+			// Log.e(LOG_TAG, "MsControlException: " + e.getMessage(),
+			// e);
+			// }
+			// }
+			// });
 
 			final Button btnOccult = (Button) findViewById(R.id.btnOcculPanel);
 			panel = (LinearLayout) findViewById(R.id.LinearLayout1);
@@ -623,24 +610,24 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 				}
 			});
 
-			if (videoCaptureSurface != null) {
-				videoCaptureSurface.setOnTouchListener(new OnTouchListener() {
-
-					@Override
-					public boolean onTouch(View v, MotionEvent event) {
-						if (videoPlayerComponent != null)
-							try {
-								videoPlayerComponent
-										.onAction(AndroidAction.CAMERA_AUTOFOCUS);
-							} catch (MsControlException e) {
-								Log.e(LOG_TAG,
-										"MsControlException: " + e.getMessage(),
-										e);
-							}
-						return false;
-					}
-				});
-			}
+			// if (videoCaptureSurface != null) {
+			// videoCaptureSurface.setOnTouchListener(new OnTouchListener() {
+			//
+			// @Override
+			// public boolean onTouch(View v, MotionEvent event) {
+			// if (videoPlayerComponent != null)
+			// try {
+			// videoPlayerComponent
+			// .onAction(AndroidAction.CAMERA_AUTOFOCUS);
+			// } catch (MsControlException e) {
+			// Log.e(LOG_TAG,
+			// "MsControlException: " + e.getMessage(),
+			// e);
+			// }
+			// return false;
+			// }
+			// });
+			// }
 		}
 	}
 
@@ -665,10 +652,10 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	@Override
 	protected void onPause() {
 		Log.d(LOG_TAG, "OnPause");
-		if (videoRecorderComponent != null)
-			videoRecorderComponent.stop();
-		if (videoPlayerComponent != null)
-			videoPlayerComponent.stop();
+		// if (videoRecorderComponent != null)
+		// videoRecorderComponent.stop();
+		// if (videoPlayerComponent != null)
+		// videoPlayerComponent.stop();
 		if (timer != null)
 			timer.cancel();
 		super.onPause();
@@ -714,16 +701,16 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			Dialog dialog = new Dialog(this);
 			dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 			dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-			String info_video = Video_Preferences
-					.getMediaPreferencesInfo(getApplicationContext());
-			info_video += "\n\n"
-					+ Connection_Preferences
-							.getConnectionNetPreferenceInfo(getApplicationContext());
+			// String info_video = Video_Preferences
+			// .getMediaPreferencesInfo(getApplicationContext());
+			// info_video += "\n\n"
+			// + Connection_Preferences
+			// .getConnectionNetPreferenceInfo(getApplicationContext());
 			dialog.setContentView(R.layout.info_video);
 
-			((TextView) dialog.findViewById(R.id.info_video))
-					.setText("MEDIA NEGOCIATE\n" + getInfoSdp()
-							+ "\n\n-------\nMEDIA CONFIGURATE\n " + info_video);
+			// ((TextView) dialog.findViewById(R.id.info_video))
+			// .setText("MEDIA NEGOCIATE\n" + getInfoSdp()
+			// + "\n\n-------\nMEDIA CONFIGURATE\n " + info_video);
 
 			dialog.show();
 
@@ -748,109 +735,109 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		finish();
 	}
 
-	private void startGetMediaInfo() {
-		timer = new Timer();
-		timer.schedule(new TimerTask() {
-			public void run() {
-				mHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						if (nc != null) {
-							// Get input info
-							if (videoRecorderComponent != null) {
-								videoBW = (int) nc.getBitrate(StreamType.video,
-										Joinable.Direction.RECV) / 1000;
-								try {
-									infoInputBW = "V: "
-											+ videoBW
-											+ " kbps / "
-											+ videoRecorderComponent
-													.getInfo(AndroidInfo.RECORDER_QUEUE);
-								} catch (MsControlException e) {
-									infoInputBW = "No Video";
-								}
-							} else
-								infoInputBW = "No Video";
-
-							if (audioRecorderComponent != null) {
-								audioBW = (int) nc.getBitrate(StreamType.audio,
-										Joinable.Direction.RECV) / 1000;
-								try {
-									infoInputBW = infoInputBW
-											+ " ---- A: "
-											+ audioBW
-											+ " kbps / "
-											+ audioRecorderComponent
-													.getInfo(AndroidInfo.RECORDER_QUEUE);
-								} catch (MsControlException e) {
-									infoInputBW = infoInputBW
-											+ " ---- No Audio";
-								}
-							} else
-								infoInputBW = infoInputBW + " ---- No Audio";
-
-							// Get output info
-							if (videoPlayerComponent != null) {
-								videoBW = (int) nc.getBitrate(StreamType.video,
-										Joinable.Direction.SEND) / 1000;
-								infoOutputBW = "V: " + videoBW + " kbps";
-							} else
-								infoOutputBW = "No Video";
-
-							if (audioPlayerComponent != null) {
-								audioBW = (int) nc.getBitrate(StreamType.audio,
-										Joinable.Direction.SEND) / 1000;
-								infoOutputBW = infoOutputBW + " ---- A: "
-										+ audioBW + " kbps";
-							} else
-								infoOutputBW = infoOutputBW + " ---- No Audio";
-
-						} else {
-							infoInputBW = "No Video ---- No Audio";
-							infoOutputBW = "No Video ---- No Audio";
-						}
-						if (txt_bandwidth != null)
-							txt_bandwidth.setText("I: " + infoInputBW + "\nO: "
-									+ infoOutputBW);
-					}
-				});
-			}
-		}, 0, 1000);
-	}
-
-	private String getInfoSdp() {
-		String info = "NC hasn't Info";
-		if (nc != null) {
-			SessionSpec sessionSpec;
-			try {
-				sessionSpec = nc.getSdpPortManager()
-						.getMediaServerSessionDescription();
-				info = "";
-				for (MediaSpec media : sessionSpec.getMedias()) {
-					if (media.getType().contains(MediaType.AUDIO))
-						info += "\nAudio: \n";
-					else if (media.getType().contains(MediaType.VIDEO))
-						info += "\nVideo: \n";
-
-					for (Payload payload : media.getPayloads()) {
-						try {
-							PayloadRtp infoRtp = payload.getRtp();
-							info += infoRtp.toString() + "\n";
-						} catch (Exception e) {
-							continue;
-						}
-					}
-				}
-			} catch (SdpPortManagerException e1) {
-				return "NC hasn't Info";
-			} catch (MsControlException e1) {
-				return "NC hasn't Info";
-			}
-			return info;
-		}
-		return "NC hasn't Info";
-
-	}
+	// private void startGetMediaInfo() {
+	// timer = new Timer();
+	// timer.schedule(new TimerTask() {
+	// public void run() {
+	// mHandler.post(new Runnable() {
+	// @Override
+	// public void run() {
+	// if (nc != null) {
+	// // Get input info
+	// if (videoRecorderComponent != null) {
+	// videoBW = (int) nc.getBitrate(StreamType.video,
+	// Joinable.Direction.RECV) / 1000;
+	// try {
+	// infoInputBW = "V: "
+	// + videoBW
+	// + " kbps / "
+	// + videoRecorderComponent
+	// .getInfo(AndroidInfo.RECORDER_QUEUE);
+	// } catch (MsControlException e) {
+	// infoInputBW = "No Video";
+	// }
+	// } else
+	// infoInputBW = "No Video";
+	//
+	// if (audioRecorderComponent != null) {
+	// audioBW = (int) nc.getBitrate(StreamType.audio,
+	// Joinable.Direction.RECV) / 1000;
+	// try {
+	// infoInputBW = infoInputBW
+	// + " ---- A: "
+	// + audioBW
+	// + " kbps / "
+	// + audioRecorderComponent
+	// .getInfo(AndroidInfo.RECORDER_QUEUE);
+	// } catch (MsControlException e) {
+	// infoInputBW = infoInputBW
+	// + " ---- No Audio";
+	// }
+	// } else
+	// infoInputBW = infoInputBW + " ---- No Audio";
+	//
+	// // Get output info
+	// if (videoPlayerComponent != null) {
+	// videoBW = (int) nc.getBitrate(StreamType.video,
+	// Joinable.Direction.SEND) / 1000;
+	// infoOutputBW = "V: " + videoBW + " kbps";
+	// } else
+	// infoOutputBW = "No Video";
+	//
+	// if (audioPlayerComponent != null) {
+	// audioBW = (int) nc.getBitrate(StreamType.audio,
+	// Joinable.Direction.SEND) / 1000;
+	// infoOutputBW = infoOutputBW + " ---- A: "
+	// + audioBW + " kbps";
+	// } else
+	// infoOutputBW = infoOutputBW + " ---- No Audio";
+	//
+	// } else {
+	// infoInputBW = "No Video ---- No Audio";
+	// infoOutputBW = "No Video ---- No Audio";
+	// }
+	// if (txt_bandwidth != null)
+	// txt_bandwidth.setText("I: " + infoInputBW + "\nO: "
+	// + infoOutputBW);
+	// }
+	// });
+	// }
+	// }, 0, 1000);
+	// }
+	//
+	// private String getInfoSdp() {
+	// String info = "NC hasn't Info";
+	// if (nc != null) {
+	// SessionSpec sessionSpec;
+	// try {
+	// sessionSpec = nc.getSdpPortManager()
+	// .getMediaServerSessionDescription();
+	// info = "";
+	// for (MediaSpec media : sessionSpec.getMedias()) {
+	// if (media.getType().contains(MediaType.AUDIO))
+	// info += "\nAudio: \n";
+	// else if (media.getType().contains(MediaType.VIDEO))
+	// info += "\nVideo: \n";
+	//
+	// for (Payload payload : media.getPayloads()) {
+	// try {
+	// PayloadRtp infoRtp = payload.getRtp();
+	// info += infoRtp.toString() + "\n";
+	// } catch (Exception e) {
+	// continue;
+	// }
+	// }
+	// }
+	// } catch (SdpPortManagerException e1) {
+	// return "NC hasn't Info";
+	// } catch (MsControlException e1) {
+	// return "NC hasn't Info";
+	// }
+	// return info;
+	// }
+	// return "NC hasn't Info";
+	//
+	// }
 
 	private void setSizeToScreen() {
 

@@ -135,7 +135,6 @@ public class SoftPhoneService extends Service implements SoftphoneCallListener {
 
 	@Override
 	public void callSetup() {
-
 		Message msg = new Message();
 		Bundle b = new Bundle();
 		b.putString("finishActivity", "MEDIA_CONTROL_OUTGOING");
@@ -154,7 +153,6 @@ public class SoftPhoneService extends Service implements SoftphoneCallListener {
 		Intent iIncomingCall = new Intent();
 		iIncomingCall.setAction(Actions.CALL_SETUP);
 		sendBroadcast(iIncomingCall);
-
 	}
 
 	@Override

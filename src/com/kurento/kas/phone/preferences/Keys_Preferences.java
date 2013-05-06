@@ -6,10 +6,10 @@ public class Keys_Preferences {
 	public static String SIP_LOCAL_USERNAME = "SIP_LOCAL_USERNAME";
 	public static String SIP_LOCAL_PASSWORD = "SIP_LOCAL_PASSWORD";
 	public static String SIP_LOCAL_DOMAIN = "SIP_LOCAL_DOMAIN";
-	public static String SIP_PROXY_IP = "SIP_PROXY_IP";
-	public static String SIP_PROXY_PORT = "SIP_PROXY_PORT";
-	public static String SIP_MIN_LOCAL_PORT = "SIP_MIN_LOCAL_PORT";
-	public static String SIP_MAX_LOCAL_PORT = "SIP_MAX_LOCAL_PORT";
+	// public static String SIP_PROXY_IP = "SIP_PROXY_IP";
+	// public static String SIP_PROXY_PORT = "SIP_PROXY_PORT";
+	// public static String SIP_MIN_LOCAL_PORT = "SIP_MIN_LOCAL_PORT";
+	// public static String SIP_MAX_LOCAL_PORT = "SIP_MAX_LOCAL_PORT";
 
 	// Push Connection Preference
 	public static String PUSH_CLIENT_USERNAME = "PUSH_CLIENT_USERNAME";

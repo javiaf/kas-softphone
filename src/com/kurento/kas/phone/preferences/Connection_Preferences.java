@@ -28,15 +28,13 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.kurento.kas.phone.softphone.R;
+import com.kurento.kas.sip.ua.SipPreferences;
 
 public class Connection_Preferences extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener {
 
 	private static boolean preferenceConnectionChanged = false;
 	private static String info;
-
-	private static final int SIP_PORT_MIN_DEF = 6060;
-	private static final int SIP_PORT_MAX_DEF = 10000;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,36 +45,9 @@ public class Connection_Preferences extends PreferenceActivity implements
 				.registerOnSharedPreferenceChangeListener(this);
 	}
 
-	// TODO Add throw exception when params is null
-	public static void setConnectionPreferences(Context context,
-			Map<String, String> params) {
-
-		SharedPreferences settings = PreferenceManager
-				.getDefaultSharedPreferences(context);
-		SharedPreferences.Editor editor = settings.edit();
-
-		editor.putString(Keys_Preferences.SIP_LOCAL_USERNAME,
-				params.get(Keys_Preferences.SIP_LOCAL_USERNAME));
-		editor.putString(Keys_Preferences.SIP_LOCAL_PASSWORD,
-				params.get(Keys_Preferences.SIP_LOCAL_PASSWORD));
-		editor.putString(Keys_Preferences.SIP_LOCAL_DOMAIN,
-				params.get(Keys_Preferences.SIP_LOCAL_DOMAIN));
-		editor.putString(Keys_Preferences.SIP_PROXY_IP,
-				params.get(Keys_Preferences.SIP_PROXY_IP));
-		editor.putString(Keys_Preferences.SIP_PROXY_PORT,
-				params.get(Keys_Preferences.SIP_PROXY_PORT));
-		editor.putString(Keys_Preferences.SIP_MIN_LOCAL_PORT,
-				params.get(Keys_Preferences.SIP_MIN_LOCAL_PORT));
-		editor.putString(Keys_Preferences.SIP_MAX_LOCAL_PORT,
-				params.get(Keys_Preferences.SIP_MAX_LOCAL_PORT));
-
-		editor.commit();
-
-	}
-
 	public static Map<String, String> getConnectionPreferences(Context context) {
 		Map<String, String> params = new HashMap<String, String>();
-		String username, password, domain, ip, port, min_port, max_port;
+		String username, password, domain, ip;
 
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(context);
@@ -85,16 +56,9 @@ public class Connection_Preferences extends PreferenceActivity implements
 		password = settings.getString(Keys_Preferences.SIP_LOCAL_PASSWORD, "");
 		domain = settings.getString(Keys_Preferences.SIP_LOCAL_DOMAIN, "");
 
-		ip = settings.getString(Keys_Preferences.SIP_PROXY_IP, "");
-		port = settings.getString(Keys_Preferences.SIP_PROXY_PORT, "");
+		ip = settings.getString(SipPreferences.SIP_PROXY_SERVER_ADDRESS, "");
 
-		min_port = settings.getString(Keys_Preferences.SIP_MIN_LOCAL_PORT,
-				String.valueOf(SIP_PORT_MIN_DEF));
-		max_port = settings.getString(Keys_Preferences.SIP_MAX_LOCAL_PORT,
-				String.valueOf(SIP_PORT_MAX_DEF));
-
-		if (username.equals("") || domain.equals("") || ip.equals("")
-				|| port.equals(""))
+		if (username.equals("") || domain.equals("") || ip.equals(""))
 			return null;
 
 		params.put(Keys_Preferences.SIP_LOCAL_USERNAME,
@@ -103,26 +67,24 @@ public class Connection_Preferences extends PreferenceActivity implements
 				password.replace(" ", ""));
 		params.put(Keys_Preferences.SIP_LOCAL_DOMAIN, domain.replace(" ", ""));
 
-		params.put(Keys_Preferences.SIP_PROXY_IP, ip.replace(" ", ""));
-		params.put(Keys_Preferences.SIP_PROXY_PORT, port);
-
-		params.put(Keys_Preferences.SIP_MIN_LOCAL_PORT, min_port);
-		params.put(Keys_Preferences.SIP_MAX_LOCAL_PORT, max_port);
+		params.put(SipPreferences.SIP_PROXY_SERVER_ADDRESS, ip.replace(" ", ""));
 
 		return params;
 	}
 
 	public static String getConnectionPreferencesInfo(Context context) {
-
 		Map<String, String> params = getConnectionPreferences(context);
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		int port = settings.getInt(SipPreferences.SIP_PROXY_SERVER_PORT, -1);
 
 		if (params != null) {
 			info = "Connection preferences\n" + "User: \n"
 					+ params.get(Keys_Preferences.SIP_LOCAL_USERNAME) + "@"
 					+ params.get(Keys_Preferences.SIP_LOCAL_DOMAIN)
 					+ "\n\nProxy: \n"
-					+ params.get(Keys_Preferences.SIP_PROXY_IP) + ":"
-					+ params.get(Keys_Preferences.SIP_PROXY_PORT);
+					+ params.get(SipPreferences.SIP_PROXY_SERVER_ADDRESS) + ":"
+					+ port;
 		} else {
 			info = "Connection preferences are incorrect";
 		}
@@ -146,24 +108,6 @@ public class Connection_Preferences extends PreferenceActivity implements
 		return info;
 	}
 
-	// TODO Add throw exception when params is null
-	public static void setConnectionNetPreferences(Context context,
-			Map<String, Object> params) {
-
-		SharedPreferences settings = PreferenceManager
-				.getDefaultSharedPreferences(context);
-		SharedPreferences.Editor editor = settings.edit();
-
-		editor.putBoolean(Keys_Preferences.MEDIA_NET_KEEP_ALIVE,
-				(Boolean) params.get(Keys_Preferences.MEDIA_NET_KEEP_ALIVE));
-		editor.putString(Keys_Preferences.MEDIA_NET_KEEP_DELAY,
-				(String) params.get(Keys_Preferences.MEDIA_NET_KEEP_DELAY));
-		editor.putString(Keys_Preferences.MEDIA_NET_TRANSPORT,
-				(String) params.get(Keys_Preferences.MEDIA_NET_TRANSPORT));
-
-		editor.commit();
-	}
-
 	public static Map<String, Object> getConnectionNetPreferences(
 			Context context) {
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -180,18 +124,6 @@ public class Connection_Preferences extends PreferenceActivity implements
 				settings.getString(Keys_Preferences.MEDIA_NET_TRANSPORT, "UDP"));
 
 		return params;
-	}
-
-	// TODO Add throw exception when params is null
-	public static void setStunPreferences(Context context, Boolean activate) {
-
-		SharedPreferences settings = PreferenceManager
-				.getDefaultSharedPreferences(context);
-		SharedPreferences.Editor editor = settings.edit();
-
-		editor.putBoolean(Keys_Preferences.STUN_ENABLE, activate);
-
-		editor.commit();
 	}
 
 	public static Map<String, String> getStunPreferences(Context context) {
@@ -213,27 +145,6 @@ public class Connection_Preferences extends PreferenceActivity implements
 			stunPort = "0";
 		}
 
-		// String stunHostAux = settings.getString(Keys_Preferences.STUN_LIST,
-		// "193.147.51.24");
-		// stunPort = "0";
-		// if (stunHostAux.equals("-")) {
-		// stunHostAux = settings.getString(Keys_Preferences.STUN_HOST, "-");
-		// if (!stunHostAux.equals("-")) {
-		// stunHost = stunHostAux;
-		// stunPort = settings.getString(Keys_Preferences.STUN_HOST_PORT,
-		// "3478");
-		// } else {
-		// stunHost = "";
-		// stunPort = "0";
-		// }
-		// } else {
-		// stunHost = stunHostAux;
-		// stunPort = "3478";
-		// }
-		// if (stunHost.equals("") || stunPort.equals("")) {
-		// stunHost = "";
-		// stunPort = "0";
-		// }
 		Log.d("Connection_Preferences", "StunHost = " + stunHost + ":"
 				+ stunPort);
 		params.put(Keys_Preferences.STUN_HOST, stunHost);
@@ -269,10 +180,8 @@ public class Connection_Preferences extends PreferenceActivity implements
 		if (key.equals(Keys_Preferences.SIP_LOCAL_DOMAIN)
 				|| key.equals(Keys_Preferences.SIP_LOCAL_PASSWORD)
 				|| key.equals(Keys_Preferences.SIP_LOCAL_USERNAME)
-				|| key.equals(Keys_Preferences.SIP_MAX_LOCAL_PORT)
-				|| key.equals(Keys_Preferences.SIP_MIN_LOCAL_PORT)
-				|| key.equals(Keys_Preferences.SIP_PROXY_IP)
-				|| key.equals(Keys_Preferences.SIP_PROXY_PORT)
+				|| key.equals(SipPreferences.SIP_PROXY_SERVER_ADDRESS)
+				|| key.equals(SipPreferences.SIP_PROXY_SERVER_PORT)
 				|| key.equals(Keys_Preferences.MEDIA_NET_KEEP_ALIVE)
 				|| key.equals(Keys_Preferences.MEDIA_NET_KEEP_DELAY)
 				|| key.equals(Keys_Preferences.MEDIA_NET_TRANSPORT)

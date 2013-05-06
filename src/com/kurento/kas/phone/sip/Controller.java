@@ -1,79 +1,47 @@
 package com.kurento.kas.phone.sip;
 
-import java.net.InetAddress;
-import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.kurento.commons.config.Parameters;
-import com.kurento.commons.sip.agent.NetworkListener;
-import com.kurento.commons.sip.agent.UaFactory;
-import com.kurento.commons.sip.agent.UaImpl;
-import com.kurento.commons.sip.util.SipConfig;
-import com.kurento.commons.ua.Call;
-import com.kurento.commons.ua.CallListener;
-import com.kurento.commons.ua.EndPoint;
-import com.kurento.commons.ua.EndPointListener;
-import com.kurento.commons.ua.TerminateReason;
-import com.kurento.commons.ua.UA;
-import com.kurento.commons.ua.UaStun;
-import com.kurento.commons.ua.event.CallEvent;
-import com.kurento.commons.ua.event.CallEventEnum;
-import com.kurento.commons.ua.event.EndPointEvent;
-import com.kurento.commons.ua.exception.ServerInternalErrorException;
+import com.kurento.kas.conference.Conference;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
-import com.kurento.kas.phone.network.NetworkIP;
 import com.kurento.kas.phone.preferences.Connection_Preferences;
 import com.kurento.kas.phone.preferences.Keys_Preferences;
-import com.kurento.kas.phone.preferences.Video_Preferences;
 import com.kurento.kas.phone.shared.Actions;
 import com.kurento.kas.phone.softphone.CallNotifier;
 import com.kurento.kas.phone.softphone.IPhone;
 import com.kurento.kas.phone.softphone.SoftphoneCallListener;
-import com.kurento.kas.phone.testutils.ControllerController;
-import com.kurento.mscontrol.commons.MsControlException;
-import com.kurento.mscontrol.commons.join.JoinableStream.StreamType;
-import com.kurento.mscontrol.commons.networkconnection.NetworkConnection;
-import com.kurento.mscontrol.kas.MediaSessionAndroid;
-import com.kurento.mscontrol.kas.MsControlFactoryAndroid;
+import com.kurento.kas.sip.ua.KurentoSipException;
+import com.kurento.kas.sip.ua.SipUA;
+import com.kurento.kas.ua.Call;
+import com.kurento.kas.ua.Call.RejectCode;
+import com.kurento.kas.ua.CallDialingHandler;
+import com.kurento.kas.ua.CallEstablishedHandler;
+import com.kurento.kas.ua.CallRingingHandler;
+import com.kurento.kas.ua.CallTerminatedHandler;
+import com.kurento.kas.ua.ErrorHandler;
+import com.kurento.kas.ua.KurentoException;
+import com.kurento.kas.ua.Register;
+import com.kurento.kas.ua.RegisterHandler;
+import com.kurento.kas.ua.UA;
 
-public class Controller implements EndPointListener, CallListener, IPhone,
-		CallNotifier {
-	public final static String LOG = Controller.class.getName();
+public class Controller implements IPhone, CallNotifier {
+	public final static String LOG_TAG = Controller.class.getSimpleName();
 
 	private Context context;
-	private UaStun ua = null;
-	private SipConfig sipConfig;
-	private EndPoint endPoint = null;;
-	private EndPointEvent pendingEndPointEvent;
+	private UA ua = null;
+	private Register reg;
+
 	private Call currentCall;
 	private Call incomingCall;
 	private int expires = 3600;
 
-	private NetworkListener networkListener;
-
 	private Boolean isCall = false;
 
 	private SoftphoneCallListener callListener;
-
-	private InetAddress localAddress;
-	// Only use it to do test
-	private String localAddressS = null;
-	private String username, password, domain, ipServer, stunHost, transport;
-	private int portServer, localPort, stunPort;
-	private boolean keep_alive;
-	private long keep_delay;
-	private MediaSessionAndroid mediaSession;
-	private Map<String, String> connectionParams;
-	private Map<String, String> stunParams;
-	private Parameters mediaPrefereces;
-	private Map<String, Object> mediaNetPreferences;
-
-	// Only use it to do tests
-	private ControllerController controlController;
 
 	// You must call configureController after
 	public Controller(Context context) {
@@ -82,100 +50,26 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 
 	public void configureController() {
 		reconfigureController();
-		networkChanged();
 	}
 
 	public void reconfigureController() {
 		try {
-			this.localAddress = NetworkIP.getLocalAddress();
+			ua = new SipUA(context);
+			addHandlers();
 
-			this.mediaPrefereces = Video_Preferences
-					.getMediaPreferences(context);
-
-			this.mediaSession = MsControlFactoryAndroid
-					.createMediaSession(mediaPrefereces);
-
-			this.mediaNetPreferences = Connection_Preferences
-					.getConnectionNetPreferences(context);
-			this.keep_alive = (Boolean) mediaNetPreferences
-					.get(Keys_Preferences.MEDIA_NET_KEEP_ALIVE);
-			this.keep_delay = (Long) (mediaNetPreferences
-					.get(Keys_Preferences.MEDIA_NET_KEEP_DELAY));
-			this.transport = (String) mediaNetPreferences
-					.get(Keys_Preferences.MEDIA_NET_TRANSPORT);
-
-			this.connectionParams = Connection_Preferences
+			Map<String, String> connectionParams = Connection_Preferences
 					.getConnectionPreferences(this.context);
-			if (connectionParams != null) {
-				this.ipServer = connectionParams
-						.get(Keys_Preferences.SIP_PROXY_IP);
-				this.portServer = Integer.valueOf(connectionParams
-						.get(Keys_Preferences.SIP_PROXY_PORT));
-				this.username = connectionParams
-						.get(Keys_Preferences.SIP_LOCAL_USERNAME);
-				this.password = connectionParams
-						.get(Keys_Preferences.SIP_LOCAL_PASSWORD);
-				this.domain = connectionParams
-						.get(Keys_Preferences.SIP_LOCAL_DOMAIN);
-				this.localPort = Integer.valueOf(connectionParams
-						.get(Keys_Preferences.SIP_MIN_LOCAL_PORT));
-
-			}
-			this.stunParams = Connection_Preferences
-					.getStunPreferences(context);
-			this.stunHost = stunParams.get(Keys_Preferences.STUN_HOST);
-			this.stunPort = Integer.valueOf(stunParams
-					.get(Keys_Preferences.STUN_HOST_PORT));
-
-			Log.d(LOG, "All params its Ok");
-			sipConfig = new SipConfig();
-
-			// Only use it to do tests
-			if (localAddressS != null)
-				sipConfig.setLocalAddress(localAddressS);
-			sipConfig.setLocalPort(localPort);
-			sipConfig.setProxyAddress(ipServer);
-			sipConfig.setProxyPort(portServer);
-			sipConfig.setStunServerAddress(stunHost);
-			sipConfig.setStunServerPort(stunPort);
-			sipConfig.setEnableKeepAlive(keep_alive);
-			sipConfig.setKeepAlivePeriod(keep_delay);
-			sipConfig.setTransport(transport);
-			sipConfig.setTimer(new AlarmUaTimer(context));
-
-			UaFactory.setMediaSession(mediaSession);
-		} catch (MsControlException e) {
-			Log.e(LOG, "MsControlException: " + e.getMessage(), e);
-			return;
-		} catch (Exception ex) {
-			Log.e(LOG, "Exception: " + ex.getMessage(), ex);
+			String username = connectionParams
+					.get(Keys_Preferences.SIP_LOCAL_USERNAME);
+			String domain = connectionParams
+					.get(Keys_Preferences.SIP_LOCAL_DOMAIN);
+			reg = new Register(username, domain);
+			ua.register(reg);
+		} catch (KurentoSipException e) {
+			Log.e(LOG_TAG, "Exception: " + e.getMessage(), e);
 			return;
 		}
 
-		UA uaAux;
-		try {
-			uaAux = UaFactory.getInstance(sipConfig);
-
-			if (uaAux instanceof UaStun)
-				ua = (UaStun) uaAux;
-			else
-				return;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			networkListener = UaFactory.getNetworkListener(ua);
-
-			Map<String, Object> extra = new HashMap<String, Object>();
-			extra.put(UaImpl.SIP_EXPIRES, expires);
-			extra.put(UaImpl.SIP_PASWORD, password);
-			endPoint = ua.registerEndpoint(username, domain, this, extra);
-			// EndPointFactory.getInstance(username, domain, password,
-			// expires, ua, this);
-		} catch (Exception e) {
-			Log.e(LOG, "Exception: " + e.getMessage(), e);
-			return;
-		}
 		setIsCall(false);
 	}
 
@@ -191,66 +85,14 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 		return ua;
 	}
 
-	public String getConnectionType() {
-		try {
-			return "Stun:\n" + ua.getConnectionType().toString();
-		} catch (Exception e) {
-			return "No STUN info";
-		}
-	}
-
-	public void connectionHasChanged() {
-		try {// TODO Review
-			Intent i = new Intent();
-			ApplicationContext.contextTable.put("isRegister", false);
-			i.setAction(Actions.REGISTER_USER_FAIL);
-			context.sendBroadcast(i);
-			finishUA();
-		} catch (Exception e) {
-			Log.e(LOG, "Exception: " + e.getMessage(), e);
-		}
-		reconfigureController();
-		networkChanged();
-	}
-
-	public void mediaHasChanged() {
-		try {
-			mediaSession = MsControlFactoryAndroid
-					.createMediaSession(Video_Preferences
-							.getMediaPreferences(context));
-			UaFactory.setMediaSession(mediaSession);
-		} catch (MsControlException e) {
-			Log.e(LOG, "MsControlException: " + e.getMessage(), e);
-		}
-	}
-
-	public void networkChanged() {
-		if (networkListener != null)
-			try {
-				networkListener.networkReconfigure();
-			} catch (ServerInternalErrorException e) {
-				Log.e(LOG, "NetworkChanged: " + e.getMessage(), e);
-			}
-		// if (ua != null)
-		// try {
-		// ua.reconfigure();
-		// } catch (ServerInternalErrorException e) {
-		// e.printStackTrace();
-		// }
-	}
-
-	public MediaSessionAndroid getMediaSession() {
-		return mediaSession;
-	}
-
 	public boolean isRegister() {
-		return (endPoint != null);
+		return true; // TODO: complete
 	}
 
 	public void finishUA() throws Exception {
 		if (ua != null)
 			ua.terminate();
-		Log.d(LOG, "FinishUA");
+		Log.d(LOG_TAG, "FinishUA");
 	}
 
 	@Override
@@ -273,18 +115,19 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 	@Override
 	public void reject() throws Exception {
 		setIsCall(false);
-		pendingEndPointEvent.getCallSource().terminate(TerminateReason.DECLINE);
+		incomingCall.hangup(RejectCode.DECLINE);
 	}
 
 	@Override
 	public void call(String remoteURI) throws Exception {
 		if (getIsCall()) {
-			Log.d(LOG, "You cannot send an INVITE because exist a Call Active");
+			Log.d(LOG_TAG,
+					"You cannot send an INVITE because exist a Call Active");
 			callListener.callReject();
 		} else {
 			setIsCall(true);
-			Log.d(LOG, "Send an INVITE to " + remoteURI);
-			currentCall = endPoint.dial(remoteURI, this);
+			Log.d(LOG_TAG, "Send an INVITE to " + remoteURI);
+			ua.dial(reg.getUri(), remoteURI);
 			Intent iOutgoingDial = new Intent();
 			iOutgoingDial.setAction(Actions.CURRENT_CALL_OK);
 			context.sendBroadcast(iOutgoingDial);
@@ -295,208 +138,129 @@ public class Controller implements EndPointListener, CallListener, IPhone,
 	public void hang() {
 		setIsCall(false);
 		if (currentCall != null)
-			try {
-				currentCall.terminate();
-				if (callListener != null)
-					callListener.callTerminate();
-			} catch (ServerInternalErrorException e) {
-				Log.e(LOG, "ServerInternalErrorException: " + e.getMessage(), e);
-			}
+			currentCall.hangup();
+		if (callListener != null)
+			callListener.callTerminate();
 	}
 
 	@Override
 	public void cancel() {
-		Log.d(LOG, "***Send a CANCEL");
+		Log.d(LOG_TAG, "***Send a CANCEL");
 		setIsCall(false);
 		if (currentCall != null)
-			try {
-				currentCall.terminate();
-			} catch (ServerInternalErrorException e) {
-				Log.e(LOG, "ServerInternalErrorException: " + e.getMessage(), e);
-			}
+			currentCall.hangup();
 	}
 
-	@Override
-	public void onEvent(CallEvent event) {
-		CallEventEnum eventType = event.getEventType();
-		Log.d(LOG, "onEvent  SipCallEvent: " + eventType.toString()
-				+ "; Message: " + event.getMessage());
+	private void addHandlers() {
+		ua.setExceptionHandler(new ErrorHandler() {
 
-		// Only use it to do tests
-		if (controlController != null)
-			controlController.onEvent(event);
-
-		if (CallEvent.CALL_SETUP.equals(eventType)) {
-			currentCall = event.getSource();
-			setIsCall(true);
-			Log.d(LOG, "Setting currentCall");
-			if (callListener != null) {
-				// ApplicationContext.contextTable.put("callDirection",
-				// currentCall.getMediaTypesModes());
-
-				NetworkConnection nc = currentCall.getNetworkConnection();
-				ApplicationContext.contextTable.put("nc", nc);
-				try {
-					ApplicationContext.contextTable.put("audioJoinable",
-							nc.getJoinableStream(StreamType.audio));
-				} catch (MsControlException e) {
-					// TODO: handle exception
-				}
-				try {
-					ApplicationContext.contextTable.put("videoJoinable",
-							nc.getJoinableStream(StreamType.video));
-				} catch (MsControlException e) {
-					// TODO: handle exception
-				}
-				ApplicationContext.contextTable.put("mediaTypesModes",
-						currentCall.getMediaTypesModes());
-
-				callListener.callSetup();
+			@Override
+			public void onUAError(UA ua, KurentoException exception) {
+				Log.i(LOG_TAG, "onUAError");
 			}
-		} else if (CallEvent.CALL_TERMINATE.equals(eventType)) {
-			setIsCall(false);
-			currentCall = null;
 
-			Log.d(LOG, "Call Terminate");
-			if (callListener != null)
-				callListener.callTerminate();
+			@Override
+			public void onConfError(Conference conference,
+					KurentoException exception) {
+				Log.i(LOG_TAG, "onConfError");
+			}
 
-			Intent iOutgoingClose = new Intent();
-			iOutgoingClose.setAction(Actions.OUTGOING_CALL_CLOSE);
-			context.sendBroadcast(iOutgoingClose);
-		} else if (CallEvent.CALL_REJECT.equals(eventType)) {
-			setIsCall(false);
-			currentCall = null;
-			Log.d(LOG, "Call Reject");
-			Intent iOutgoingClose = new Intent();
-			iOutgoingClose.setAction(Actions.CALL_REJECT);
-			context.sendBroadcast(iOutgoingClose);
-			// if (callListener != null)
-			// callListener.callReject();
-		} else if (CallEvent.CALL_BUSY.equals(eventType)) {
-			setIsCall(false);
-			currentCall = null;
+			@Override
+			public void onCallError(Call call, KurentoException exception) {
+				Log.i(LOG_TAG, "onCallError");
+			}
+		});
 
-			Log.d(LOG, "Call Busy");
-			Intent iOutgoingClose = new Intent();
-			iOutgoingClose.setAction(Actions.CALL_BUSY);
-			context.sendBroadcast(iOutgoingClose);
-		} else if (CallEvent.CALL_CANCEL.equals(eventType)) {
-			setIsCall(false);
-			currentCall = null;
+		ua.setRegisterHandler(new RegisterHandler() {
 
-			Log.d(LOG, "Call Cancel");
-			Intent iIncomingCall = new Intent();
-			iIncomingCall.setAction(Actions.CALL_CANCEL);
-			context.sendBroadcast(iIncomingCall);
-			// if (callListener != null)
-			// callListener.callCancel();
-		} else if (CallEvent.CALL_ERROR.equals(eventType)) {
-			setIsCall(false);
-			currentCall = null;
+			@Override
+			public void onRegistrationSuccess(Register register) {
+				Log.i(LOG_TAG, "onRegistrationSuccess");
+				Intent i = new Intent();
+				ApplicationContext.contextTable.put("isRegister", true);
+				i.setAction(Actions.REGISTER_USER_SUCESSFUL);
+				context.sendBroadcast(i);
+			}
 
-			Intent iOutgoingClose = new Intent();
-			iOutgoingClose.setAction(Actions.CALL_ERROR);
-			iOutgoingClose.putExtra("message", event.getMessage());
-			context.sendBroadcast(iOutgoingClose);
+			@Override
+			public void onConnectionFailure(Register register) {
+				Log.i(LOG_TAG, "onConnectionFailure");
+				Intent i = new Intent();
+				ApplicationContext.contextTable.put("isRegister", false);
+				i.setAction(Actions.REGISTER_USER_FAIL);
+				context.sendBroadcast(i);
+			}
 
-			// Log.d(LOG, "Call Error");
-			// if (callListener != null)
-			// callListener.callReject();
-		} else if (CallEvent.MEDIA_NOT_SUPPORTED.equals(eventType)) {
-			Log.d(LOG, "Media Not Supported");
-			setIsCall(false);
-			currentCall = null;
+			@Override
+			public void onAuthenticationFailure(Register register) {
+				Log.i(LOG_TAG, "onAuthenticationFailure");
+				Intent i = new Intent();
+				ApplicationContext.contextTable.put("isRegister", false);
+				i.setAction(Actions.REGISTER_USER_FAIL);
+				context.sendBroadcast(i);
+			}
+		});
 
-			Intent iOutgoingClose = new Intent();
-			iOutgoingClose.setAction(Actions.MEDIA_NOT_SUPPORTED);
-			context.sendBroadcast(iOutgoingClose);
+		ua.setCallDialingHandler(new CallDialingHandler() {
 
-		} else if (CallEvent.USER_NOT_FOUND.equals(eventType)) {
-			Log.d(LOG, "User Not Found");
-			setIsCall(false);
-			currentCall = null;
+			@Override
+			public void onRemoteRinging(Call dialingCall) {
+				Log.i(LOG_TAG, "onRemoteRinging");
+				Intent iIncomingCall = new Intent();
+				iIncomingCall.setAction(Actions.CALL_RINGING);
+				context.sendBroadcast(iIncomingCall);
+			}
+		});
 
-			Intent iOutgoingClose = new Intent();
-			iOutgoingClose.setAction(Actions.USER_NOT_FOUND);
-			context.sendBroadcast(iOutgoingClose);
-		} else if (CallEvent.MEDIA_RESOURCE_NOT_AVAILABLE.equals(eventType)) {
-			setIsCall(false);
-			currentCall = null;
-		} else if (CallEvent.CALL_RINGING.equals(eventType)) {
-			Log.d(LOG, "Ringing ...");
-			Intent iIncomingCall = new Intent();
-			iIncomingCall.setAction(Actions.CALL_RINGING);
-			context.sendBroadcast(iIncomingCall);
-		} else
-			setIsCall(false);
-	}
+		ua.setCallEstablishedHandler(new CallEstablishedHandler() {
 
-	@Override
-	public void onEvent(EndPointEvent event) {
-		Log.d(LOG, "OnEndPointEvent " + event.getEventType().toString());
-		Intent i = new Intent();
+			@Override
+			public void onEstablished(Call call) {
+				Log.i(LOG_TAG, "onEstablished");
+				setIsCall(true);
+				currentCall = call;
+				Log.d(LOG_TAG, "Setting currentCall");
+				if (callListener != null)
+					callListener.callSetup();
+			}
+		});
 
-		// Only use it to do tests
-		if (controlController != null)
-			controlController.onEvent(event);
+		ua.setCallRingingHandler(new CallRingingHandler() {
 
-		if (event.getEventType().equals(EndPointEvent.REGISTER_USER_SUCESSFUL)) {
-			ApplicationContext.contextTable.put("isRegister", true);
-			i.setAction(Actions.REGISTER_USER_SUCESSFUL);
-			context.sendBroadcast(i);
-		} else if (event.getEventType()
-				.equals(EndPointEvent.REGISTER_USER_FAIL)) {
-			ApplicationContext.contextTable.put("isRegister", false);
-			i.setAction(Actions.REGISTER_USER_FAIL);
-			context.sendBroadcast(i);
-		} else if (event.getEventType().equals(EndPointEvent.INCOMING_CALL)) {
-			// this.pendingEndPointEvent = event;
-			// incomingCall = pendingEndPointEvent.getCallSource();
-			// incomingCall.addListener(this);
-			try {
+			@Override
+			public void onRinging(Call ringinCall) {
+				Log.i(LOG_TAG, "onRinging");
 				synchronized (this) {
 					if (getIsCall()) {
-						Log.d(LOG,
+						Log.d(LOG_TAG,
 								"Send reject because I've received an INVITE");
-						event.getCallSource().terminate(TerminateReason.BUSY);
-						// reject();
+						ringinCall.hangup(RejectCode.BUSY);
 					} else {
 						setIsCall(true);
-						this.pendingEndPointEvent = event;
-						incomingCall = pendingEndPointEvent.getCallSource();
-						incomingCall.addListener(this);
-
-						Log.d(LOG, "I've received an INVITE");
-						Log.d(LOG, "Me llama Uri: "
-								+ event.getCallSource().getRemoteUri());
+						incomingCall = ringinCall;
 						if (callListener != null)
-							callListener.incomingCall(event.getCallSource()
-									.getRemoteUri());
+							callListener.incomingCall(ringinCall.getRemoteUri());
 					}
 				}
-			} catch (Exception e) {
-				Log.e(LOG, "Exception: " + e.getMessage(), e);
 			}
-		} else if (event.getEventType().equals(
-				EndPointEvent.UNREGISTER_USER_SUCESSFUL)) {
-			i.setAction(Actions.UNREGISTER_USER_SUCESSFUL);
-			context.sendBroadcast(i);
-		} else if (event.getEventType().equals(
-				EndPointEvent.UNREGISTER_USER_FAIL)) {
-			i.setAction(Actions.UNREGISTER_USER_FAIL);
-			context.sendBroadcast(i);
-		}
-	}
+		});
 
-	// Only use it to do tests
-	public void setControlController(ControllerController control) {
-		controlController = control;
-	}
+		ua.setCallTerminatedHander(new CallTerminatedHandler() {
 
-	// Only use it to do test
-	public void setLocalAddress(String localAddressTest) {
-		this.localAddressS = localAddressTest;
+			@Override
+			public void onTerminate(Call terminatedCall) {
+				Log.i(LOG_TAG, "onTerminate");
+				setIsCall(false);
+				currentCall = null;
+
+				if (callListener != null)
+					callListener.callTerminate();
+
+				Intent iOutgoingClose = new Intent();
+				iOutgoingClose.setAction(Actions.OUTGOING_CALL_CLOSE);
+				context.sendBroadcast(iOutgoingClose);
+			}
+		});
 	}
 
 }

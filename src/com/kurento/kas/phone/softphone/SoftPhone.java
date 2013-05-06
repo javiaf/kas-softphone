@@ -14,7 +14,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Message;
 import android.provider.ContactsContract;
@@ -40,7 +39,6 @@ import com.kurento.kas.phone.preferences.Connection_Preferences;
 import com.kurento.kas.phone.preferences.Video_Preferences;
 import com.kurento.kas.phone.shared.Actions;
 import com.kurento.kas.phone.sip.Controller;
-import com.kurento.kas.phone.testutils.SoftphoneController;
 
 public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 		OnClickListener {
@@ -70,9 +68,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 
 	private ControlContacts controlcontacts = new ControlContacts(this);
 
-	private static SoftphoneController softphoneController;
-	private static String localAddressTest = null;
-
 	private IntentFilter intentFilter;
 	private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
@@ -80,58 +75,58 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
 			Log.d(LOG_TAG, "Action = " + action);
-			if (Actions.REGISTER_USER_SUCESSFUL.equals(action)) {
-				Log.d(LOG_TAG, "softphoneController : " + softphoneController);
-				if (softphoneController != null)
-					softphoneController.onEvent(action);
-				connection.setBackgroundResource(R.drawable.connect_icon);
-			} else if (Actions.REGISTER_USER_FAIL.equals(action)
-					|| Actions.UNREGISTER_USER_SUCESSFUL.equals(action)) {
-				if (softphoneController != null)
-					softphoneController.onEvent(action);
-				connection.setBackgroundResource(R.drawable.disconnect_icon);
-			} else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
-				NetworkInfo ni = intent.getExtras()
-						.getParcelable("networkInfo");
-				Log.d(LOG_TAG, "Connection Type: " + ni.getType() + "; State:"
-						+ ni.getState());
-				switch (ni.getType()) {
-				case ConnectivityManager.TYPE_WIFI:
-					if (ni.getState().equals(NetworkInfo.State.CONNECTED)) {
-						wifi.setBackgroundResource(R.drawable.wifi_on_120);
-						if (controller != null && controller.getUa() == null)
-							controller.connectionHasChanged();
-						else if (controller != null)
-							controller.networkChanged();
-						controller.mediaHasChanged();
-					} else {
-						wifi.setBackgroundResource(R.drawable.wifi_off_120);
-						connection
-								.setBackgroundResource(R.drawable.disconnect_icon);
-						if (controller != null && controller.getIsCall())
-							controller.hang();
-					}
-					break;
-				case ConnectivityManager.TYPE_MOBILE:
-					if (ni.getState().equals(NetworkInfo.State.CONNECTED)) {
-						_3g.setBackgroundResource(R.drawable.icon_3g_on_120);
-						if (controller != null && controller.getUa() == null)
-							controller.connectionHasChanged();
-						else if (controller != null)
-							controller.networkChanged();
-						controller.mediaHasChanged();
-					} else {
-						_3g.setBackgroundResource(R.drawable.icon_3g_off_120);
-						connection
-								.setBackgroundResource(R.drawable.disconnect_icon);
-						if (controller != null && controller.getIsCall())
-							controller.hang();
-					}
-					break;
-				default:
-					break;
-				}
-			}
+//			if (Actions.REGISTER_USER_SUCESSFUL.equals(action)) {
+//				Log.d(LOG_TAG, "softphoneController : " + softphoneController);
+//				if (softphoneController != null)
+//					softphoneController.onEvent(action);
+//				connection.setBackgroundResource(R.drawable.connect_icon);
+//			} else if (Actions.REGISTER_USER_FAIL.equals(action)
+//					|| Actions.UNREGISTER_USER_SUCESSFUL.equals(action)) {
+//				if (softphoneController != null)
+//					softphoneController.onEvent(action);
+//				connection.setBackgroundResource(R.drawable.disconnect_icon);
+//			} else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
+//				NetworkInfo ni = intent.getExtras()
+//						.getParcelable("networkInfo");
+//				Log.d(LOG_TAG, "Connection Type: " + ni.getType() + "; State:"
+//						+ ni.getState());
+//				switch (ni.getType()) {
+//				case ConnectivityManager.TYPE_WIFI:
+//					if (ni.getState().equals(NetworkInfo.State.CONNECTED)) {
+//						wifi.setBackgroundResource(R.drawable.wifi_on_120);
+//						if (controller != null && controller.getUa() == null)
+//							controller.connectionHasChanged();
+//						else if (controller != null)
+//							controller.networkChanged();
+//						controller.mediaHasChanged();
+//					} else {
+//						wifi.setBackgroundResource(R.drawable.wifi_off_120);
+//						connection
+//								.setBackgroundResource(R.drawable.disconnect_icon);
+//						if (controller != null && controller.getIsCall())
+//							controller.hang();
+//					}
+//					break;
+//				case ConnectivityManager.TYPE_MOBILE:
+//					if (ni.getState().equals(NetworkInfo.State.CONNECTED)) {
+//						_3g.setBackgroundResource(R.drawable.icon_3g_on_120);
+//						if (controller != null && controller.getUa() == null)
+//							controller.connectionHasChanged();
+//						else if (controller != null)
+//							controller.networkChanged();
+//						controller.mediaHasChanged();
+//					} else {
+//						_3g.setBackgroundResource(R.drawable.icon_3g_off_120);
+//						connection
+//								.setBackgroundResource(R.drawable.disconnect_icon);
+//						if (controller != null && controller.getIsCall())
+//							controller.hang();
+//					}
+//					break;
+//				default:
+//					break;
+//				}
+//			 }
 		}
 	};
 
@@ -211,9 +206,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 			public void run() {
 				try {
 					controller = new Controller(getApplicationContext());
-					// Only for test
-					if (localAddressTest != null)
-						controller.setLocalAddress(localAddressTest);
 					controller.configureController();
 					ApplicationContext.contextTable.put("controller",
 							controller);
@@ -347,8 +339,9 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 			dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 			info_connect = Connection_Preferences
 					.getConnectionPreferencesInfo(getApplicationContext());
-			if (controller != null)
-				info_connect += "\n\n" + controller.getConnectionType();
+			// TODO: restore
+			// if (controller != null)
+			// info_connect += "\n\n" + controller.getConnectionType();
 			dialog.setContentView(R.layout.info_connection);
 			((TextView) dialog.findViewById(R.id.info_connect))
 					.setText(info_connect);
@@ -356,8 +349,8 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 			break;
 		case R.id.video_button:
 			dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-			info_video = Video_Preferences
-					.getMediaPreferencesInfo(getApplicationContext());
+			// info_video = Video_Preferences
+			// .getMediaPreferencesInfo(getApplicationContext());
 			info_video += "\n\n"
 					+ Connection_Preferences
 							.getConnectionNetPreferenceInfo(getApplicationContext());
@@ -443,25 +436,25 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 			break;
 		case SHOW_PREFERENCES:
 			if (Video_Preferences.isPreferenceChanged())
-				if (controller != null)
-					controller.mediaHasChanged();
+				// if (controller != null)
+				// controller.mediaHasChanged();
 
-			if (Connection_Preferences.isPreferenceChanged())
-				if (controller != null) {
-					dialogWait = ProgressDialog.show(SoftPhone.this, "",
-							"Please wait for few seconds...", true);
-					new Thread(new Runnable() {
-						public void run() {
-							try {
-								controller.connectionHasChanged();
-								if (dialogWait != null)
-									dialogWait.dismiss();
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-					}).start();
-				}
+				// if (Connection_Preferences.isPreferenceChanged())
+				// if (controller != null) {
+				// dialogWait = ProgressDialog.show(SoftPhone.this, "",
+				// "Please wait for few seconds...", true);
+				// new Thread(new Runnable() {
+				// public void run() {
+				// try {
+				// controller.connectionHasChanged();
+				// if (dialogWait != null)
+				// dialogWait.dismiss();
+				// } catch (Exception e) {
+				// e.printStackTrace();
+				// }
+				// }
+				// }).start();
+				// }
 
 			Video_Preferences.resetChanged();
 			Connection_Preferences.resetChanged();
@@ -523,20 +516,20 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 				dialogWait = ProgressDialog.show(SoftPhone.this, "",
 						"Please wait ...", true);
 
-				new Thread(new Runnable() {
-					public void run() {
-						try {
-							controller.connectionHasChanged();
-							ApplicationContext.contextTable.put("controller",
-									controller);
-							Log.d(LOG_TAG, "controller completed");
-							if (dialogWait != null)
-								dialogWait.dismiss();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				}).start();
+				// new Thread(new Runnable() {
+				// public void run() {
+				// try {
+				// controller.connectionHasChanged();
+				// ApplicationContext.contextTable.put("controller",
+				// controller);
+				// Log.d(LOG_TAG, "controller completed");
+				// if (dialogWait != null)
+				// dialogWait.dismiss();
+				// } catch (Exception e) {
+				// e.printStackTrace();
+				// }
+				// }
+				// }).start();
 			} else {
 				createController();
 			}
@@ -604,10 +597,4 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 
 	}
 
-	public static void setSoftphoneController(SoftphoneController sController,
-			String localAddress) {
-		softphoneController = sController;
-		localAddressTest = localAddress;
-
-	}
 }
