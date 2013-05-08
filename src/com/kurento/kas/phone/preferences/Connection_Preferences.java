@@ -28,7 +28,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.kurento.kas.phone.softphone.R;
-import com.kurento.kas.sip.ua.SipPreferences;
+import com.kurento.kas.sip.ua.Preferences;
 
 public class Connection_Preferences extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener {
@@ -56,7 +56,7 @@ public class Connection_Preferences extends PreferenceActivity implements
 		password = settings.getString(Keys_Preferences.SIP_LOCAL_PASSWORD, "");
 		domain = settings.getString(Keys_Preferences.SIP_LOCAL_DOMAIN, "");
 
-		ip = settings.getString(SipPreferences.SIP_PROXY_SERVER_ADDRESS, "");
+		ip = settings.getString(Preferences.SIP_PROXY_SERVER_ADDRESS, "");
 
 		if (username.equals("") || domain.equals("") || ip.equals(""))
 			return null;
@@ -67,7 +67,7 @@ public class Connection_Preferences extends PreferenceActivity implements
 				password.replace(" ", ""));
 		params.put(Keys_Preferences.SIP_LOCAL_DOMAIN, domain.replace(" ", ""));
 
-		params.put(SipPreferences.SIP_PROXY_SERVER_ADDRESS, ip.replace(" ", ""));
+		params.put(Preferences.SIP_PROXY_SERVER_ADDRESS, ip.replace(" ", ""));
 
 		return params;
 	}
@@ -76,14 +76,14 @@ public class Connection_Preferences extends PreferenceActivity implements
 		Map<String, String> params = getConnectionPreferences(context);
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(context);
-		int port = settings.getInt(SipPreferences.SIP_PROXY_SERVER_PORT, -1);
+		int port = settings.getInt(Preferences.SIP_PROXY_SERVER_PORT, -1);
 
 		if (params != null) {
 			info = "Connection preferences\n" + "User: \n"
 					+ params.get(Keys_Preferences.SIP_LOCAL_USERNAME) + "@"
 					+ params.get(Keys_Preferences.SIP_LOCAL_DOMAIN)
 					+ "\n\nProxy: \n"
-					+ params.get(SipPreferences.SIP_PROXY_SERVER_ADDRESS) + ":"
+					+ params.get(Preferences.SIP_PROXY_SERVER_ADDRESS) + ":"
 					+ port;
 		} else {
 			info = "Connection preferences are incorrect";
@@ -180,8 +180,8 @@ public class Connection_Preferences extends PreferenceActivity implements
 		if (key.equals(Keys_Preferences.SIP_LOCAL_DOMAIN)
 				|| key.equals(Keys_Preferences.SIP_LOCAL_PASSWORD)
 				|| key.equals(Keys_Preferences.SIP_LOCAL_USERNAME)
-				|| key.equals(SipPreferences.SIP_PROXY_SERVER_ADDRESS)
-				|| key.equals(SipPreferences.SIP_PROXY_SERVER_PORT)
+				|| key.equals(Preferences.SIP_PROXY_SERVER_ADDRESS)
+				|| key.equals(Preferences.SIP_PROXY_SERVER_PORT)
 				|| key.equals(Keys_Preferences.MEDIA_NET_KEEP_ALIVE)
 				|| key.equals(Keys_Preferences.MEDIA_NET_KEEP_DELAY)
 				|| key.equals(Keys_Preferences.MEDIA_NET_TRANSPORT)
