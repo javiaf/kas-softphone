@@ -168,6 +168,12 @@ public class Controller implements IPhone, CallNotifier {
 			@Override
 			public void onCallError(Call call, KurentoException exception) {
 				Log.i(LOG_TAG, "onCallError");
+				setIsCall(false);
+				currentCall = null;
+
+				Intent iOutgoingClose = new Intent();
+				iOutgoingClose.setAction(Actions.OUTGOING_CALL_CLOSE);
+				context.sendBroadcast(iOutgoingClose);
 			}
 		});
 
