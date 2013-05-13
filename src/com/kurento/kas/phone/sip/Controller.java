@@ -127,7 +127,7 @@ public class Controller implements IPhone, CallNotifier {
 		} else {
 			setIsCall(true);
 			Log.d(LOG_TAG, "Send an INVITE to " + remoteURI);
-			ua.dial(reg.getUri(), remoteURI);
+			currentCall = ua.dial(reg.getUri(), remoteURI);
 			Intent iOutgoingDial = new Intent();
 			iOutgoingDial.setAction(Actions.CURRENT_CALL_OK);
 			context.sendBroadcast(iOutgoingDial);
