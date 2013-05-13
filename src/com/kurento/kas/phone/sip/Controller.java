@@ -226,8 +226,10 @@ public class Controller implements IPhone, CallNotifier {
 				setIsCall(true);
 				currentCall = call;
 				Log.d(LOG_TAG, "Setting currentCall");
-				if (callListener != null)
+				if (callListener != null) {
+					ApplicationContext.contextTable.put("call", call);
 					callListener.callSetup();
+				}
 			}
 		});
 
