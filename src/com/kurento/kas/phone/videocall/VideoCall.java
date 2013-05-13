@@ -54,8 +54,8 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
-import com.kurento.kas.media.VideoStreamView;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
+import com.kurento.kas.phone.media.VideoStreamView;
 import com.kurento.kas.phone.preferences.VideoCall_Preferences;
 import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.softphone.R;
