@@ -15,7 +15,7 @@
 		<android.version>4.0.1.2</android.version>
 		<kasSipUaImplVersion>2.0.0-SNAPSHOT</kasSipUaImplVersion>
 		<jain-sip-api.version>1.2</jain-sip-api.version>
-		<jain-sip-ri.version>1.2.167</jain-sip-ri.version>
+		<jain-sip-ri.version>1.2.139</jain-sip-ri.version>
 		<android-async-http.version>1.3.1</android-async-http.version>
 
 		<!-- Plugins Versions -->
