@@ -130,7 +130,7 @@
             android:name="com.kurento.kas.phone.videocall.VideoCallService"
             android:enabled="true" />
         <service
-            android:name="com.kurento.kas.sip.util.RegisterService"
+            android:name="com.kurento.kas.sip.util.AlarmService"
             android:enabled="true" />
     </application>
 
