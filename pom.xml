@@ -111,6 +111,12 @@
 									<alias>${keystore.alias}</alias>
 									<storepass>${keystore.store.password}</storepass>
 									<keypass>${keystore.key.password}</keypass>
+									<arguments>
+										<argument>-sigalg</argument>
+										<argument>MD5withRSA</argument>
+										<argument>-digestalg</argument>
+										<argument>SHA1</argument>
+									</arguments>
 								</configuration>
 							</execution>
 						</executions>
