@@ -180,8 +180,8 @@ public class Controller implements IPhone, CallNotifier {
 		ua.setRegisterHandler(new RegisterHandler() {
 
 			@Override
-			public void onRegistrationSuccess(Register register) {
-				Log.i(LOG_TAG, "onRegistrationSuccess");
+			public void onUserOnline(Register register) {
+				Log.i(LOG_TAG, "onUserOnline");
 				Intent i = new Intent();
 				ApplicationContext.contextTable.put("isRegister", true);
 				i.setAction(Actions.REGISTER_USER_SUCESSFUL);
@@ -189,8 +189,17 @@ public class Controller implements IPhone, CallNotifier {
 			}
 
 			@Override
-			public void onConnectionFailure(Register register) {
-				Log.i(LOG_TAG, "onConnectionFailure");
+			public void onUserOffline(Register register) {
+				Log.i(LOG_TAG, "onUserOffline");
+				Intent i = new Intent();
+				ApplicationContext.contextTable.put("isRegister", false);
+				i.setAction(Actions.REGISTER_USER_SUCESSFUL);
+				context.sendBroadcast(i);
+			}
+
+			@Override
+			public void onAuthenticationFailure(Register register) {
+				Log.i(LOG_TAG, "onAuthenticationFailure");
 				Intent i = new Intent();
 				ApplicationContext.contextTable.put("isRegister", false);
 				i.setAction(Actions.REGISTER_USER_FAIL);
@@ -198,8 +207,9 @@ public class Controller implements IPhone, CallNotifier {
 			}
 
 			@Override
-			public void onAuthenticationFailure(Register register) {
-				Log.i(LOG_TAG, "onAuthenticationFailure");
+			public void onRegisterError(Register register,
+					KurentoException exception) {
+				Log.i(LOG_TAG, "onRegisterError");
 				Intent i = new Intent();
 				ApplicationContext.contextTable.put("isRegister", false);
 				i.setAction(Actions.REGISTER_USER_FAIL);
