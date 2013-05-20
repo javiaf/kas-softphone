@@ -2,6 +2,8 @@
 .classpath
 .settings/
 .externalToolBuilders/
+.idea/
+*.iml
 target/
 bin/
 kas-mscontrol_src/

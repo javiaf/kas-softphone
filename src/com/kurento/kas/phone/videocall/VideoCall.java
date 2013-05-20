@@ -18,10 +18,6 @@ package com.kurento.kas.phone.videocall;
 
 import java.util.Timer;
 
-import org.webrtc.MediaStream;
-import org.webrtc.VideoRenderer;
-import org.webrtc.VideoRenderer.I420Frame;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -55,7 +51,6 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
-import com.kurento.kas.phone.media.VideoStreamView;
 import com.kurento.kas.phone.preferences.VideoCall_Preferences;
 import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.softphone.R;
@@ -92,7 +87,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 
 	private View videoCaptureSurface;
 
-	private Boolean isStarted = true;
+	private final Boolean isStarted = true;
 	private int widthSurfaceReceive;
 	private int heigthSurfaceReceive;
 
@@ -152,23 +147,12 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		mHandler = new Handler();
 		timer = new Timer();
 
-		LinearLayout view = (LinearLayout) findViewById(R.id.video_receive_surface_container);
-		VideoStreamView streamView = new VideoStreamView(view);
+		LinearLayout remoteView = (LinearLayout) findViewById(R.id.video_receive_surface_container);
+		LinearLayout localView = (LinearLayout) findViewById(R.id.video_local_surface_container);
 
 		Call call = (Call) ApplicationContext.contextTable.get("call");
-		MediaStream localStream = call.getLocalStream();
-		if (localStream != null && localStream.videoTracks.size() > 0) {
-			localStream.videoTracks.get(0).addRenderer(
-					new VideoRenderer(new VideoCallback(streamView,
-							VideoStreamView.Endpoint.LOCAL)));
-		}
-
-		MediaStream remoteStream = call.getRemoteStream();
-		if (remoteStream != null && remoteStream.videoTracks.size() > 0) {
-			remoteStream.videoTracks.get(0).addRenderer(
-					new VideoRenderer(new VideoCallback(streamView,
-							VideoStreamView.Endpoint.REMOTE)));
-		}
+		call.setRemoteDisplay(remoteView);
+		call.setLocalDisplay(localView);
 
 		// Controller controller = (Controller) ApplicationContext.contextTable
 		// .get("controller");
@@ -661,6 +645,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		ApplicationContext.contextTable.put("videoCall", getIntent());
 	}
 
+	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK)
 			ApplicationContext.contextTable.put("videoCall", getIntent());
@@ -925,32 +910,6 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 			break;
 		default:
 			break;
-		}
-	}
-
-	public class VideoCallback implements VideoRenderer.Callbacks {
-
-		private final VideoStreamView view;
-		private final VideoStreamView.Endpoint stream;
-
-		public VideoCallback(VideoStreamView view,
-				VideoStreamView.Endpoint stream) {
-			this.view = view;
-			this.stream = stream;
-		}
-
-		@Override
-		public void setSize(final int width, final int height) {
-			view.queueEvent(new Runnable() {
-				public void run() {
-					view.setSize(stream, width, height);
-				}
-			});
-		}
-
-		@Override
-		public void renderFrame(I420Frame frame) {
-			view.queueFrame(stream, frame);
 		}
 	}
 }

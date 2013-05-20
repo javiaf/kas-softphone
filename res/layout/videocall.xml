@@ -2,28 +2,38 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/video_frame"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent" >
 
-<!--     <SurfaceView -->
-<!--         android:id="@+id/video_receive_surface" -->
-<!--         android:layout_width="380dip" -->
-<!--         android:layout_height="match_parent" > -->
-<!--     </SurfaceView> -->
+    <!-- <SurfaceView -->
+    <!-- android:id="@+id/video_receive_surface" -->
+    <!-- android:layout_width="380dip" -->
+    <!-- android:layout_height="match_parent" > -->
+    <!-- </SurfaceView> -->
 
     <LinearLayout
         android:id="@+id/video_receive_surface_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white" >
+        android:background="@android:color/transparent"
+        android:orientation="vertical" >
+    </LinearLayout>
 
-	</LinearLayout>
+    <LinearLayout
+        android:id="@+id/video_local_surface_container"
+        android:layout_width="161dp"
+        android:layout_height="120dip"
+        android:layout_gravity="right|bottom"
+        android:background="@android:color/transparent"
+        android:orientation="vertical" >
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/layouttable"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="top|right" >
+        android:layout_gravity="top|right"
+        android:orientation="horizontal" >
 
         <Button
             android:id="@+id/btnOcculPanel"
@@ -31,48 +41,47 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/occult_menu_out" />
-        
-         <LinearLayout
-                android:id="@+id/LinearLayout1"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
 
-                <Button
-                    android:id="@+id/button_terminate_call"
-                    android:layout_width="65dp"
-                    android:layout_height="57dp"
-                    android:layout_marginLeft="5px"
-                    android:background="@drawable/ic_jog_dial_end_call" />
+        <LinearLayout
+            android:id="@+id/LinearLayout1"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
 
-                <ToggleButton
-                    android:id="@+id/button_camera"
-                    android:layout_width="50dip"
-                    android:layout_height="50dip"
-                    android:layout_marginLeft="10dip"
-                    android:background="@drawable/camera"
-                    android:textOff=""
-                    android:textOn="" />
+            <Button
+                android:id="@+id/button_terminate_call"
+                android:layout_width="65dp"
+                android:layout_height="57dp"
+                android:layout_marginLeft="5px"
+                android:background="@drawable/ic_jog_dial_end_call" />
 
-                <ToggleButton
-                    android:id="@+id/button_headset"
-                    android:layout_width="50dip"
-                    android:layout_height="50dip"
-                    android:layout_marginLeft="10dip"
-                    android:background="@drawable/headset_button"
-                    android:textOff=""
-                    android:textOn="" />
+            <ToggleButton
+                android:id="@+id/button_camera"
+                android:layout_width="50dip"
+                android:layout_height="50dip"
+                android:layout_marginLeft="10dip"
+                android:background="@drawable/camera"
+                android:textOff=""
+                android:textOn="" />
 
-                <ToggleButton
-                    android:id="@+id/button_mute"
-                    android:layout_width="50dip"
-                    android:layout_height="50dip"
-                    android:layout_marginLeft="10dip"
-                    android:background="@drawable/mute_button"
-                    android:textOff=""
-                    android:textOn="" />
-            </LinearLayout>
-        
+            <ToggleButton
+                android:id="@+id/button_headset"
+                android:layout_width="50dip"
+                android:layout_height="50dip"
+                android:layout_marginLeft="10dip"
+                android:background="@drawable/headset_button"
+                android:textOff=""
+                android:textOn="" />
+
+            <ToggleButton
+                android:id="@+id/button_mute"
+                android:layout_width="50dip"
+                android:layout_height="50dip"
+                android:layout_marginLeft="10dip"
+                android:background="@drawable/mute_button"
+                android:textOff=""
+                android:textOn="" />
+        </LinearLayout>
     </LinearLayout>
 
     <!-- <SurfaceView -->
