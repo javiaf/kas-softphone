@@ -63,9 +63,12 @@ public class Controller implements IPhone, CallNotifier {
 					.get(Keys_Preferences.SIP_LOCAL_USERNAME);
 			String domain = connectionParams
 					.get(Keys_Preferences.SIP_LOCAL_DOMAIN);
-			reg = new Register(username, domain);
+			reg = new Register("sip:" + username + "@" + domain);
 			ua.register(reg);
 		} catch (KurentoSipException e) {
+			Log.e(LOG_TAG, "Exception: " + e.getMessage(), e);
+			return;
+		} catch (KurentoException e) {
 			Log.e(LOG_TAG, "Exception: " + e.getMessage(), e);
 			return;
 		}
