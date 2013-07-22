@@ -6,6 +6,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.kurento.kas.call.Call;
+import com.kurento.kas.call.CallDialingHandler;
+import com.kurento.kas.call.CallEstablishedHandler;
+import com.kurento.kas.call.CallRingingHandler;
+import com.kurento.kas.call.CallTerminatedHandler;
+import com.kurento.kas.call.DialingCall;
+import com.kurento.kas.call.EstablishedCall;
+import com.kurento.kas.call.RingingCall;
+import com.kurento.kas.call.RingingCall.RejectCode;
+import com.kurento.kas.call.TerminatedCall;
 import com.kurento.kas.conference.Conference;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.preferences.Connection_Preferences;
@@ -16,12 +26,6 @@ import com.kurento.kas.phone.softphone.IPhone;
 import com.kurento.kas.phone.softphone.SoftphoneCallListener;
 import com.kurento.kas.sip.ua.KurentoSipException;
 import com.kurento.kas.sip.ua.SipUA;
-import com.kurento.kas.ua.Call;
-import com.kurento.kas.ua.Call.RejectCode;
-import com.kurento.kas.ua.CallDialingHandler;
-import com.kurento.kas.ua.CallEstablishedHandler;
-import com.kurento.kas.ua.CallRingingHandler;
-import com.kurento.kas.ua.CallTerminatedHandler;
 import com.kurento.kas.ua.ErrorHandler;
 import com.kurento.kas.ua.KurentoException;
 import com.kurento.kas.ua.Register;
@@ -35,8 +39,9 @@ public class Controller implements IPhone, CallNotifier {
 	private UA ua = null;
 	private Register reg;
 
-	private Call currentCall;
-	private Call incomingCall;
+	private DialingCall dialingCall;
+	private RingingCall incomingCall;
+	private EstablishedCall establishedCall;
 	private int expires = 3600;
 
 	private Boolean isCall = false;
@@ -118,7 +123,7 @@ public class Controller implements IPhone, CallNotifier {
 	@Override
 	public void reject() throws Exception {
 		setIsCall(false);
-		incomingCall.hangup(RejectCode.DECLINE);
+		incomingCall.reject(RejectCode.DECLINE);
 	}
 
 	@Override
@@ -130,7 +135,7 @@ public class Controller implements IPhone, CallNotifier {
 		} else {
 			setIsCall(true);
 			Log.d(LOG_TAG, "Send an INVITE to " + remoteURI);
-			currentCall = ua.dial(reg.getUri(), remoteURI);
+			dialingCall = ua.dial(reg.getUri(), remoteURI);
 			Intent iOutgoingDial = new Intent();
 			iOutgoingDial.setAction(Actions.CURRENT_CALL_OK);
 			context.sendBroadcast(iOutgoingDial);
@@ -140,8 +145,8 @@ public class Controller implements IPhone, CallNotifier {
 	@Override
 	public void hang() {
 		setIsCall(false);
-		if (currentCall != null)
-			currentCall.hangup();
+		if (establishedCall != null)
+			establishedCall.hangup();
 		if (callListener != null)
 			callListener.callTerminate();
 	}
@@ -150,12 +155,12 @@ public class Controller implements IPhone, CallNotifier {
 	public void cancel() {
 		Log.d(LOG_TAG, "***Send a CANCEL");
 		setIsCall(false);
-		if (currentCall != null)
-			currentCall.hangup();
+		if (dialingCall != null)
+			dialingCall.cancel();
 	}
 
 	private void addHandlers() {
-		ua.setExceptionHandler(new ErrorHandler() {
+		ua.setErrorHandler(new ErrorHandler() {
 
 			@Override
 			public void onUAError(UA ua, KurentoException exception) {
@@ -172,7 +177,7 @@ public class Controller implements IPhone, CallNotifier {
 			public void onCallError(Call call, KurentoException exception) {
 				Log.i(LOG_TAG, "onCallError");
 				setIsCall(false);
-				currentCall = null;
+				establishedCall = null;
 
 				Intent iOutgoingClose = new Intent();
 				iOutgoingClose.setAction(Actions.OUTGOING_CALL_CLOSE);
@@ -223,7 +228,7 @@ public class Controller implements IPhone, CallNotifier {
 		ua.setCallDialingHandler(new CallDialingHandler() {
 
 			@Override
-			public void onRemoteRinging(Call dialingCall) {
+			public void onRemoteRinging(DialingCall dialingCall) {
 				Log.i(LOG_TAG, "onRemoteRinging");
 				Intent iIncomingCall = new Intent();
 				iIncomingCall.setAction(Actions.CALL_RINGING);
@@ -234,10 +239,10 @@ public class Controller implements IPhone, CallNotifier {
 		ua.setCallEstablishedHandler(new CallEstablishedHandler() {
 
 			@Override
-			public void onEstablished(Call call) {
+			public void onEstablished(EstablishedCall call) {
 				Log.i(LOG_TAG, "onEstablished");
 				setIsCall(true);
-				currentCall = call;
+				establishedCall = call;
 				Log.d(LOG_TAG, "Setting currentCall");
 				if (callListener != null) {
 					ApplicationContext.contextTable.put("call", call);
@@ -249,13 +254,13 @@ public class Controller implements IPhone, CallNotifier {
 		ua.setCallRingingHandler(new CallRingingHandler() {
 
 			@Override
-			public void onRinging(Call ringinCall) {
+			public void onRinging(RingingCall ringinCall) {
 				Log.i(LOG_TAG, "onRinging");
 				synchronized (this) {
 					if (getIsCall()) {
 						Log.d(LOG_TAG,
 								"Send reject because I've received an INVITE");
-						ringinCall.hangup(RejectCode.BUSY);
+						ringinCall.reject(RejectCode.BUSY);
 					} else {
 						setIsCall(true);
 						incomingCall = ringinCall;
@@ -269,10 +274,10 @@ public class Controller implements IPhone, CallNotifier {
 		ua.setCallTerminatedHander(new CallTerminatedHandler() {
 
 			@Override
-			public void onTerminate(Call terminatedCall) {
+			public void onTerminated(TerminatedCall terminatedCall) {
 				Log.i(LOG_TAG, "onTerminate");
 				setIsCall(false);
-				currentCall = null;
+				establishedCall = null;
 
 				if (callListener != null)
 					callListener.callTerminate();

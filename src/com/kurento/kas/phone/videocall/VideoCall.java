@@ -50,12 +50,12 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.kurento.kas.call.EstablishedCall;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.preferences.VideoCall_Preferences;
 import com.kurento.kas.phone.sip.Controller;
 import com.kurento.kas.phone.softphone.R;
 import com.kurento.kas.phone.softphone.ServiceUpdateUIListener;
-import com.kurento.kas.ua.Call;
 
 public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private static final String LOG_TAG = VideoCall.class.getName();
@@ -150,7 +150,8 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 		LinearLayout remoteView = (LinearLayout) findViewById(R.id.video_receive_surface_container);
 		LinearLayout localView = (LinearLayout) findViewById(R.id.video_local_surface_container);
 
-		Call call = (Call) ApplicationContext.contextTable.get("call");
+		EstablishedCall call = (EstablishedCall) ApplicationContext.contextTable
+				.get("call");
 		call.setRemoteDisplay(remoteView);
 		call.setLocalDisplay(localView);
 
