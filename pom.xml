@@ -13,6 +13,7 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 
 		<sign.develop>true</sign.develop>
+		<android.platform>14</android.platform>
 
 		<!-- Versions -->
 		<android.version>4.0.1.2</android.version>
@@ -22,7 +23,7 @@
 		<android-async-http.version>1.3.1</android-async-http.version>
 
 		<!-- Plugins Versions -->
-		<android-maven-plugin.version>3.5.3</android-maven-plugin.version>
+		<android-maven-plugin.version>3.6.0</android-maven-plugin.version>
 	</properties>
 
 	<name>K-Phone</name>
