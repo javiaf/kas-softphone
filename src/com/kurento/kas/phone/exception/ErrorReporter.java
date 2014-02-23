@@ -131,10 +131,8 @@ public class ErrorReporter implements Thread.UncaughtExceptionHandler {
 					+ "\n\n"
 					+ Connection_Preferences
 							.getConnectionNetPreferenceInfo(context);
-
 			mediaPreferences = Video_Preferences
 					.getMediaPreferencesInfo(context);
-
 		} catch (NameNotFoundException e) {
 			e.printStackTrace();
 		}

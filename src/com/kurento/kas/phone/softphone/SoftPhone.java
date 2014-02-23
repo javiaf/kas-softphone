@@ -145,7 +145,6 @@ public class SoftPhone extends Activity implements ServiceUpdateUIListener,
 		isCreated = true;
 		errorReporter = new ErrorReporter();
 		errorReporter.Init(getApplicationContext());
-
 		// Start BD
 		// TODO This code must changed from other class that manages this
 		SQLiteDatabase db = (SQLiteDatabase) ApplicationContext.contextTable

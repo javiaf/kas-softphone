@@ -77,26 +77,20 @@ public class Connection_Preferences extends PreferenceActivity implements
 	public static Map<String, String> getConnectionPreferences(Context context) {
 		Map<String, String> params = new HashMap<String, String>();
 		String username, password, domain, ip, port, min_port, max_port;
-
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(context);
-
 		username = settings.getString(Keys_Preferences.SIP_LOCAL_USERNAME, "");
 		password = settings.getString(Keys_Preferences.SIP_LOCAL_PASSWORD, "");
 		domain = settings.getString(Keys_Preferences.SIP_LOCAL_DOMAIN, "");
-
 		ip = settings.getString(Keys_Preferences.SIP_PROXY_IP, "");
 		port = settings.getString(Keys_Preferences.SIP_PROXY_PORT, "");
-
 		min_port = settings.getString(Keys_Preferences.SIP_MIN_LOCAL_PORT,
 				String.valueOf(SIP_PORT_MIN_DEF));
 		max_port = settings.getString(Keys_Preferences.SIP_MAX_LOCAL_PORT,
 				String.valueOf(SIP_PORT_MAX_DEF));
-
 		if (username.equals("") || domain.equals("") || ip.equals("")
 				|| port.equals(""))
 			return null;
-
 		params.put(Keys_Preferences.SIP_LOCAL_USERNAME,
 				username.replace(" ", ""));
 		params.put(Keys_Preferences.SIP_LOCAL_PASSWORD,
@@ -108,7 +102,6 @@ public class Connection_Preferences extends PreferenceActivity implements
 
 		params.put(Keys_Preferences.SIP_MIN_LOCAL_PORT, min_port);
 		params.put(Keys_Preferences.SIP_MAX_LOCAL_PORT, max_port);
-
 		return params;
 	}
 
