@@ -40,11 +40,13 @@ import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.os.StrictMode;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -131,6 +133,10 @@ public class MediaControlIncoming extends Activity implements
 	protected void onCreate(Bundle savedInstanceState) {
 
 		setContentView(R.layout.control_call_incomingcall);
+		if( Build.VERSION.SDK_INT >= 9){
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy); 
+     }
 
 		intentFilter = new IntentFilter();
 		if (intentFilter != null) {

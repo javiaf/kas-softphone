@@ -113,7 +113,9 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private View videoCaptureSurface;
 	private ViewGroup viewGroup;
 
+
 	private Boolean isStarted = true;
+	protected ViewGroup viewGroupCap;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -183,12 +185,13 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 								.equals(videoMode))) {
 					videoCaptureSurface = (View) findViewById(R.id.video_capture_surface);
 					
-					viewGroup = (ViewGroup) findViewById(R.id.video_frame);
+
 					Parameters params = MsControlFactoryAndroid.createParameters();
 	/*				params.put(MediaComponentAndroid.PREVIEW_SURFACE_CONTAINER,
 							new Value<View>(videoCaptureSurface));*/
+					viewGroupCap = (ViewGroup) findViewById(R.id.video_frame_capture);
 					params.put(MediaComponentAndroid.PREVIEW_SURFACE_CONTAINER,
-							new Value<ViewGroup>(viewGroup));
+							new Value<ViewGroup>(viewGroupCap));
 					
 					params.put(MediaComponentAndroid.DISPLAY_ORIENTATION,
 							new Value<Integer>(Orientation));
@@ -211,6 +214,7 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 					/*params.put(MediaComponentAndroid.VIEW_SURFACE_CONTAINER,
 							new Value<View>((View) findViewById(R.id.video_receive_surface)));
 					*/
+					viewGroup = (ViewGroup) findViewById(R.id.video_frame);
 					params.put(MediaComponentAndroid.VIEW_SURFACE_CONTAINER,
 							new Value<ViewGroup>(viewGroup));
 					params.put(MediaComponentAndroid.DISPLAY_WIDTH,
@@ -393,9 +397,9 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 									new Value<View>((View) 
 											findViewById(R.id.video_capture_surface)));
 							*/
-							
+							viewGroupCap = (ViewGroup) findViewById(R.id.video_frame_capture);
 							params.put(MediaComponentAndroid.PREVIEW_SURFACE_CONTAINER,
-									new Value<ViewGroup>(viewGroup));
+									new Value<ViewGroup>(viewGroupCap));
 							
 							params.put(
 									MediaComponentAndroid.DISPLAY_ORIENTATION,

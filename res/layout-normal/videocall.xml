@@ -3,14 +3,18 @@
     android:id="@+id/video_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-    
+    <FrameLayout
+    android:id="@+id/video_frame_capture"
+        android:layout_width="108dp"
+        android:layout_height="96dp"
+        android:layout_gravity="bottom|right" >
      <SurfaceView
         android:id="@+id/video_capture_surface"
         android:layout_width="108dp"
         android:layout_height="96dp"
         android:layout_gravity="bottom|right" >
     </SurfaceView>
-
+</FrameLayout>
     <SurfaceView
         android:id="@+id/video_receive_surface"
         android:layout_width="418dp"

@@ -34,6 +34,7 @@ public class Keys_Preferences {
 	public static String MEDIA_NET_TRANSPORT = "MEDIA_NET_TRANSPORT";
 
 	// Video Category
+	public static String MEDIA_HARDWARE_CODECS = "MEDIA_HARDWARE_CODECS";
 	public static String MEDIA_VIDEO_CODECS = "MEDIA_VIDEO_CODECS";
 	public static String MEDIA_VIDEO_H263_CODEC = "MEDIA_VIDEO_H263_CODEC";
 	public static String MEDIA_VIDEO_MPEG4_CODEC = "MEDIA_VIDEO_MPEG4_CODEC";
