@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/video_frame"
+    android:id="@+id/parent_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
+
     <FrameLayout
-    android:id="@+id/video_frame_capture"
-        android:layout_width="129dp"
-        android:layout_height="114dp"
-        android:layout_gravity="bottom|right" >
-    <SurfaceView
-        android:id="@+id/video_capture_surface"
-        android:layout_width="129dp"
-        android:layout_height="114dp"
-        android:layout_gravity="bottom|right" >
-    </SurfaceView>
-</FrameLayout>
-    <SurfaceView
-        android:id="@+id/video_receive_surface"
-        android:layout_width="670dp"
+        android:id="@+id/video_frame"
+        android:layout_width="match_parent"
         android:layout_height="match_parent" >
-    </SurfaceView>
+
+        <FrameLayout
+            android:id="@+id/video_frame_capture"
+            android:layout_width="129dp"
+            android:layout_height="114dp"
+            android:layout_gravity="bottom|right" >
+        </FrameLayout>
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/layouttable"

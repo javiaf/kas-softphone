@@ -34,16 +34,20 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.kurento.commons.config.Parameters;
 import com.kurento.commons.config.Value;
 import com.kurento.kas.media.codecs.AudioCodecType;
 import com.kurento.kas.media.codecs.VideoCodecType;
+import com.kurento.kas.media.codecs.VideoMediaCodecType;
 import com.kurento.kas.phone.applicationcontext.ApplicationContext;
 import com.kurento.kas.phone.network.NetworkIP;
 import com.kurento.mediaspec.Direction;
@@ -59,10 +63,12 @@ public class Video_Preferences extends PreferenceActivity implements
 
 	private static boolean preferenceMediaChanged = false;
 	private static String info;
+	private static ArrayList<String> videoHWCodecs;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.videoHWCodecs = VideoMediaCodecType.getCodecList();
 		setPreferenceChanged(false);
 		setPreferenceScreen(createPreferenceHierarchy());
 		this.getPreferenceManager().getSharedPreferences()
@@ -157,6 +163,7 @@ public class Video_Preferences extends PreferenceActivity implements
 		// ------//
 		// Video Category
 		PreferenceCategory videoCategory = new PreferenceCategory(this);
+		videoCategory.setKey(Keys_Preferences.MEDIA_VIDEO_CATEGORY);
 		videoCategory.setTitle("Video Preferences");
 		root.addPreference(videoCategory);
 
@@ -169,16 +176,92 @@ public class Video_Preferences extends PreferenceActivity implements
 		videoCategory.addPreference(videoCodecPref);
 
 		// Codecs
+		PreferenceCategory typeCodecs = new PreferenceCategory(this);
+		typeCodecs.setKey(Keys_Preferences.MEDIA_CODECSTYPE_CATEGORY);
+		typeCodecs.setTitle("SW/HW CODECS");
+		videoCodecPref.addPreference(typeCodecs);
+		CheckBoxPreference hwVideoCodecPref = new CheckBoxPreference(this);
+		hwVideoCodecPref.setKey(Keys_Preferences.MEDIA_HARDWARE_CODECS);
+		hwVideoCodecPref.setTitle("Use HW Codecs");
+		hwVideoCodecPref.setDefaultValue(false);
+		hwVideoCodecPref
+				.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+
+					@Override
+					public boolean onPreferenceChange(Preference preference,
+							Object newValue) {
+						PreferenceScreen videoCodecPref = (PreferenceScreen) findPreference(Keys_Preferences.MEDIA_VIDEO_CODECS);
+
+						Boolean prefChecked = (Boolean) newValue;
+						if (prefChecked)
+							Toast.makeText(
+									Video_Preferences.this,
+									"The available codecs in Hardware mode depends on device capabilities",
+									Toast.LENGTH_SHORT).show();
+						CheckBoxPreference cbp = (CheckBoxPreference) preference;
+						cbp.setChecked(prefChecked);
+						int nPrefs = videoCodecPref.getPreferenceCount();
+
+						for (int i = 0; i < nPrefs; i++) {
+							Preference pref = videoCodecPref.getPreference(i);
+
+							if (!prefChecked) {
+								pref.setEnabled(true);
+							} else {
+								if (pref.getKey()
+										.equals(Keys_Preferences.MEDIA_VIDEO_H263_CODEC)) {
+									if (videoHWCodecs
+											.contains((String) VideoMediaCodecType.MIME_H263)) {
+										pref.setEnabled(true);
+									} else {
+										pref.setEnabled(false);
+									}
+
+								} else if (pref
+										.getKey()
+										.equals(Keys_Preferences.MEDIA_VIDEO_H264_CODEC)) {
+									if (videoHWCodecs
+											.contains((String) VideoMediaCodecType.MIME_H264)) {
+										pref.setEnabled(true);
+									} else {
+										pref.setEnabled(false);
+									}
+								} else if (pref
+										.getKey()
+										.equals(Keys_Preferences.MEDIA_VIDEO_MPEG4_CODEC)) {
+
+									if (videoHWCodecs
+											.contains((String) VideoMediaCodecType.MIME_MPEG4)) {
+										pref.setEnabled(true);
+									} else {
+										pref.setEnabled(false);
+									}
+
+								}
+							}
+
+						}
+
+						return prefChecked;
+					}
+
+				});
+
+		videoCodecPref.addPreference(hwVideoCodecPref);
+		PreferenceCategory codecsCategory = new PreferenceCategory(this);
+		codecsCategory.setKey(Keys_Preferences.MEDIA_CODECS_CATEGORY);
+		codecsCategory.setTitle("CODECS");
+		videoCodecPref.addPreference(codecsCategory);
 		CheckBoxPreference nextVideoCodecPref = new CheckBoxPreference(this);
 		nextVideoCodecPref.setKey(Keys_Preferences.MEDIA_VIDEO_H263_CODEC);
 		nextVideoCodecPref.setTitle("H263");
 		videoCodecPref.addPreference(nextVideoCodecPref);
 		nextVideoCodecPref = new CheckBoxPreference(this);
-		nextVideoCodecPref.setDefaultValue(true);
 		nextVideoCodecPref.setKey(Keys_Preferences.MEDIA_VIDEO_MPEG4_CODEC);
 		nextVideoCodecPref.setTitle("MPEG4");
 		videoCodecPref.addPreference(nextVideoCodecPref);
 		nextVideoCodecPref = new CheckBoxPreference(this);
+		nextVideoCodecPref.setDefaultValue(true);
 		nextVideoCodecPref.setKey(Keys_Preferences.MEDIA_VIDEO_H264_CODEC);
 		nextVideoCodecPref.setTitle("H264");
 		videoCodecPref.addPreference(nextVideoCodecPref);
@@ -525,9 +608,8 @@ public class Video_Preferences extends PreferenceActivity implements
 				new Value<List<VideoCodecType>>(
 						getVideoCodecsFromSettings(context)));
 
-		params.put(MediaSessionAndroid.HARDWARE_CODECS,
-				new Value<Boolean>(true));
-
+		params.put(MediaSessionAndroid.HARDWARE_CODECS, new Value<Boolean>(
+				getHWCodecsEnabledFromSettings(context)));
 		PortRange audioPortRange;
 		try {
 			int minAudioPort = Integer.parseInt(settings.getString(
@@ -647,6 +729,18 @@ public class Video_Preferences extends PreferenceActivity implements
 			selectedAudioCodecs.add(AudioCodecType.PCMA);
 		}
 		return selectedAudioCodecs;
+	}
+
+	private static Boolean getHWCodecsEnabledFromSettings(Context context) {
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(context);
+
+		if (settings.getBoolean(Keys_Preferences.MEDIA_HARDWARE_CODECS, false)) {
+			return true;
+		}
+
+		return false;
+
 	}
 
 	private static ArrayList<VideoCodecType> getVideoCodecsFromSettings(

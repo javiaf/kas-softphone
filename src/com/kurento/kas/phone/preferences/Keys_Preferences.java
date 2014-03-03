@@ -1,6 +1,7 @@
 package com.kurento.kas.phone.preferences;
 
 public class Keys_Preferences {
+	
 	// Connection Preferences
 	// Sip Connection Prerefences
 	public static String SIP_LOCAL_USERNAME = "SIP_LOCAL_USERNAME";
@@ -34,6 +35,9 @@ public class Keys_Preferences {
 	public static String MEDIA_NET_TRANSPORT = "MEDIA_NET_TRANSPORT";
 
 	// Video Category
+	public static String MEDIA_VIDEO_CATEGORY = "MEDIA_VIDEO_CATEGORY";
+	public static String MEDIA_CODECSTYPE_CATEGORY = "MEDIA_CODECSTYPE_CATEGORY";
+	public static String MEDIA_CODECS_CATEGORY = "MEDIA_CODECS_CATEGORY";
 	public static String MEDIA_HARDWARE_CODECS = "MEDIA_HARDWARE_CODECS";
 	public static String MEDIA_VIDEO_CODECS = "MEDIA_VIDEO_CODECS";
 	public static String MEDIA_VIDEO_H263_CODEC = "MEDIA_VIDEO_H263_CODEC";
