@@ -28,10 +28,12 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
+import android.os.StrictMode;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
@@ -85,6 +87,7 @@ import com.kurento.mscontrol.kas.mediacomponent.MediaComponentAndroid;
 public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	private static final String LOG_TAG = VideoCall.class.getName();
 	private static final int SHOW_PREFERENCES = 1;
+	private static final String TAG = "VideoCall";
 	private PowerManager.WakeLock wl;
 	private boolean hang = false;
 	private Map<MediaType, Direction> callDirectionMap, mediaTypesModes;
@@ -122,6 +125,11 @@ public class VideoCall extends Activity implements ServiceUpdateUIListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		VideoCallService.setUpdateListener(this);
+		if( Build.VERSION.SDK_INT >= 9){
+			Log.d(TAG,"FIX ME! STRICT POLICY SET TO PERMIT ALL");
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy); 
+     }
 		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
 		mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK

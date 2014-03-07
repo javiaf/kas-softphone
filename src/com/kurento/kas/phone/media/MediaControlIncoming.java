@@ -77,6 +77,8 @@ public class MediaControlIncoming extends Activity implements
 	private final static int NOTIF_CALLING_IN = 4;
 	private final static int NOTIF_SOFTPHONE = 1;
 
+	private static final String TAG = "MediaControlIncoming";
+
 	private Notification mNotif;
 	private PendingIntent mNotifContentIntent;
 	private Intent notifIntent;
@@ -134,6 +136,7 @@ public class MediaControlIncoming extends Activity implements
 
 		setContentView(R.layout.control_call_incomingcall);
 		if( Build.VERSION.SDK_INT >= 9){
+			Log.d(TAG,"FIX ME! STRICT POLICY SET TO PERMIT ALL");
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy); 
      }
