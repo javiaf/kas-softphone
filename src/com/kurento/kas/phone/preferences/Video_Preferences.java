@@ -182,7 +182,7 @@ public class Video_Preferences extends PreferenceActivity implements
 		videoCodecPref.addPreference(typeCodecs);
 		CheckBoxPreference hwVideoCodecPref = new CheckBoxPreference(this);
 		hwVideoCodecPref.setKey(Keys_Preferences.MEDIA_HARDWARE_CODECS);
-		hwVideoCodecPref.setTitle("Use HW Codecs");
+		hwVideoCodecPref.setTitle("Use HW Encoder");
 		hwVideoCodecPref.setDefaultValue(false);
 		hwVideoCodecPref
 				.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
@@ -212,7 +212,7 @@ public class Video_Preferences extends PreferenceActivity implements
 										.equals(Keys_Preferences.MEDIA_VIDEO_H263_CODEC)) {
 									if (videoHWCodecs
 											.contains((String) VideoMediaCodecType.MIME_H263)) {
-										pref.setEnabled(true);
+										pref.setEnabled(false);
 									} else {
 										pref.setEnabled(false);
 									}
@@ -232,7 +232,7 @@ public class Video_Preferences extends PreferenceActivity implements
 
 									if (videoHWCodecs
 											.contains((String) VideoMediaCodecType.MIME_MPEG4)) {
-										pref.setEnabled(true);
+										pref.setEnabled(false);
 									} else {
 										pref.setEnabled(false);
 									}
@@ -246,7 +246,10 @@ public class Video_Preferences extends PreferenceActivity implements
 					}
 
 				});
-
+		CheckBoxPreference hwDecoderPref = new CheckBoxPreference(this);
+		hwDecoderPref.setKey(Keys_Preferences.MEDIA_HARDWARE_DECODER);
+		hwDecoderPref.setTitle("Hardware decoder Enabled (Buggy)");
+		videoCodecPref.addPreference(hwDecoderPref);
 		videoCodecPref.addPreference(hwVideoCodecPref);
 		PreferenceCategory codecsCategory = new PreferenceCategory(this);
 		codecsCategory.setKey(Keys_Preferences.MEDIA_CODECS_CATEGORY);
@@ -610,6 +613,8 @@ public class Video_Preferences extends PreferenceActivity implements
 
 		params.put(MediaSessionAndroid.HARDWARE_CODECS, new Value<Boolean>(
 				getHWCodecsEnabledFromSettings(context)));
+		params.put(MediaSessionAndroid.HARDWARE_DECODER, new Value<Boolean>(
+				getHWDecoderEnabledFromSettings(context)));
 		PortRange audioPortRange;
 		try {
 			int minAudioPort = Integer.parseInt(settings.getString(
@@ -738,7 +743,17 @@ public class Video_Preferences extends PreferenceActivity implements
 		if (settings.getBoolean(Keys_Preferences.MEDIA_HARDWARE_CODECS, false)) {
 			return true;
 		}
+		return false;
 
+	}
+
+	private static Boolean getHWDecoderEnabledFromSettings(Context context) {
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(context);
+
+		if (settings.getBoolean(Keys_Preferences.MEDIA_HARDWARE_DECODER, false)) {
+			return true;
+		}
 		return false;
 
 	}
